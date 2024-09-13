@@ -2,10 +2,10 @@ import java.util.Random;
 
 public class XORNeuralNetwork {
     // 权重和偏置
-    double[][] W1; // 输入层到隐藏层的权重
-    double[] b1;   // 隐藏层的偏置
-    double[] W2;   // 隐藏层到输出层的权重
-    double b2;     // 输出层的偏置
+    double[][] inputToHiddenWeights; // 输入层到隐藏层的权重
+    double[] hiddenBiases;           // 隐藏层的偏置
+    double[] hiddenToOutputWeights;  // 隐藏层到输出层的权重
+    double outputBias;               // 输出层的偏置
 
     double learningRate = 0.1; // 学习率
 
@@ -14,72 +14,77 @@ public class XORNeuralNetwork {
         Random rand = new Random();
 
         // 初始化权重和偏置，使用随机值
-        W1 = new double[2][2];
-        W1[0][0] = rand.nextDouble(); W1[0][1] = rand.nextDouble();
-        W1[1][0] = rand.nextDouble(); W1[1][1] = rand.nextDouble();
+        inputToHiddenWeights = new double[2][2];
+        inputToHiddenWeights[0][0] = rand.nextDouble(); inputToHiddenWeights[0][1] = rand.nextDouble();
+        inputToHiddenWeights[1][0] = rand.nextDouble(); inputToHiddenWeights[1][1] = rand.nextDouble();
 
-        b1 = new double[2];
-        b1[0] = rand.nextDouble();
-        b1[1] = rand.nextDouble();
+        hiddenBiases = new double[2];
+        hiddenBiases[0] = rand.nextDouble();
+        hiddenBiases[1] = rand.nextDouble();
 
-        W2 = new double[2];
-        W2[0] = rand.nextDouble();
-        W2[1] = rand.nextDouble();
+        hiddenToOutputWeights = new double[2];
+        hiddenToOutputWeights[0] = rand.nextDouble();
+        hiddenToOutputWeights[1] = rand.nextDouble();
 
-        b2 = rand.nextDouble();
+        outputBias = rand.nextDouble();
     }
 
     // Sigmoid激活函数
     public double sigmoid(double z) {
-        return 1.0 / (1.0 + Math.exp(-z));
+        return 1.0 / (1.0 + Math.exp(-z)); // sigmoid公式: 1 / (1 + e^(-z))
     }
 
     // Sigmoid的导数
     public double sigmoidDerivative(double z) {
-        return z * (1.0 - z);
+        return z * (1.0 - z); // sigmoid导数公式: z * (1 - z)
     }
 
     // 前向传播
-    public double forward(double x1, double x2) {
+    public double forward(double input1, double input2) {
         // 隐藏层
-        double z1_1 = W1[0][0] * x1 + W1[1][0] * x2 + b1[0];
-        double h1_1 = sigmoid(z1_1);
+        // 计算隐藏层第一个神经元的输入和输出
+        double hiddenLayerInput1 = inputToHiddenWeights[0][0] * input1 + inputToHiddenWeights[1][0] * input2 + hiddenBiases[0]; // z_1 = W_1 * x_1 + W_2 * x_2 + b_1
+        double hiddenLayerOutput1 = sigmoid(hiddenLayerInput1); // h_1 = sigmoid(z_1)
 
-        double z1_2 = W1[0][1] * x1 + W1[1][1] * x2 + b1[1];
-        double h1_2 = sigmoid(z1_2);
+        // 计算隐藏层第二个神经元的输入和输出
+        double hiddenLayerInput2 = inputToHiddenWeights[0][1] * input1 + inputToHiddenWeights[1][1] * input2 + hiddenBiases[1]; // z_2 = W_3 * x_1 + W_4 * x_2 + b_2
+        double hiddenLayerOutput2 = sigmoid(hiddenLayerInput2); // h_2 = sigmoid(z_2)
 
         // 输出层
-        double z2 = W2[0] * h1_1 + W2[1] * h1_2 + b2;
-        double y_hat = sigmoid(z2);
+        // 计算输出层的输入和输出
+        double outputLayerInput = hiddenToOutputWeights[0] * hiddenLayerOutput1 + hiddenToOutputWeights[1] * hiddenLayerOutput2 + outputBias; // z = W_5 * h_1 + W_6 * h_2 + b_output
+        double predictedOutput = sigmoid(outputLayerInput); // y_hat = sigmoid(z)
 
-        return y_hat;
+        return predictedOutput;
     }
 
     // 反向传播
-    public void backward(double x1, double x2, double y, double y_hat) {
+    public void backward(double input1, double input2, double actualOutput, double predictedOutput) {
         // 输出层误差
-        double delta2 = (y_hat - y) * sigmoidDerivative(y_hat);
+        double outputError = (predictedOutput - actualOutput) * sigmoidDerivative(predictedOutput); // delta_output = (y_hat - y) * sigmoid'(y_hat)
 
         // 隐藏层误差
-        double z1_1 = W1[0][0] * x1 + W1[1][0] * x2 + b1[0];
-        double h1_1 = sigmoid(z1_1);
-        double delta1_1 = delta2 * W2[0] * sigmoidDerivative(h1_1);
+        double hiddenLayerInput1 = inputToHiddenWeights[0][0] * input1 + inputToHiddenWeights[1][0] * input2 + hiddenBiases[0]; // 计算隐藏层第一个神经元的输入
+        double hiddenLayerOutput1 = sigmoid(hiddenLayerInput1); // h_1 = sigmoid(z_1)
+        double hiddenLayerError1 = outputError * hiddenToOutputWeights[0] * sigmoidDerivative(hiddenLayerOutput1); // delta_hidden_1 = delta_output * W_5 * sigmoid'(h_1)
 
-        double z1_2 = W1[0][1] * x1 + W1[1][1] * x2 + b1[1];
-        double h1_2 = sigmoid(z1_2);
-        double delta1_2 = delta2 * W2[1] * sigmoidDerivative(h1_2);
+        double hiddenLayerInput2 = inputToHiddenWeights[0][1] * input1 + inputToHiddenWeights[1][1] * input2 + hiddenBiases[1]; // 计算隐藏层第二个神经元的输入
+        double hiddenLayerOutput2 = sigmoid(hiddenLayerInput2); // h_2 = sigmoid(z_2)
+        double hiddenLayerError2 = outputError * hiddenToOutputWeights[1] * sigmoidDerivative(hiddenLayerOutput2); // delta_hidden_2 = delta_output * W_6 * sigmoid'(h_2)
 
         // 更新权重和偏置
-        W2[0] -= learningRate * delta2 * h1_1;
-        W2[1] -= learningRate * delta2 * h1_2;
-        b2 -= learningRate * delta2;
+        // 更新隐藏层到输出层的权重和偏置
+        hiddenToOutputWeights[0] -= learningRate * outputError * hiddenLayerOutput1; // W_5 = W_5 - lr * delta_output * h_1
+        hiddenToOutputWeights[1] -= learningRate * outputError * hiddenLayerOutput2; // W_6 = W_6 - lr * delta_output * h_2
+        outputBias -= learningRate * outputError; // b_output = b_output - lr * delta_output
 
-        W1[0][0] -= learningRate * delta1_1 * x1;
-        W1[1][0] -= learningRate * delta1_1 * x2;
-        W1[0][1] -= learningRate * delta1_2 * x1;
-        W1[1][1] -= learningRate * delta1_2 * x2;
-        b1[0] -= learningRate * delta1_1;
-        b1[1] -= learningRate * delta1_2;
+        // 更新输入层到隐藏层的权重和偏置
+        inputToHiddenWeights[0][0] -= learningRate * hiddenLayerError1 * input1; // W_1 = W_1 - lr * delta_hidden_1 * x_1
+        inputToHiddenWeights[1][0] -= learningRate * hiddenLayerError1 * input2; // W_2 = W_2 - lr * delta_hidden_1 * x_2
+        inputToHiddenWeights[0][1] -= learningRate * hiddenLayerError2 * input1; // W_3 = W_3 - lr * delta_hidden_2 * x_1
+        inputToHiddenWeights[1][1] -= learningRate * hiddenLayerError2 * input2; // W_4 = W_4 - lr * delta_hidden_2 * x_2
+        hiddenBiases[0] -= learningRate * hiddenLayerError1; // b_1 = b_1 - lr * delta_hidden_1
+        hiddenBiases[1] -= learningRate * hiddenLayerError2; // b_2 = b_2 - lr * delta_hidden_2
     }
 
     // 训练神经网络
@@ -89,15 +94,15 @@ public class XORNeuralNetwork {
 
         for (int epoch = 0; epoch < epochs; epoch++) {
             for (int i = 0; i < inputs.length; i++) {
-                double x1 = inputs[i][0];
-                double x2 = inputs[i][1];
-                double y = outputs[i];
+                double input1 = inputs[i][0];
+                double input2 = inputs[i][1];
+                double actualOutput = outputs[i];
 
                 // 前向传播
-                double y_hat = forward(x1, x2);
+                double predictedOutput = forward(input1, input2);
 
                 // 反向传播和更新权重
-                backward(x1, x2, y, y_hat);
+                backward(input1, input2, actualOutput, predictedOutput);
             }
         }
     }
@@ -107,16 +112,16 @@ public class XORNeuralNetwork {
         double[][] inputs = { {0, 0}, {0, 1}, {1, 0}, {1, 1} };
 
         for (int i = 0; i < inputs.length; i++) {
-            double x1 = inputs[i][0];
-            double x2 = inputs[i][1];
-            double y_hat = forward(x1, x2);
-            System.out.println("Input: [" + x1 + ", " + x2 + "] => Output: " + y_hat);
+            double input1 = inputs[i][0];
+            double input2 = inputs[i][1];
+            double predictedOutput = forward(input1, input2);
+            System.out.println("Input: [" + input1 + ", " + input2 + "] => Output: " + predictedOutput);
         }
     }
 
     public static void main(String[] args) {
         XORNeuralNetwork nn = new XORNeuralNetwork();
-        nn.train(100000); // 训练10000次
+        nn.train(1); // 训练10000次
         nn.test();       // 测试
     }
 }
