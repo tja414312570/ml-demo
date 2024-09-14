@@ -5,8 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="36b89685-809c-44a5-b9bc-aadae95ebccd" name="Changes" comment="python代码">
-      <change afterPath="$PROJECT_DIR$/playwrigh_maint.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/playwrigh_maint.py" beforeDir="false" afterPath="$PROJECT_DIR$/playwrigh_maint.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,13 +36,13 @@
   "keyToString": {
     "Python.main (1).executor": "Run",
     "Python.main.executor": "Run",
-    "Python.playwrigh_maint (1).executor": "Run",
+    "Python.playwrigh_maint (1).executor": "Debug",
     "Python.playwright.executor": "Run",
     "Python.sigmoid.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "D:/git/ml-demo/pythonProject/fnn",
+    "last_opened_file_path": "D:/git/ml-demo/pythonProject",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -54,6 +54,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\git\ml-demo\pythonProject" />
       <recent name="D:\git\ml-demo\pythonProject\fnn" />
     </key>
   </component>
@@ -201,6 +202,7 @@
       <workItem from="1724897545112" duration="12005000" />
       <workItem from="1725846605357" duration="5498000" />
       <workItem from="1726128543166" duration="25542000" />
+      <workItem from="1726301491849" duration="3885000" />
     </task>
     <task id="LOCAL-00001" summary="python代码">
       <option name="closed" value="true" />
@@ -250,6 +252,16 @@
           <line>60</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/playwrigh_maint.py</url>
+          <line>147</line>
+          <option name="timeStamp" value="27" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/playwrigh_maint.py</url>
+          <line>98</line>
+          <option name="timeStamp" value="31" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -263,7 +275,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pythonProject$main__1_.coverage" NAME="main (1) Coverage Results" MODIFIED="1725870204171" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fnn" />
     <SUITE FILE_PATH="coverage/pythonProject$playwright.coverage" NAME="playwright Coverage Results" MODIFIED="1726236518007" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/pythonProject$playwrigh_maint__1_.coverage" NAME="playwrigh_maint (1) Coverage Results" MODIFIED="1726241300738" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pythonProject$playwrigh_maint__1_.coverage" NAME="playwrigh_maint (1) Coverage Results" MODIFIED="1726305314264" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pythonProject$main.coverage" NAME="main Coverage Results" MODIFIED="1726210176459" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/pythonProject$sigmoid.coverage" NAME="sigmoid Coverage Results" MODIFIED="1725870230075" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/fnn" />
   </component>
