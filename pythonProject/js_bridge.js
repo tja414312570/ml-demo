@@ -40,7 +40,16 @@
             console.log("查找发送按钮", sendButton, document)
             if (sendButton) {
                 document.myApp.sendButton = sendButton;
-                document.myApp.send("现在我发送要求给你，你可以写python代码，我会执行你的代码，并返回执行结果你，你可以解析结果，并解读给我，执行结果你可以自定义，比如json，字符串等。要求是只能有一个print");
+                document.myApp.send(`
+                现在我发送要求给你，你可以写python代码，我会执行你的代码，并返回执行结果你，你可以解析结果，并解读给我，执行结果你可以自定义，比如json，字符串等。要求是只能有一个print。
+                对于某些情况，你可能需要我上传文件，此时你可以在打印中另起一行，以fileupload:['file1','file2']的格式输出，我看到了会解析里面的文件，并一并上传给你，对于文件，建议你都通过上传文件的方式处理
+                对于报错没有相关组件时，你可以通过python代码执行bash命令或其他安装组件命令，我执行了代码之后，会把执行结果给你，你可以依据python结果继续执行相关指令
+                注意：1、我不会执行python外的其他操作，因此你需要我做的，均需要写成python代码，我把执行结果给你，你需要自己解析以决定下一步操作。python代码一定要完整，不要写不完整的代码
+                    2、除了我主动提供给你的环境，你需要的环境资料均可以通过python代码执行后我给你
+                    3、所有操作只使用python，对于多步操作，你可以分解python代码执行循序，比如打开浏览器，你可以用python打开，并在python里输出打开结果，然后通过分析这个结果决定是否截图查看下部操作等
+                    4、千万不要把我本地环境和你的环境弄混，特别是你写的python代码的环境，比如路径等
+                    5、如果某些文件你需要我上传分析，你需要用python代码执行为fileupload:['file1','file2']的格式之后我才能识别
+                    `);
                  let observer = new MutationObserver(function(mutationsList, observer) {
                     for (let mutation of mutationsList) {
                         // 检查按钮是否已经从 DOM 中被删除

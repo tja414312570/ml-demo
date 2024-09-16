@@ -1,4 +1,5 @@
 import atexit
+import contextlib
 import os
 import subprocess
 import json
@@ -10,6 +11,8 @@ import traceback
 
 import sys
 import io
+import re
+import ast
 
 mitm_port = 8080
 HOST = 'localhost'
@@ -115,36 +118,35 @@ def handle_client(conn, loop):
                 break  # 连接异常时退出循环
 
 
-# 处理 EventStream 数据
-async def process_event_data(event_data):
-    try:
-        # 首先尝试将收到的字符串转换为 JSON
-        await process_json_data(json.loads(event_data))
-    except Exception as e:
-        print(f"处理数据时出错: {e}，数据：{event_data}")
-        await dispatcher_result(f"处理数据时出错: {e}，数据：{event_data}")
-        traceback.print_exc()
+class Tee:
+    """实现同时将输出写入多个流的类，比如 sys.stdout 和 StringIO"""
+    def __init__(self, *streams):
+        self.streams = streams
 
+    def write(self, data):
+        for stream in self.streams:
+            stream.write(data)
+
+    def flush(self):
+        for stream in self.streams:
+            stream.flush()
 
 def execute_python_code(code):
     try:
-        # 创建一个字符串流来捕获输出
-        old_stdout = sys.stdout
+        # 创建一个字符串流来捕获 exec 中的输出
         new_stdout = io.StringIO()
-        sys.stdout = new_stdout
 
-        # 执行代码
-        exec(code)
+        # 使用 contextlib.redirect_stdout 只在 exec 时重定向输出到 new_stdout
+        with contextlib.redirect_stdout(new_stdout):
+            # 执行传入的代码
+            exec(code)
 
-        # 获取输出内容
+        # 获取 exec 中的输出
         output = new_stdout.getvalue()
 
     except Exception as e:
+        # 捕获 exec 中的异常并返回
         output = f"执行代码时出错: {str(e)}"
-
-    finally:
-        # 恢复标准输出
-        sys.stdout = old_stdout
 
     return output
 
@@ -161,8 +163,80 @@ def extract_python_code_from_markdown(server_output):
     return None
 
 
-async def dispatcher_result(param):
+async def upload_file(file_path):
     global page_context
+    input_file = await page_context.query_selector('input[type="file"]')
+    print("上传文件路径")
+    # 上传指定路径下的文件
+    await input_file.set_input_files(file_path)
+
+
+async def decode_result(result_string):
+    try:
+        # 使用正则表达式提取 fileupload 列表
+        match = re.search(r"fileupload:\[(.*?)\]", result_string)
+
+        if match:
+            # 获取匹配到的内容，并将其转换为有效的 Python 列表
+            array_str = f"[{match.group(1)}]"  # 添加中括号使其成为有效的 Python 列表形式
+
+            try:
+                # 尝试使用 ast.literal_eval 解析为 Python 列表
+                file_list = ast.literal_eval(array_str)
+                return file_list
+            except (SyntaxError, ValueError) as e:
+                # 捕获解析错误并提供详细的错误信息
+                error_message = f"解析 fileupload 列表时出错: {str(e)}，数据：{array_str}"
+                error_traceback = traceback.format_exc()  # 获取详细的错误栈
+                full_error_report = f"{error_message}\n错误栈：\n{error_traceback}"
+                print(full_error_report)
+                # 使用 dispatcher_result 发送错误报告
+                await dispatcher_result(full_error_report,True)
+                return None
+        else:
+            # 没有匹配到 fileupload 列表
+            error_message = "未找到 fileupload 列表。"
+            print(error_message)
+            await dispatcher_result(error_message,True)
+            return None
+    except Exception as e:
+        # 捕获其他异常并生成完整的错误报告
+        error_message = f"处理 fileupload 列表时出错: {str(e)}，数据：{result_string}"
+        error_traceback = traceback.format_exc()  # 获取详细的错误栈
+        full_error_report = f"{error_message}\n错误栈：\n{error_traceback}"
+        print(full_error_report)
+        # 使用 dispatcher_result 发送错误报告
+        await dispatcher_result(full_error_report,True)
+        return None
+
+
+# 处理 EventStream 数据
+async def process_event_data(event_data):
+    try:
+        # 首先尝试将收到的字符串转换为 JSON
+        await process_json_data(json.loads(event_data))
+    except json.JSONDecodeError as e:
+        # 处理 JSON 格式错误
+        error_message = f"处理数据时出错: JSON 格式错误: {str(e)}，数据：{event_data}"
+        error_traceback = traceback.format_exc()  # 获取错误栈
+        full_error_report = f"{error_message}\n错误栈：\n{error_traceback}"
+        print(full_error_report)  # 打印到控制台
+        await dispatcher_result(full_error_report)  # 通过 dispatcher_result 发送错误报告
+    except Exception as e:
+        # 捕获其他异常
+        error_message = f"处理数据时出错: {str(e)}，数据：{event_data}"
+        error_traceback = traceback.format_exc()  # 获取错误栈
+        full_error_report = f"{error_message}\n错误栈：\n{error_traceback}"
+        print(full_error_report)  # 打印到控制台
+        await dispatcher_result(full_error_report)  # 通过 dispatcher_result 发送错误报告
+
+# 处理 EventStream 数据
+async def dispatcher_result(param,is_decode_result = False):
+    global page_context
+    if is_decode_result:
+        upload_files = await decode_result(param)
+        if upload_files and len(upload_files) > 0:
+            await upload_file(upload_files)
     vue_js = f"""
         document.myApp.send({param})
         """
