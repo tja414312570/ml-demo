@@ -1,11 +1,15 @@
 import atexit
 import contextlib
+import inspect
+import logging
 import os
 import subprocess
 import json
 import threading
 import asyncio
 import socket
+from logging import log
+
 from playwright.async_api import async_playwright
 import traceback
 
@@ -18,12 +22,19 @@ mitm_port = 8080
 HOST = 'localhost'
 PORT = 65432  # 定义 socket 服务器监听的端口
 
+logging.basicConfig(
+    filename='logfile.log',  # 指定日志文件名
+    filemode='a',  # 追加模式写入日志文件，默认为覆盖
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 # 用于同步 mitmproxy 启动信号
 mitm_ready_event = threading.Event()
 
 response_data = None
 
 page_context = None
+
 
 # 启动 mitmproxy
 def start_mitmproxy(port=mitm_port, upstream_proxy="127.0.0.1:7890"):
@@ -49,7 +60,7 @@ def start_mitmproxy(port=mitm_port, upstream_proxy="127.0.0.1:7890"):
     def log_output(pipe, stream_name):
         with pipe:
             for line in iter(pipe.readline, ''):
-                print(f"{stream_name}: {line.strip()}")
+                logging.info(f"{stream_name}: {line.strip()}")
 
     stdout_thread = threading.Thread(target=log_output, args=(mitmproxy_process.stdout, 'MITM STDOUT'))
     stderr_thread = threading.Thread(target=log_output, args=(mitmproxy_process.stderr, 'MITM STDERR'))
@@ -120,6 +131,7 @@ def handle_client(conn, loop):
 
 class Tee:
     """实现同时将输出写入多个流的类，比如 sys.stdout 和 StringIO"""
+
     def __init__(self, *streams):
         self.streams = streams
 
@@ -131,24 +143,36 @@ class Tee:
         for stream in self.streams:
             stream.flush()
 
-def execute_python_code(code):
+
+async def execute_python_code(code):
     try:
         # 创建一个字符串流来捕获 exec 中的输出
         new_stdout = io.StringIO()
 
         # 使用 contextlib.redirect_stdout 只在 exec 时重定向输出到 new_stdout
         with contextlib.redirect_stdout(new_stdout):
-            # 执行传入的代码
-            exec(code)
+            # 执行传入的代码，并获取返回值
+            local_vars = {}
+            exec(code, {}, local_vars)  # 使用 local_vars 存储局部变量
+
+        # 检查是否有返回的 coroutine 需要 await
+        result = local_vars.get('result')
+        if inspect.iscoroutine(result):
+            result = await result  # 如果是 coroutine，则 await 它
 
         # 获取 exec 中的输出
         output = new_stdout.getvalue()
+
+        # 如果存在 result，则将其加入到输出中
+        if result is not None:
+            output += f"\nResult: {result}"
 
     except Exception as e:
         # 捕获 exec 中的异常并返回
         output = f"执行代码时出错: {str(e)}"
 
     return output
+
 
 def extract_python_code_from_markdown(server_output):
     # 查找代码块的标记
@@ -191,13 +215,13 @@ async def decode_result(result_string):
                 full_error_report = f"{error_message}\n错误栈：\n{error_traceback}"
                 print(full_error_report)
                 # 使用 dispatcher_result 发送错误报告
-                await dispatcher_result(full_error_report,True)
+                await dispatcher_result(full_error_report, True)
                 return None
         else:
             # 没有匹配到 fileupload 列表
             error_message = "未找到 fileupload 列表。"
             print(error_message)
-            await dispatcher_result(error_message,True)
+            # await dispatcher_result(error_message,True)
             return None
     except Exception as e:
         # 捕获其他异常并生成完整的错误报告
@@ -206,7 +230,7 @@ async def decode_result(result_string):
         full_error_report = f"{error_message}\n错误栈：\n{error_traceback}"
         print(full_error_report)
         # 使用 dispatcher_result 发送错误报告
-        await dispatcher_result(full_error_report,True)
+        await dispatcher_result(full_error_report, True)
         return None
 
 
@@ -230,16 +254,29 @@ async def process_event_data(event_data):
         print(full_error_report)  # 打印到控制台
         await dispatcher_result(full_error_report)  # 通过 dispatcher_result 发送错误报告
 
+
 # 处理 EventStream 数据
-async def dispatcher_result(param,is_decode_result = False):
+async def dispatcher_result(param, is_decode_result=False):
     global page_context
-    if is_decode_result:
+    if not is_decode_result:
         upload_files = await decode_result(param)
         if upload_files and len(upload_files) > 0:
             await upload_file(upload_files)
-    vue_js = f"""
-        document.myApp.send({param})
-        """
+    if isinstance(param, str):
+        # 对 param 进行适当的转义，避免引号冲突
+        if not (param.startswith('"') and param.endswith('"')):
+            # 对字符串内部的双引号进行转义
+            param = param.replace('"', r'\"')
+            # 给字符串加上开头和结尾的双引号
+            param = f'"{param}"'
+        vue_js = f"""
+                document.myApp.send({param})
+            """
+    else:
+        # 如果 param 不是字符串，直接传递
+        vue_js = f"""
+                document.myApp.send({param})
+            """
     print(f"执行代码:{vue_js}")
     await page_context.evaluate(vue_js)
 
@@ -251,12 +288,14 @@ async def dispatcher_response(response_data):
     # 如果提取到了 Python 代码，执行它
     if python_code:
         print(f"检测到的 Python 代码:\n{python_code}")
-        result = execute_python_code(python_code)
+        result = await execute_python_code(python_code)
         print(f"执行结果:\n{result}")
         await dispatcher_result(json.dumps(result))
     else:
         print("未检测到 Python 代码块")
-#{"code":"success","body":"python执行结果"}
+
+
+# {"code":"success","body":"python执行结果"}
 async def process_json_data(event_json):
     global response_data
     # 处理 headers 并转换为中文
@@ -320,6 +359,8 @@ async def inject_scripts(page):
 
     await page.evaluate(js_content)
     print("JavaScript 注入完成")
+
+
 # 启动 Playwright 浏览器
 async def start_browser():
     playwright = await async_playwright().start()  # 确保正确启动 Playwright

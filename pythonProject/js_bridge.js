@@ -3,17 +3,28 @@
         sendButton:null,
         send: function(message) {
             // 找到 textarea 元素
-            let textarea = document.querySelector('textarea#prompt-textarea');
+            let textarea = document.querySelector('#prompt-textarea');
 
             // 清空 textarea 的内容并填写新内容
             if (textarea) {
-                textarea.value = '';  // 清空
-                textarea.value = message;  // 填写 message
-
+                console.log(textarea.tagName.toLowerCase())
+                if (textarea.tagName.toLowerCase() === 'textarea') {
+                    textarea.value = message;  // 对 textarea 赋值
+                }
+                // 判断是否为 contenteditable 的 div
+                else if (textarea.getAttribute('contenteditable') === 'true') {
+                    textarea.textContent = message;  // 对 contenteditable 的 div 赋值
+                } else {
+                    console.error("元素既不是 textarea 也不是 contenteditable 的 div",textarea);
+                    alert("输入框不支持")
+                    return;
+                }
                 // 触发 input 事件，确保 React 或 Vue 等框架监听的事件能够捕捉到变化
                 let inputEvent = new Event('input', { bubbles: true });
                 textarea.dispatchEvent(inputEvent);
                  console.log("输入值完成",message)
+            }else{
+                alert("没有找到输入框")
             }
 
             // 找到具有 data-testid="send-button" 的按钮
@@ -28,6 +39,9 @@
                             clearInterval(loop)
                     }else{
                         console.log("按钮不可用",document.myApp.sendButton)
+                        if(textarea == null || textarea.value === ''){
+                            clearInterval(loop)
+                        }
                     }
                 },500)
 
@@ -47,7 +61,7 @@
                 注意：1、我不会执行python外的其他操作，因此你需要我做的，均需要写成python代码，我把执行结果给你，你需要自己解析以决定下一步操作。python代码一定要完整，不要写不完整的代码
                     2、除了我主动提供给你的环境，你需要的环境资料均可以通过python代码执行后我给你
                     3、所有操作只使用python，对于多步操作，你可以分解python代码执行循序，比如打开浏览器，你可以用python打开，并在python里输出打开结果，然后通过分析这个结果决定是否截图查看下部操作等
-                    4、千万不要把我本地环境和你的环境弄混，特别是你写的python代码的环境，比如路径等
+                    4、千万不要把我本地环境和你的环境弄混，特别是你写的python代码的环境，比如路径等。对于路径，你可以自己查看，不要用什么/path/to/your之类的，也不要用什么mnt/data之类的
                     5、如果某些文件你需要我上传分析，你需要用python代码执行为fileupload:['file1','file2']的格式之后我才能识别
                     `);
                  let observer = new MutationObserver(function(mutationsList, observer) {
