@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import json
+import tempfile
 import threading
 import asyncio
 import socket
@@ -143,8 +144,54 @@ class Tee:
         for stream in self.streams:
             stream.flush()
 
-
 async def execute_python_code(code):
+    try:
+        # 创建一个临时文件，用于存储 Python 代码
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as temp_py_file:
+            temp_py_file.write(code.encode('utf-8'))
+            temp_file_path = temp_py_file.name
+
+        # 使用 asyncio.create_subprocess_exec 来异步执行代码
+        process = await asyncio.create_subprocess_exec(
+            sys.executable, temp_file_path,  # sys.executable 指向当前的 Python 解释器
+            stdout=asyncio.subprocess.PIPE,  # 捕获标准输出
+            stderr=asyncio.subprocess.PIPE   # 捕获标准错误
+        )
+
+        # 实时读取子进程的 stdout 和 stderr
+        output = ""
+        while True:
+            # 逐行读取 stdout 和 stderr
+            stdout_line = await process.stdout.readline()
+            stderr_line = await process.stderr.readline()
+
+            if stdout_line:
+                stdout_line = stdout_line.decode('utf-8')
+                print(stdout_line, end='')  # 实时打印 stdout
+                output += stdout_line
+
+            if stderr_line:
+                stderr_line = stderr_line.decode('utf-8')
+                print(stderr_line, end='')  # 实时打印 stderr
+                output += f"\nError: {stderr_line}"
+
+            # 如果 stdout 和 stderr 都已结束，退出循环
+            if process.stdout.at_eof() and process.stderr.at_eof():
+                break
+
+        # 确保子进程已经完成
+        await process.wait()
+
+        return output
+
+    except Exception as e:
+        return f"执行代码时出错: {str(e)}"
+
+    finally:
+        # 确保删除临时文件
+        if os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+async def execute_python_code_exec(code):
     try:
         # 创建一个字符串流来捕获 exec 中的输出
         new_stdout = io.StringIO()
@@ -405,7 +452,7 @@ async def main():
     global page_context
     page_context = page
 
-    await page.goto('https://share.github.cn.com/c/66e6d585-d3a0-8013-bb55-f6cc660458ef')
+    await page.goto('https://share.github.cn.com/')
 
     print("请手动登录...")
     await asyncio.sleep(5)  # 等待用户手动登录

@@ -58,11 +58,54 @@
                 现在我发送要求给你，你可以写python代码，我会执行你的代码，并返回执行结果你，你可以解析结果，并解读给我，执行结果你可以自定义，比如json，字符串等。要求是只能有一个print。
                 对于某些情况，你可能需要我上传文件，此时你可以在打印中另起一行，以fileupload:['file1','file2']的格式输出，我看到了会解析里面的文件，并一并上传给你，对于文件，建议你都通过上传文件的方式处理
                 对于报错没有相关组件时，你可以通过python代码执行bash命令或其他安装组件命令，我执行了代码之后，会把执行结果给你，你可以依据python结果继续执行相关指令
-                注意：1、我不会执行python外的其他操作，因此你需要我做的，均需要写成python代码，我把执行结果给你，你需要自己解析以决定下一步操作。python代码一定要完整，不要写不完整的代码
+                注意：1、我不会执行python外的其他操作，因此你需要我做的，均需要写成python代码，同时一次只能有一个python代码块，一定要注意打印你需要的信息。我会执行后把执行结果给你，你需要自己解析以决定下一步操作。python代码一定要完整，不要写不完整的代码
                     2、除了我主动提供给你的环境，你需要的环境资料均可以通过python代码执行后我给你
                     3、所有操作只使用python，对于多步操作，你可以分解python代码执行循序，比如打开浏览器，你可以用python打开，并在python里输出打开结果，然后通过分析这个结果决定是否截图查看下部操作等
                     4、千万不要把我本地环境和你的环境弄混，特别是你写的python代码的环境，比如路径等。对于路径，你可以自己查看，不要用什么/path/to/your之类的，也不要用什么mnt/data之类的
-                    5、如果某些文件你需要我上传分析，你需要用python代码执行为fileupload:['file1','file2']的格式之后我才能识别
+                    5、对于需要我上传的文件，你需要用python代码执行为fileupload:['file1','file2']的格式之后我才能识别。请注意格式，不要随意添加空格之类
+                    6、用中文，除非必要的英语，其余情况不要用除中文外的其他语言
+                    7、bash请用下列格式 
+                    import subprocess
+                    def run_shell_command(command):
+                        # 使用 unbuffer 确保输出不被缓存
+                        process = subprocess.Popen(
+                            f"{command}",  # 使用 unbuffer 确保输出不会被缓冲
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            shell=True,
+                            universal_newlines=True,
+                            bufsize=1  # 行缓冲
+                        )
+                    
+                        all_output = ""
+                    
+                        # 实时读取 stdout 和 stderr
+                        while True:
+                            stdout_line = process.stdout.readline()
+                            stderr_line = process.stderr.readline()
+                    
+                            if stdout_line:
+                                print(stdout_line, end='')  # 实时打印 stdout
+                                all_output += stdout_line   # 记录 stdout 输出
+                    
+                            if stderr_line:
+                                print(stderr_line, end='')  # 实时打印 stderr
+                                all_output += stderr_line   # 记录 stderr 输出
+                    
+                            if stdout_line == '' and stderr_line == '' and process.poll() is not None:
+                                break
+                    
+                        process.stdout.close()
+                        process.stderr.close()
+                    
+                        return all_output
+                    
+                    # 示例命令
+                    command = "your command here"
+                    output = run_shell_command(command)
+                    print("\\n命令的完整输出：")
+                    print(output)
+
                     `);
                  let observer = new MutationObserver(function(mutationsList, observer) {
                     for (let mutation of mutationsList) {
