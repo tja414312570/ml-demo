@@ -146,16 +146,22 @@ class Tee:
 
 async def execute_python_code(code):
     try:
+        print(f"执行python代码{code}")
         # 创建一个临时文件，用于存储 Python 代码
         with tempfile.NamedTemporaryFile(delete=False, suffix='.py') as temp_py_file:
             temp_py_file.write(code.encode('utf-8'))
             temp_file_path = temp_py_file.name
 
+        env = os.environ.copy()
+        env["https_proxy"] = "http://127.0.0.1:7890"
+        env["http_proxy"] = "http://127.0.0.1:7890"
+        env["all_proxy"] = "socks5://127.0.0.1:7890"
         # 使用 asyncio.create_subprocess_exec 来异步执行代码
         process = await asyncio.create_subprocess_exec(
             sys.executable, temp_file_path,  # sys.executable 指向当前的 Python 解释器
             stdout=asyncio.subprocess.PIPE,  # 捕获标准输出
-            stderr=asyncio.subprocess.PIPE   # 捕获标准错误
+            stderr=asyncio.subprocess.PIPE,   # 捕获标准错误
+            env=env
         )
 
         # 实时读取子进程的 stdout 和 stderr
@@ -191,6 +197,41 @@ async def execute_python_code(code):
         # 确保删除临时文件
         if os.path.exists(temp_file_path):
             os.remove(temp_file_path)
+
+async def run_shell_command(command):
+    print(f"执行shell命令: {command}")
+    try:
+         # 设置代理环境变量
+        env = os.environ.copy()
+        env["https_proxy"] = "http://127.0.0.1:7890"
+        env["http_proxy"] = "http://127.0.0.1:7890"
+        env["all_proxy"] = "socks5://127.0.0.1:7890"
+
+        # 启动子进程
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,  # 将 stderr 合并到 stdout
+            shell=True,
+            universal_newlines=True,
+            bufsize=1,  # 行缓冲
+            env=env  # 使用设置了代理的环境变量
+        )
+
+        all_output = ""
+
+        # 实时读取输出
+        for stdout_line in iter(process.stdout.readline, ""):
+            print(stdout_line, end='', flush=True)  # 实时打印
+            all_output += stdout_line  # 记录输出
+
+        process.stdout.close()
+        process.wait()
+
+        return all_output
+    except Exception as e:
+        return f"执行shell时出错: {str(e)}"
+
 async def execute_python_code_exec(code):
     try:
         # 创建一个字符串流来捕获 exec 中的输出
@@ -219,19 +260,6 @@ async def execute_python_code_exec(code):
         output = f"执行代码时出错: {str(e)}"
 
     return output
-
-
-def extract_python_code_from_markdown(server_output):
-    # 查找代码块的标记
-    if "```python" in server_output:
-        # 找到代码块的开始和结束
-        start_index = server_output.find("```python") + len("```python")
-        end_index = server_output.find("```", start_index)
-
-        # 提取代码块
-        python_code = server_output[start_index:end_index].strip()
-        return python_code
-    return None
 
 
 async def upload_file(file_path):
@@ -328,18 +356,41 @@ async def dispatcher_result(param, is_decode_result=False):
     await page_context.evaluate(vue_js)
 
 
+def extract_code_blocks_from_markdown(server_output):
+    """
+    提取 Markdown 文本中的所有代码块，并按顺序返回。
+
+    :param server_output: 包含 Markdown 文本的字符串
+    :return: 一个包含 (代码类型, 代码块) 的列表
+    """
+    # 正则表达式匹配 ```python 和 ```bash 代码块
+    pattern = re.compile(r"```(python|bash)\n(.*?)```", re.DOTALL)
+    code_blocks = pattern.findall(server_output)
+
+    # 返回的列表包含 (语言类型, 代码块) 的元组
+    return code_blocks
+
+
 async def dispatcher_response(response_data):
     print(f"处理命令: {response_data}")
-    python_code = extract_python_code_from_markdown(response_data)
 
-    # 如果提取到了 Python 代码，执行它
-    if python_code:
-        print(f"检测到的 Python 代码:\n{python_code}")
-        result = await execute_python_code(python_code)
-        print(f"执行结果:\n{result}")
-        await dispatcher_result(json.dumps(result))
+    # 提取所有代码块
+    code_blocks = extract_code_blocks_from_markdown(response_data)
+
+    if code_blocks:
+        for language, code in code_blocks:
+            if language == 'python':
+                print(f"检测到的 Python 代码:\n{code}")
+                result = await execute_python_code(code)
+                print(f"执行结果:\n{result}")
+                await dispatcher_result(json.dumps(result))
+            elif language == 'bash':
+                print(f"检测到的 Bash 代码:\n{code}")
+                result = await run_shell_command(code)  # 假设有 execute_bash_code 函数
+                print(f"执行结果:\n{result}")
+                await dispatcher_result(json.dumps(result))
     else:
-        print("未检测到 Python 代码块")
+        print("未检测到代码块")
 
 
 # {"code":"success","body":"python执行结果"}
@@ -393,9 +444,7 @@ async def process_json_data(event_json):
 
 async def inject_scripts(page):
     vue_js = """
-    var script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/vue@2';
-    document.head.appendChild(script);
+    
     """
     await page.evaluate(vue_js)
 
