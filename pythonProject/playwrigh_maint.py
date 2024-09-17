@@ -495,6 +495,17 @@ async def start_browser():
     return browser_context, browser_context.browser  # 返回上下文和浏览器实例
 
 
+# 页面加载或刷新时重新注入脚本
+async def monitor_and_inject_scripts(page):
+    # 初始加载时注入脚本
+    await inject_scripts(page)
+
+    # 监听页面的 load 事件，检测页面刷新并重新注入脚本
+    page.on("load", lambda: asyncio.ensure_future(inject_scripts(page)))
+
+    # 可选：同时检测到导航完成时也执行注入
+    page.on("domcontentloaded", lambda: asyncio.ensure_future(inject_scripts(page)))
+
 # 主流程
 async def main():
     # 启动 socket 服务器线程
@@ -522,7 +533,7 @@ async def main():
     print("请手动登录...")
     await asyncio.sleep(5)  # 等待用户手动登录
     # 注入 JavaScript
-    await inject_scripts(page)
+    await monitor_and_inject_scripts(page)
 
     # 优雅的等待方式，直到某个外部事件触发或按下 Ctrl+C
     stop_event = asyncio.Event()
