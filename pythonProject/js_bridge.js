@@ -98,7 +98,7 @@
                 myApp.foundSendBtn()
             }).catch(() => {
                 // Vue 加载失败，显示通知
-               myApp.showErrorNotification('Vue 加载失败，请检查网络或重试。', { autoClose: 5000 });
+               myApp.error('Vue 加载失败，请检查网络或重试。', { autoClose: 5000 });
             });
         },
         notify: function(newMessage) {
@@ -110,7 +110,7 @@
             }
         },
         // 错误通知的方法
-        showErrorNotification: function(message, options = {}) {
+        error: function(message, options = {}) {
             let errorDiv = document.querySelector('#error-notification');
 
             if (!errorDiv) {
@@ -151,7 +151,8 @@
                     现在我发送要求给你，你可以写python或bash代码，我会执行你的代码，并返回执行结果你。你可以解析结果，并解读给我。对于python或bash的执行结果你可以自定义，比如json，字符串等。
                     对于某些情况，你可能需要我上传文件，此时你可以在打印中另起一行，以fileupload:['file1','file2']的格式输出，我看到了会解析里面的文件，并一并上传给你，对于文件，建议你都通过上传文件的方式处理。
                     对于报错没有相关组件时，我执行了代码之后，会把执行结果给你，你可以依据相关结果继续执行相关指令。
-                    对于一些操作，可能需要bash，你可以尝试查看环境是否支持bash，如果支持，则可以使用bash命令。
+                    对于一些操作，bash执行更好，你可以尝试查看环境是否支持bash，如果支持，则可以优先使用bash命令。
+                    为了你能更好的适应环境，建议你第一步先获取环境，比如操作系统、python环境等等
                     注意：1、我不会执行python或bash外的其他操作，因此你需要我做的，均需要写成python或bash代码，同时一次只能有一个python或bash代码块，一定要注意打印你需要的信息。我会执行后把执行结果给你，你需要自己解析以决定下一步操作。python或bash代码一定要完整，不要写不完整的代码。
                         2、除了我主动提供给你的环境，你需要的环境资料均可以通过python或bash代码执行后我给你。
                         3、所有操作只使用python或bash，对于多步操作，你可以分解python或bash代码执行循序，比如打开浏览器，你可以用python或bash打开，并在python或bash里输出打开结果，然后通过分析这个结果决定是否截图查看下部操作等。

@@ -329,6 +329,15 @@ async def process_event_data(event_data):
         print(full_error_report)  # 打印到控制台
         await dispatcher_result(full_error_report)  # 通过 dispatcher_result 发送错误报告
 
+def process_invoke_arguments(invoke_arguments):
+    if not invoke_arguments or invoke_arguments.strip() == '""':  # 检查字符串是否为空
+        invoke_arguments = "没有任何输出"
+    if isinstance(invoke_arguments, str):
+        # 对 param 进行适当的转义，避免引号冲突
+        if not (invoke_arguments.startswith('"') and invoke_arguments.endswith('"')):
+            # 给字符串加上开头和结尾的双引号
+            invoke_arguments = f'`{invoke_arguments.replace('`', '\\`')}`'
+    return invoke_arguments
 
 # 处理 EventStream 数据
 async def dispatcher_result(param, is_decode_result=False):
@@ -337,21 +346,9 @@ async def dispatcher_result(param, is_decode_result=False):
         upload_files = await decode_result(param)
         if upload_files and len(upload_files) > 0:
             await upload_file(upload_files)
-    if isinstance(param, str):
-        # 对 param 进行适当的转义，避免引号冲突
-        if not (param.startswith('"') and param.endswith('"')):
-            # 对字符串内部的双引号进行转义
-            param = param.replace('"', r'\"')
-            # 给字符串加上开头和结尾的双引号
-            param = f'"{param}"'
-        vue_js = f"""
-                document.myApp.send({param})
-            """
-    else:
-        # 如果 param 不是字符串，直接传递
-        vue_js = f"""
-                document.myApp.send({param})
-            """
+    vue_js = f"""
+            document.myApp.send({process_invoke_arguments(param)})
+        """
     print(f"执行代码:{vue_js}")
     await page_context.evaluate(vue_js)
 
@@ -373,6 +370,7 @@ def extract_code_blocks_from_markdown(server_output):
 
 async def dispatcher_response(response_data):
     print(f"处理命令: {response_data}")
+    await notify_app(f"处理命令: {response_data}")
 
     # 提取所有代码块
     code_blocks = extract_code_blocks_from_markdown(response_data)
@@ -380,17 +378,25 @@ async def dispatcher_response(response_data):
     if code_blocks:
         for language, code in code_blocks:
             if language == 'python':
-                print(f"检测到的 Python 代码:\n{code}")
+                print(f"检测到的 {language}代码:\n{code}")
+                await notify_app(f"检测到的 {language}代码:\n{code}")
                 result = await execute_python_code(code)
                 print(f"执行结果:\n{result}")
+                await notify_app(f"执行{language}结果:\n{result}")
                 await dispatcher_result(json.dumps(result))
             elif language == 'bash':
-                print(f"检测到的 Bash 代码:\n{code}")
+                print(f"检测到的 {language}代码:\n{code}")
+                await notify_app(f"检测到的 {language}代码:\n{code}")
                 result = await run_shell_command(code)  # 假设有 execute_bash_code 函数
-                print(f"执行结果:\n{result}")
+                print(f"执行{language}结果:\n{result}")
+                await notify_app(f"执行{language}完成")
                 await dispatcher_result(json.dumps(result))
+            else:
+                await notify_app(f"不支持的代码{language}")
     else:
         print("未检测到代码块")
+        await notify_app(f"未检测到代码块")
+
 
 
 # {"code":"success","body":"python执行结果"}
@@ -443,11 +449,6 @@ async def process_json_data(event_json):
 
 
 async def inject_scripts(page):
-    vue_js = """
-    
-    """
-    await page.evaluate(vue_js)
-
     current_dir = os.path.dirname(os.path.abspath(__file__))
     script_path = os.path.join(current_dir, "js_bridge.js")
     with open(script_path, "r") as file:
@@ -456,6 +457,21 @@ async def inject_scripts(page):
     await page.evaluate(js_content)
     print("JavaScript 注入完成")
 
+async def notify_app(message):
+    js_template = f"""
+                document.myApp.notify({process_invoke_arguments(message)})
+            """
+    await invoke_js(js_template)
+
+async def invoke_js(invoke_js):
+    global page_context
+    print(f"执行js代码:\n{invoke_js}")
+    await page_context.evaluate(invoke_js)
+async def notify_app_error(message):
+    js_template = f"""
+                document.myApp.error({process_invoke_arguments(message)})
+            """
+    await invoke_js(js_template)
 
 # 启动 Playwright 浏览器
 async def start_browser():
