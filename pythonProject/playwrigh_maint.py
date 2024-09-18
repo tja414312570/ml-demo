@@ -22,6 +22,10 @@ import ast
 mitm_port = 8080
 HOST = 'localhost'
 PORT = 65432  # 定义 socket 服务器监听的端口
+import locale
+
+# 获取系统默认编码
+default_encoding = locale.getpreferredencoding()
 
 logging.basicConfig(
     filename='logfile.log',  # 指定日志文件名
@@ -451,7 +455,7 @@ async def process_json_data(event_json):
 async def inject_scripts(page):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     script_path = os.path.join(current_dir, "js_bridge.js")
-    with open(script_path, "r") as file:
+    with open(script_path, "r", encoding="utf-8", errors="ignore") as file:
         js_content = file.read()
 
     await page.evaluate(js_content)
