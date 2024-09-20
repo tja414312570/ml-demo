@@ -493,7 +493,7 @@ async def start_browser():
         headless=False,  # 显示浏览器
         args=['--auto-open-devtools-for-tabs'],  # 自动打开开发者工具
         ignore_https_errors=True,  # 忽略 HTTPS 错误
-        proxy={"server": f"http://127.0.0.1:{mitm_port}"}  # 使用代理
+        proxy={"server": f"http://127.0.0.1:3001"}  # 使用代理
     )
 
     return browser_context, browser_context.browser  # 返回上下文和浏览器实例

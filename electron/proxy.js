@@ -1,123 +1,115 @@
-import { createServer } from 'http';
-import https from 'https'; // 用于解密 HTTPS 流量
-import fs from 'fs'; // 用于加载证书
-import net from 'net'; // 用于处理 TLS 隧道
-import proxyModule from 'http-proxy';
-import url from 'url';
+import { ProxyServer } from 'anyproxy';
+import fs from 'fs';
+import path from 'path';
+import { HttpProxyAgent } from 'http-proxy-agent';
+import { fileURLToPath } from 'url';
 
-const { createProxyServer } = proxyModule;
+// 获取当前文件的路径
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// 加载自签名证书 (生成自签名证书步骤见下文)
-const privateKey = fs.readFileSync('myCA.key', 'utf8');
-const certificate = fs.readFileSync('myCA.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+// 日志文件路径
+const logFilePath = path.join(__dirname, 'proxy_logs.txt');
 
-export const startProxyServer = (upstreamProxy) => {
-  const proxy = createProxyServer({});
-
-  // 创建 HTTPS 服务器，用于处理 HTTPS 流量的解密
-  const httpsServer = https.createServer(credentials, (req, res) => {
-    console.log('----- New HTTPS Request -----');
-    console.log('Request URL:', req.url);
-    console.log('Request Method:', req.method);
-    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
-
-    // 将请求转发到上游代理或目标服务器
-    proxy.web(req, res, {
-      target: `https://${req.headers.host}`, // 直接代理 HTTPS 请求
-      changeOrigin: true
-    }, (err) => {
-      console.error('Proxy error:', err);
-      res.writeHead(502);
-      res.end('Proxy error: ' + err.message);
-    });
+// 写日志到文件的辅助函数
+function logToFile(data) {
+  fs.appendFile(logFilePath, data + '\n', (err) => {
+    if (err) {
+      console.error('Error writing to log file:', err);
+    }
   });
+}
 
-  // 创建 HTTP 代理服务器
-  const httpServer = createServer((req, res) => {
-    console.log('----- New HTTP Request -----');
-    console.log('Request URL:', req.url);
-    console.log('Request Method:', req.method);
-    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+export async function startProxyServer(upstreamProxy) {
+  const rule = {
+    // 拦截并写入请求体
+    *beforeSendRequest(requestDetail) {
+      const requestData = requestDetail.requestData.toString();
+      const logData = `Request intercepted: ${requestDetail.url}\nRequest Body: ${requestData}\n`;
+      
+      // 写日志到文件
+      logToFile(logData);
+      if (requestDetail.protocol == "http") {
+        var proxy = process.env.http_proxy || upstreamProxy.protocol + '://' + upstreamProxy.host + ':' + upstreamProxy.port;
+        var agent = new HttpProxyAgent(proxy);
+        const newRequestOptions = requestDetail.requestOptions;
+        newRequestOptions.agent = agent;
+        return requestDetail;
+    }
+    else if (requestDetail.protocol == "https") {
+        var proxy = process.env.http_proxy || upstreamProxy.protocol + '://' + upstreamProxy.host + ':' + upstreamProxy.port;
+        var agent = new HttpProxyAgent(proxy);
+        const newRequestOptions = requestDetail.requestOptions;
+        newRequestOptions.agent = agent;
+        return requestDetail;
+    }
+    //   return null; // 不修改请求
+    },
+    // 拦截并写入响应体
+    *beforeSendResponse(requestDetail, responseDetail) {
+      const contentType = responseDetail.response.header['Content-Type'] || '';
+      const responseBody = responseDetail.response.body;
 
-    // 将 HTTP 请求转发到目标服务器
-    proxy.web(req, res, {
-      target: `${upstreamProxy.protocol}//${upstreamProxy.host}:${upstreamProxy.port}`,
+      // 将响应体保存到日志文件
+      const logData = `Response for: ${requestDetail.url}\nResponse Body (Buffer): ${responseBody}\n`;
+
+      // 写日志到文件
+      logToFile(logData);
+
+      // 如果还想将 Buffer 转为字符串再保存
+      const originalBodyAsString = responseBody.toString();
+      const logDataAsString = `Response Body (String): ${originalBodyAsString}\n`;
+
+      // 写日志到文件
+      logToFile(logDataAsString);
+
+      return null;  // 不修改响应体，保持原样返回
+    }
+  };
+
+  // 配置代理服务器
+  const proxyOptions = {
+    port: 3001,
+    rule, // 使用自定义规则
+    forceProxyHttps: true, // 强制代理 HTTPS
+    silent: false, // 输出日志
+    webInterface: {
+      enable: true, // 启用 Web 界面（调试用）
+      webPort: 8002,
+    },
+    throttle: 10000,  // 设置带宽限制，避免超时
+    wsIntercept: false,  // 不拦截 WebSocket 请求
+    silent: true,  // 关闭详细日志输出
+    caCertDir: path.join(__dirname, 'certs') // 指定证书目录
+  };
+
+  // 如果有上游代理，设置上游代理配置
+  if (upstreamProxy) {
+    proxyOptions.upstreamProxy = {
+      host: upstreamProxy.host,
+      port: upstreamProxy.port,
+      isHttp: upstreamProxy.protocol === 'http:',
       headers: {
-        'Proxy-Authorization': 'Basic ' + Buffer.from(upstreamProxy.auth || '').toString('base64')
+        'Proxy-Authorization': `Basic ${Buffer.from(upstreamProxy.auth).toString('base64')}`
       }
-    }, (err) => {
-      console.error('Proxy error:', err);
-      res.writeHead(502);
-      res.end('Proxy error: ' + err.message);
-    });
+    };
+  }
+
+  // 启动代理服务器
+  const server = new ProxyServer(proxyOptions);
+
+  // 捕获并处理代理内部的 ECONNRESET 错误
+  process.on('uncaughtException', (err) => {
+    if (err.code === 'ECONNRESET') {
+      const errorLog = `Connection reset by peer: ${err}\n`;
+      logToFile(errorLog); // 写错误日志到文件
+      console.warn('A connection was reset by the server:', err);
+    } else {
+      console.error('An unexpected error occurred:', err);
+      logToFile(`Unexpected error: ${err}\n`); // 写其他错误日志
+    }
   });
 
-  // 处理 HTTPS 请求的 CONNECT 方法
-  httpServer.on('connect', (req, clientSocket, head) => {
-    console.log('Handling HTTPS CONNECT method for:', req.url);
-
-    const { port, hostname } = url.parse(`http://${req.url}`);
-
-    // 代理 HTTPS 连接
-    const serverSocket = net.connect(port || 443, hostname, () => {
-      clientSocket.write('HTTP/1.1 200 Connection Established\r\n' +
-                         'Proxy-agent: Node.js-Proxy\r\n' +
-                         '\r\n');
-      serverSocket.write(head);
-      serverSocket.pipe(clientSocket);
-      clientSocket.pipe(serverSocket);
-    });
-
-    serverSocket.on('error', (err) => {
-      console.error('Error in HTTPS connection:', err);
-      clientSocket.end();
-    });
-  });
-
-  // 监听代理响应，处理 XHR 和 event-stream 响应
-  proxy.on('proxyRes', (proxyRes, req, res) => {
-    let body = '';
-
-    proxyRes.on('data', (chunk) => {
-      body += chunk;
-    });
-
-    proxyRes.on('end', () => {
-      console.log('Response Headers:', proxyRes.headers);
-
-      // 检查是否是 XHR 请求
-      if (req.headers['x-requested-with'] && req.headers['x-requested-with'] === 'XMLHttpRequest') {
-        console.log('XHR Response Body:', body);
-      }
-
-      // 检查是否是 event-stream
-      if (proxyRes.headers['content-type'] && proxyRes.headers['content-type'].includes('text/event-stream')) {
-        console.log('Event-Stream Response Body:', body);
-      }
-
-      // 打印完整的响应体
-      console.log('Full Response Body:', body);
-
-      // 继续将响应发送回客户端
-      res.writeHead(proxyRes.statusCode, proxyRes.headers);
-      res.end(body);
-    });
-  });
-
-  proxy.on('error', (err, req, res) => {
-    console.error('Proxy encountered an error:', err);
-    res.writeHead(502, {
-      'Content-Type': 'text/plain'
-    });
-    res.end('Something went wrong. Error: ' + err.message);
-  });
-
-  httpServer.listen(3000, () => {
-    console.log('HTTP Proxy server running on port 3000');
-  });
-
-  httpsServer.listen(3001, () => {
-    console.log('HTTPS Proxy server running on port 3001');
-  });
-};
+  server.start();
+  console.log('AnyProxy server started on port 3001');
+}

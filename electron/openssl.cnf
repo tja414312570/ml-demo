@@ -1,0 +1,23 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_ca
+prompt = no
+
+[req_distinguished_name]
+C = US
+ST = CA
+L = My City
+O = My Organization
+OU = My Unit
+CN = My Proxy Root CA
+
+[v3_ca]
+subjectAltName = @alt_names
+keyUsage = critical, keyCertSign, cRLSign
+basicConstraints = critical, CA:true
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+
+[alt_names]
+DNS.1 = localhost
+# 其他域名可以在生成伪造证书时动态添加
