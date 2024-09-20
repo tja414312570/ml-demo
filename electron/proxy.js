@@ -30,14 +30,14 @@ export async function startProxyServer(upstreamProxy) {
       // 写日志到文件
       logToFile(logData);
       if (requestDetail.protocol == "http") {
-        var proxy = process.env.http_proxy || upstreamProxy.protocol + '://' + upstreamProxy.host + ':' + upstreamProxy.port;
+        var proxy = process.env.http_proxy || upstreamProxy.protocol + '//' + upstreamProxy.host + ':' + upstreamProxy.port;
         var agent = new HttpProxyAgent(proxy);
         const newRequestOptions = requestDetail.requestOptions;
         newRequestOptions.agent = agent;
         return requestDetail;
     }
     else if (requestDetail.protocol == "https") {
-        var proxy = process.env.http_proxy || upstreamProxy.protocol + '://' + upstreamProxy.host + ':' + upstreamProxy.port;
+        var proxy = process.env.http_proxy || upstreamProxy.protocol + '//' + upstreamProxy.host + ':' + upstreamProxy.port;
         var agent = new HttpProxyAgent(proxy);
         const newRequestOptions = requestDetail.requestOptions;
         newRequestOptions.agent = agent;
