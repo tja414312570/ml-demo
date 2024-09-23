@@ -4,3 +4,5 @@
 /pythonProject/.venv/share/
 /electron/node_modules/
 /electron/dist/
+/electron/certs/
+/electron/.http-mitm-proxy/

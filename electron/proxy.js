@@ -1,8 +1,10 @@
-import { ProxyServer } from 'anyproxy';
+import {Proxy} from 'http-mitm-proxy'; // 导入 CommonJS 模块
 import fs from 'fs';
 import path from 'path';
 import { HttpProxyAgent } from 'http-proxy-agent';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { fileURLToPath } from 'url';
+import zlib from 'zlib';
 
 // 获取当前文件的路径
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +15,7 @@ const logFilePath = path.join(__dirname, 'proxy_logs.txt');
 
 // 写日志到文件的辅助函数
 function logToFile(data) {
+  // console.log(data)
   fs.appendFile(logFilePath, data + '\n', (err) => {
     if (err) {
       console.error('Error writing to log file:', err);
@@ -21,84 +24,125 @@ function logToFile(data) {
 }
 
 export async function startProxyServer(upstreamProxy) {
-  const rule = {
-    // 拦截并写入请求体
-    *beforeSendRequest(requestDetail) {
-      const requestData = requestDetail.requestData.toString();
-      const logData = `Request intercepted: ${requestDetail.url}\nRequest Body: ${requestData}\n`;
+  const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
+
+  // 拦截 HTTP 请求
+  proxy.onRequest((ctx, callback) => {
+    console.log("请求",ctx.proxyToServerRequestOptions.host)
+    const requestData = ctx.clientToProxyRequest;
+    let body = [];
+
+    // requestData.on('data', (chunk) => {
+    //   body.push(chunk);
+    // }).on('end', () => {
+    //   body = Buffer.concat(body).toString();
+    //   const logData = `Request intercepted: ${requestData.url}\nRequest Body: ${body}\n`;
+    //   logToFile(logData);
+    // });
+    callback(); // 继续请求
+  });
+
+  const processResponseBody = (ctx)=>{
+     return new Promise((resolve, reject) => {
+        // 如果响应是压缩的，进行解压
+          const response = ctx.serverToProxyResponse;
+          const requestOptions = ctx.proxyToServerRequestOptions;
       
-      // 写日志到文件
+          // 获取响应的 Content-Type 和 Content-Encoding
+          const contentType = response.headers['content-type'] || '';
+          const contentEncoding = response.headers['content-encoding'] || '';
+      
+          // 检查是否是压缩响应
+          const isCompressed = contentEncoding.includes('gzip') || contentEncoding.includes('deflate') || contentEncoding.includes('br');
+      
+          let body = [];
+      
+          response.on('data', (chunk) => {
+            body.push(chunk);
+          });
+      
+          response.on('end', () => {
+            body = Buffer.concat(body);
+      
+            // 如果响应是压缩的，进行解压
+            if (isCompressed) {
+              if (contentEncoding.includes('gzip')) {
+                zlib.gunzip(body, (err, decompressedBody) => {
+                  if (!err) {
+                    resolve(decompressedBody.toString());
+                  } else {
+                    console.error('Gzip 解压失败:', err);
+                    reject(err);
+                  }
+                });
+              } else if (contentEncoding.includes('deflate')) {
+                zlib.inflate(body, (err, decompressedBody) => {
+                  if (!err) {
+                    resolve(decompressedBody.toString());
+                  } else {
+                    console.error('Deflate 解压失败:', err);
+                    reject(err);
+                  }
+                });
+              } else if (contentEncoding.includes('br')) {
+                zlib.brotliDecompress(body, (err, decompressedBody) => {
+                  if (!err) {
+                    resolve(decompressedBody.toString());
+                  } else {
+                    console.error('Brotli 解压失败:', err);
+                    reject(err);
+                  }
+                });
+              }
+            } else {
+              // 如果没有压缩，直接返回响应体
+              resolve(body.toString());
+            }
+          });
+      
+          response.on('error', (err) => {
+            reject(err);
+          });
+      });
+  }
+  // 拦截 HTTP 响应
+  proxy.onResponse((ctx, callback) => {
+    const response = ctx.serverToProxyResponse;
+  const requestOptions = ctx.proxyToServerRequestOptions;
+
+  // 获取响应的 Content-Type
+  const contentType = response.headers['content-type'] || '';
+  
+  // 检查是否是静态资源，如 HTML、CSS、图片等
+  const isStaticResource = (
+    contentType.includes('html') ||      // HTML 页面
+    contentType.includes('css') ||       // CSS 样式表
+    contentType.includes('image') ||         // 图片（如 png, jpg, gif 等）
+    contentType.includes('javascript') ||  // JS 文件
+    contentType.includes('font')             // 字体文件
+  );
+
+  if (isStaticResource) {
+    console.log("静态资源请求，放行", requestOptions.host);
+  } else {
+    // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
+    console.log("拦截处理:"+requestOptions.host+""+requestOptions.path+"，上下文类型:"+contentType);
+    let logData = `拦截处理:${requestOptions.method}:${requestOptions.port === 443 ?'https':'http'}://${requestOptions.host}${requestOptions.path}\n`;
+    let promise = processResponseBody(ctx);
+    promise.then(bodyStr=>{
+      logData+= `响应数据: ${bodyStr}\n`;
+    }).catch(err=>{
+      logData+= `错误原因: ${err}\n`;
+      console.error(err);
+    }).finally(()=>{
       logToFile(logData);
-      if (requestDetail.protocol == "http") {
-        var proxy = process.env.http_proxy || upstreamProxy.protocol + '//' + upstreamProxy.host + ':' + upstreamProxy.port;
-        var agent = new HttpProxyAgent(proxy);
-        const newRequestOptions = requestDetail.requestOptions;
-        newRequestOptions.agent = agent;
-        return requestDetail;
-    }
-    else if (requestDetail.protocol == "https") {
-        var proxy = process.env.http_proxy || upstreamProxy.protocol + '//' + upstreamProxy.host + ':' + upstreamProxy.port;
-        var agent = new HttpProxyAgent(proxy);
-        const newRequestOptions = requestDetail.requestOptions;
-        newRequestOptions.agent = agent;
-        return requestDetail;
-    }
-    //   return null; // 不修改请求
-    },
-    // 拦截并写入响应体
-    *beforeSendResponse(requestDetail, responseDetail) {
-      const contentType = responseDetail.response.header['Content-Type'] || '';
-      const responseBody = responseDetail.response.body;
-
-      // 将响应体保存到日志文件
-      const logData = `Response for: ${requestDetail.url}\nResponse Body (Buffer): ${responseBody}\n`;
-
-      // 写日志到文件
-      logToFile(logData);
-
-      // 如果还想将 Buffer 转为字符串再保存
-      const originalBodyAsString = responseBody.toString();
-      const logDataAsString = `Response Body (String): ${originalBodyAsString}\n`;
-
-      // 写日志到文件
-      logToFile(logDataAsString);
-
-      return null;  // 不修改响应体，保持原样返回
-    }
-  };
-
-  // 配置代理服务器
-  const proxyOptions = {
-    port: 3001,
-    rule, // 使用自定义规则
-    forceProxyHttps: true, // 强制代理 HTTPS
-    silent: false, // 输出日志
-    webInterface: {
-      enable: true, // 启用 Web 界面（调试用）
-      webPort: 8002,
-    },
-    throttle: 10000,  // 设置带宽限制，避免超时
-    wsIntercept: false,  // 不拦截 WebSocket 请求
-    silent: true,  // 关闭详细日志输出
-    caCertDir: path.join(__dirname, 'certs') // 指定证书目录
-  };
-
-  // 如果有上游代理，设置上游代理配置
-  if (upstreamProxy) {
-    proxyOptions.upstreamProxy = {
-      host: upstreamProxy.host,
-      port: upstreamProxy.port,
-      isHttp: upstreamProxy.protocol === 'http:',
-      headers: {
-        'Proxy-Authorization': `Basic ${Buffer.from(upstreamProxy.auth).toString('base64')}`
-      }
-    };
+    })
   }
 
-  // 启动代理服务器
-  const server = new ProxyServer(proxyOptions);
+    callback(); // 继续响应
+  });
 
-  // 捕获并处理代理内部的 ECONNRESET 错误
+  // 处理 ECONNRESET 错误
   process.on('uncaughtException', (err) => {
     if (err.code === 'ECONNRESET') {
       const errorLog = `Connection reset by peer: ${err}\n`;
@@ -109,7 +153,43 @@ export async function startProxyServer(upstreamProxy) {
       logToFile(`Unexpected error: ${err}\n`); // 写其他错误日志
     }
   });
-
-  server.start();
-  console.log('AnyProxy server started on port 3001');
+  // proxy.onCertificateMissing = (ctx, files, callback) => {
+  //   console.log('Looking for "%s" certificates', ctx.hostname);
+  //   console.log('"%s" missing', ctx.files.keyFile);
+  //   console.log('"%s" missing', ctx.files.certFile);
+  
+  //   // Here you have the last chance to provide certificate files data
+  //   // A tipical use case would be creating them on the fly
+  //   //
+  //   return callback(null, {
+  //     key: keyFileData,
+  //     cert: certFileData
+  //   });
+  // };
+  
+  proxy.onError((ctx, err) => {
+    console.error('Proxy error:', err);
+  });
+  
+  let options = { port: 3001 ,host: '127.0.0.1' };
+  // 判断是否需要使用上游代理
+  if (upstreamProxy) {
+    const proxyUrl = `${upstreamProxy.protocol}//${upstreamProxy.host}:${upstreamProxy.port}`;
+    logToFile(`使用上游代理:${proxyUrl}`)
+    options.httpAgent = new HttpProxyAgent(proxyUrl);
+    options.httpsAgent = new HttpsProxyAgent(proxyUrl);
+  }
+  proxy. _onError_bak_ =  proxy. _onError;
+  proxy. _onError = (kind, ctx, err)=> {
+    if (err.code === 'ERR_SSL_SSLV3_ALERT_CERTIFICATE_UNKNOWN') {
+      // console.log(`忽略 SSL 错误: ${ctx.clientToProxyRequest.url}`);
+      return;
+    }
+    proxy. _onError_bak_(kind,ctx,err)
+}
+  // 启动代理服务器
+  proxy.listen(options, () => {
+    console.log('http-mitm-proxy server started on port 3001');
+  });
+  // proxy.listen({ port: 8080, host: '127.0.0.1' });
 }

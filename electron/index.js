@@ -45,7 +45,7 @@ const createWindow = () => {
     proxyBypassRules: 'localhost'
   }).then(() => {
     console.log('Proxy is set successfully');
-    win.loadURL('https://www.baidu.com');
+    win.loadURL('https://share.github.cn.com/c/66f0bc12-4778-8007-90ee-5676751dfbbb');
   }).catch((err) => {
     console.error('Failed to set proxy:', err);
   });
