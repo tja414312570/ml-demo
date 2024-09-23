@@ -3,9 +3,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { startProxyServer } from './proxy.js';  // 引入代理逻辑
 
+import { promises as fs } from 'fs'; 
+
+import { notifyApp, notifyAppError } from './bridge.js';
+
 // 获取当前模块路径
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+app.disableHardwareAcceleration();
+
 
 app.commandLine.appendSwitch('log-net-log', path.join(__dirname, 'net-log.json'));
 
@@ -15,6 +21,51 @@ ipcMain.on('login-info', (event, data) => {
   // 你可以将数据记录到安全的存储中
 });
 
+
+async function injectScripts(win) {
+  try {
+      // 获取当前目录并构造 JavaScript 文件路径
+      const currentDir = __dirname;
+      const scriptPath = path.join(currentDir, "js_bridge.js");
+
+      // 读取 JavaScript 文件内容
+      const jsContent = await fs.readFile(scriptPath, { encoding: 'utf-8' });
+
+      // 将 JavaScript 注入到页面中
+      await win.webContents.executeJavaScript(jsContent);
+      console.log("JavaScript 注入完成");
+      // while(!await bridgeCompleted(win)){
+      //   console.log("等待初始化")
+      // }
+      // notifyApp(win,"通知数据")
+      notifyAppError(win,"通知错误")
+  } catch (error) {
+      console.error("注入 JavaScript 时出错: ", error);
+  }
+}
+
+
+async function monitorAndInjectScripts(win) {
+  // 初始加载时注入脚本
+  await injectScripts(win);
+
+  // 监听页面的 load 事件，检测页面刷新并重新注入脚本
+  win.webContents.on('did-finish-load', async () => {
+      await injectScripts(win);
+  });
+
+  // 可选：检测 DOM 内容加载时也重新注入脚本
+  win.webContents.on('dom-ready', async () => {
+      await injectScripts(win);
+  });
+}
+const bridgeCompleted = (win)=>{
+  return win.webContents.executeJavaScript(`
+    (function() {
+        return !!(document.myApp && document.myApp.vueInstance);
+    })();
+`)
+}
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 800,
@@ -25,8 +76,9 @@ const createWindow = () => {
         preload: path.join(__dirname, 'preload.js'),
         allowRunningInsecureContent: true // 允许不安全内容
     }
+    
   });
-
+  global.window = win;
   win.webContents.openDevTools();
 
   // 设置代理
@@ -35,7 +87,7 @@ const createWindow = () => {
   currentSession.clearCache().then(() => {
     console.log('Cache cleared successfully.');
   });
-
+  monitorAndInjectScripts(win);
   // 清除存储的SSL证书错误状态
   currentSession.clearAuthCache().then(() => {
     console.log('Auth cache cleared successfully.');
