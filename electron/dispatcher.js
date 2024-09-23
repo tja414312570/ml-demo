@@ -3,6 +3,9 @@ import { execFile, exec } from 'child_process';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
+import { notifyApp, sendApp ,uploadFile} from './bridge.js';
+
+import util from 'util';
 
 // 使用 promisify 将子进程命令转换为 Promise
 const execFileAsync = promisify(execFile);
@@ -67,86 +70,40 @@ async function runShellCommand(command) {
 }
 
 // 上传文件的函数
-async function uploadFile(page, filePath) {
-    const inputFile = await page.$('input[type="file"]');
-    console.log("上传文件路径:", filePath);
-    await inputFile.setInputFiles(filePath);
-}
 
-// 处理 fileupload 列表的解析函数
-async function decodeResult(resultString) {
-    try {
-        const match = resultString.match(/fileupload:\[(.*?)\]/);
 
-        if (match) {
-            const arrayStr = `[${match[1]}]`;
 
-            try {
-                const fileList = JSON.parse(arrayStr);
-                return fileList;
-            } catch (error) {
-                const errorReport = `解析 fileupload 列表时出错: ${error.message}`;
-                console.error(errorReport);
-                return null;
-            }
-        } else {
-            console.log("未找到 fileupload 列表。");
-            return null;
-        }
-    } catch (error) {
-        console.error(`处理 fileupload 列表时出错: ${error.message}`);
-        return null;
-    }
-}
-
+let responseData;
 // 处理 EventStream 数据并返回 JSON 的处理函数
-function processEventData(eventData) {
-    return new Promise((resolve) => {
-        // 使用 promise 包装，异步处理 eventData
-        setImmediate(async () => {
-            try {
-                const eventJson = JSON.parse(eventData);
-                await processJsonData(eventJson);
-                resolve();
-            } catch (error) {
-                console.error(`处理数据时出错: JSON 格式错误: ${error.message}, 数据：${eventData}`);
-                resolve();  // 保持继续处理的流畅性
-            }
-        });
-    });
-}
-
 // 异步处理 JSON 数据
-async function processJsonData(eventJson) {
-    const headers = eventJson.headers || {};
-    const body = eventJson.body || '';
+async function processEventData(body,headers) {
 
-    console.log("收到的请求头信息：");
-    for (const [key, value] of Object.entries(headers)) {
-        switch (key) {
-            case "content-length":
-                console.log(`内容长度: ${value}`);
-                break;
-            case "authorization":
-                console.log(`授权: ${value.slice(0, 10)}...（部分隐藏）`);
-                break;
-            case "accept":
-                console.log(`接受内容类型: ${value}`);
-                break;
-            case "referer":
-                console.log(`来源页面: ${value}`);
-                break;
-            case "cookie":
-                console.log(`Cookie 信息: ${value.slice(0, 30)}...（部分隐藏）`);
-                break;
-            default:
-                console.log(`${key}: ${value}`);
-        }
-    }
-
+    console.log("收到的请求头信息：",body);
+    
     if (body) {
         if (body === '[DONE]') {
             console.log("EventStream 完成，等待处理...");
+            for (const [key, value] of Object.entries(headers)) {
+                switch (key) {
+                    case "content-length":
+                        console.log(`内容长度: ${value}`);
+                        break;
+                    case "authorization":
+                        console.log(`授权: ${value.slice(0, 10)}...（部分隐藏）`);
+                        break;
+                    case "accept":
+                        console.log(`接受内容类型: ${value}`);
+                        break;
+                    case "referer":
+                        console.log(`来源页面: ${value}`);
+                        break;
+                    case "cookie":
+                        console.log(`Cookie 信息: ${value.slice(0, 30)}...（部分隐藏）`);
+                        break;
+                    default:
+                        console.log(`${key}: ${value}`);
+                }
+            }
             await dispatcherResponse(responseData);
         } else {
             const bodyData = JSON.parse(body);
@@ -206,12 +163,119 @@ async function dispatcherResponse(responseData) {
     }
 }
 
+const regex = /fileupload:\[(.*?)\]/;
+
+// 解析结果函数
+async function decodeResult(resultString) {
+    try {
+        // 使用正则表达式提取 fileupload 列表
+        const match = resultString.match(regex);
+
+        if (match) {
+            const arrayStr = `[${match[1]}]`;  // 将匹配结果转换为有效的数组格式
+
+            try {
+                // 使用 JSON.parse() 将字符串转换为数组
+                const fileList = JSON.parse(arrayStr.replace(/'/g, '"'));  // 将单引号替换为双引号
+                return fileList;
+            } catch (error) {
+                const errorMessage = `解析 fileupload 列表时出错: ${error.message}，数据：${arrayStr}`;
+                const errorTraceback = util.inspect(error);  // 打印错误栈
+                const fullErrorReport = `${errorMessage}\n错误栈：\n${errorTraceback}`;
+                console.error(fullErrorReport);
+
+                // 调用 dispatcherResult 发送错误报告
+                await dispatcherResult(fullErrorReport, true);
+                return null;
+            }
+        } else {
+            // 没有匹配到 fileupload 列表
+            const errorMessage = "未找到 fileupload 列表。";
+            console.error(errorMessage);
+            return null;
+        }
+    } catch (error) {
+        // 捕获其他异常并生成完整的错误报告
+        const errorMessage = `处理 fileupload 列表时出错: ${error.message}，数据：${resultString}`;
+        const errorTraceback = util.inspect(error);  // 获取详细的错误栈
+        const fullErrorReport = `${errorMessage}\n错误栈：\n${errorTraceback}`;
+        console.error(fullErrorReport);
+
+        // 调用 dispatcherResult 发送错误报告
+        await dispatcherResult(fullErrorReport, true);
+        return null;
+    }
+}
+async function dispatcherResult(param, isDecodeResult = false) {
+    if (!isDecodeResult) {
+        const uploadFiles = await decodeResult(param);
+        if (uploadFiles && uploadFiles.length > 0) {
+            await uploadFile(uploadFiles);
+        }
+    }
+    sendApp(param)
+}
+
+
+let currentData = '';
+
+const decodeEventStream = (data)=> {
+    // 将事件流根据两个换行符进行分割
+    const events = data.split('\n\n');
+
+    events.forEach(event => {
+        if (event.startsWith('data:')) {
+            const eventData = event.slice(5).trim();  // 去除前面的 'data:' 并移除空白字符
+            try {
+                console.log('Received Event:', eventData);
+                // 如果事件流发送 '[DONE]'，处理最终的响应数据
+                if (eventData === '[DONE]') {
+                    processResponse(currentData);
+                } 
+                // 检查数据中是否包含特定标志 '"finished_successfully"'
+                else if (eventData.includes('"finished_successfully"')) {
+                    currentData = eventData;
+                }
+            } catch (error) {
+                console.error(`Failed to parse event data: ${eventData}`, error);
+            }
+        }
+    });
+}
+
+const processResponse = (ctx, bodyString)=> {
+    const contentType = ctx.serverToProxyResponse.headers['content-type'] || '';
+
+    // 检查是否为 SSE (text/event-stream)
+    if (contentType.includes('text/event-stream')) {
+        console.log(`Captured SSE from ${ctx.clientToProxyRequest.url}`);
+
+        // 获取响应体的数据流（SSE 是流式数据，可能会多次发送）
+        const sseData = bodyString;
+
+        // 将 SSE 数据根据事件分隔符 \n\n 进行分割
+        const events = sseData.split('\n\n');
+
+        // 遍历每个事件并处理
+        events.forEach(event => {
+            if (event.startsWith('data:')) {
+                // 去除 'data:' 前缀并整理数据
+                const eventData = event.slice(5).trim();
+                // 打印 SSE 事件数据
+                console.log(`SSE Event Data:\n${eventData}`);
+                processEventData(eventData,ctx.serverToProxyResponse.headers);
+            }
+        });
+    }
+}
+
+
 export {
     executePythonCode,
     runShellCommand,
-    uploadFile,
     decodeResult,
     processEventData,
-    processJsonData,
     dispatcherResponse,
+    decodeEventStream,
+    processResponse
 };

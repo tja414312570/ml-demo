@@ -5,6 +5,7 @@ import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { fileURLToPath } from 'url';
 import zlib from 'zlib';
+import {processResponse} from './dispatcher.js'
 
 // 获取当前文件的路径
 const __filename = fileURLToPath(import.meta.url);
@@ -130,6 +131,7 @@ export async function startProxyServer(upstreamProxy) {
     let logData = `拦截处理:${requestOptions.method}:${requestOptions.port === 443 ?'https':'http'}://${requestOptions.host}${requestOptions.path}\n`;
     let promise = processResponseBody(ctx);
     promise.then(bodyStr=>{
+      processResponse(ctx,bodyStr);
       logData+= `响应数据: ${bodyStr}\n`;
     }).catch(err=>{
       logData+= `错误原因: ${err}\n`;
@@ -188,8 +190,15 @@ export async function startProxyServer(upstreamProxy) {
     proxy. _onError_bak_(kind,ctx,err)
 }
   // 启动代理服务器
-  proxy.listen(options, () => {
-    console.log('http-mitm-proxy server started on port 3001');
+  
+  return new Promise((resolve,reject)=>{
+    proxy.listen(options, (err) => {
+      if(err){
+        reject(err)
+      }else{
+        console.log('http-mitm-proxy server started on port 3001');
+        resolve(proxy);
+      }
+    });
   });
-  // proxy.listen({ port: 8080, host: '127.0.0.1' });
 }

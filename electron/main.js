@@ -6,11 +6,12 @@ import { startProxyServer } from './proxy.js';  // 引入代理逻辑
 import { promises as fs } from 'fs'; 
 
 import { notifyApp, notifyAppError } from './bridge.js';
+import { showErrorDialog } from './utils.js';
 
 // 获取当前模块路径
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.disableHardwareAcceleration();
+// app.disableHardwareAcceleration();
 
 
 app.commandLine.appendSwitch('log-net-log', path.join(__dirname, 'net-log.json'));
@@ -37,8 +38,8 @@ async function injectScripts(win) {
       // while(!await bridgeCompleted(win)){
       //   console.log("等待初始化")
       // }
-      // notifyApp(win,"通知数据")
-      notifyAppError(win,"通知错误")
+      // notifyApp("通知数据")
+      // notifyAppError("通知错误")
   } catch (error) {
       console.error("注入 JavaScript 时出错: ", error);
   }
@@ -68,8 +69,8 @@ const bridgeCompleted = (win)=>{
 }
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1280,
+    height: 970,
     webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -80,24 +81,26 @@ const createWindow = () => {
   });
   global.window = win;
   win.webContents.openDevTools();
-
+  monitorAndInjectScripts(win);
   // 设置代理
   const ses = win.webContents.session;
   const currentSession = session.defaultSession;
   currentSession.clearCache().then(() => {
     console.log('Cache cleared successfully.');
   });
-  monitorAndInjectScripts(win);
+  
   // 清除存储的SSL证书错误状态
   currentSession.clearAuthCache().then(() => {
     console.log('Auth cache cleared successfully.');
   });
+ 
   ses.setProxy({
     proxyRules: '127.0.0.1:3001',
     proxyBypassRules: 'localhost'
   }).then(() => {
     console.log('Proxy is set successfully');
     win.loadURL('https://share.github.cn.com/c/66f0bc12-4778-8007-90ee-5676751dfbbb');
+    
   }).catch((err) => {
     console.error('Failed to set proxy:', err);
   });
@@ -108,7 +111,11 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
     event.preventDefault();  // 阻止默认行为
     callback(true);  // 忽略证书错误并继续加载页面
   });
-
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
 app.whenReady().then(() => {
      // 启动代理服务器并指定上游代理
   const upstreamProxy = {
@@ -117,7 +124,9 @@ app.whenReady().then(() => {
     protocol: 'http:',  // 上游代理协议
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
-
-  startProxyServer(upstreamProxy);
-  createWindow();
+  startProxyServer(upstreamProxy).then(proxy=>{
+    createWindow()
+  }).catch(err=>{
+    showErrorDialog("代理未启动成功")
+  })
 });

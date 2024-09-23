@@ -1,3 +1,4 @@
+import {showErrorDialog} from "./utils.js"
 // 执行 JS 代码的通用函数
 const invokeJs = (invokeJsCode, callback) => {
     console.log(`执行 JS 代码:\n${invokeJsCode}`);
@@ -12,7 +13,7 @@ const invokeJs = (invokeJsCode, callback) => {
             if (callback) callback(err);
         });
     }else{
-
+        showErrorDialog("窗口未初始化")
     }
 };
 
@@ -47,8 +48,26 @@ const notifyAppError = (message) => {
     invokeJs(jsTemplate);  // 传递窗口对象和 JS 模板
 };
 
+const sendApp = (message) => {
+    const jsTemplate = `
+        document.myApp.send(${processInvokeArguments(message)});
+    `;
+    invokeJs(jsTemplate);  // 传递窗口对象和 JS 模板
+};
+
+const uploadFile = (files)=>{
+    async function uploadFile(page, filePath) {
+        const inputFile = await page.$('input[type="file"]');
+        console.log("上传文件路径:", filePath);
+        await inputFile.setInputFiles(files);
+    }
+    
+}
 // 集中导出所有函数
 export {
     notifyApp,
-    notifyAppError
+    notifyAppError,
+    invokeJs,
+    sendApp,
+    uploadFile
 };
