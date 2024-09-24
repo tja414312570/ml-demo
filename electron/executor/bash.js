@@ -12,7 +12,7 @@ const execAsync = promisify(exec);
 export const support = 'bash';
 
 // 执行 shell 命令
-async function execute(command) {
+export async function execute(command) {
     console.log(`执行 shell 命令: ${command}`);
     try {
         const env = {

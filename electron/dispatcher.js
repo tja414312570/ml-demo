@@ -3,7 +3,7 @@ import { execFile, exec } from 'child_process';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
-import { notifyApp, sendApp ,uploadFile} from './bridge.js';
+import { notifyApp, notifyAppError, sendApp ,uploadFile} from './bridge.js';
 
 import util from 'util';
 
@@ -13,6 +13,13 @@ import {loadModules} from './modules.js'
 const executors = {};
 
 loadModules('executor', (file, module) => {
+    if (!module.execute) {
+        throw new Error(` “${file}“ executor not implements execute function`);
+    }
+    // 检查 executor.execute 是否是函数
+    if (typeof module.execute !== 'function') {
+        throw new Error(` “${file}“ executor executor.execute is not a function`);
+    }
     executors[module.support] = module;
     console.log(`load-module: ${file},${module.support}`);
 }).catch(console.error);
@@ -105,10 +112,18 @@ async function dispatcherResponse(responseData) {
                 console.log(`检测到的 ${language} 代码:\n${code}`);
                 await notifyApp(`检测到的 ${language} 代码:\n${code}`);
                 const executor = executors[language];
+                // 检查 executor 是否存在
+                if (!executor.execute) {
+                    throw new Error(` “${language}“ executor not implements execute function`);
+                }
+                // 检查 executor.execute 是否是函数
+                if (typeof executor.execute !== 'function') {
+                    throw new Error(` “${language}“ executor executor.execute is not a function`);
+                }
                 const result = await executor.execute(code);
                 console.log(`执行结果:\n${result}`);
                 await notifyApp(`执行 ${language} 结果:\n${result}`);
-                await dispatcherResult(JSON.stringify(result));
+                await dispatcherResult(result);
             } else {
                 await notifyApp(`不支持的代码语言: ${language}`);
             }
@@ -139,7 +154,6 @@ async function decodeResult(resultString) {
                 const errorTraceback = util.inspect(error);  // 打印错误栈
                 const fullErrorReport = `${errorMessage}\n错误栈：\n${errorTraceback}`;
                 console.error(fullErrorReport);
-
                 // 调用 dispatcherResult 发送错误报告
                 await dispatcherResult(fullErrorReport, true);
                 return null;
@@ -199,29 +213,38 @@ const decodeEventStream = (data)=> {
     });
 }
 
-const processResponse = (ctx, bodyString)=> {
-    const contentType = ctx.serverToProxyResponse.headers['content-type'] || '';
+const processResponse = async (ctx, bodyString)=> {
+    try{
+        const contentType = ctx.serverToProxyResponse.headers['content-type'] || '';
 
-    // 检查是否为 SSE (text/event-stream)
-    if (contentType.includes('text/event-stream')) {
-        console.log(`Captured SSE from ${ctx.clientToProxyRequest.url}`);
+        // 检查是否为 SSE (text/event-stream)
+        if (contentType.includes('text/event-stream')) {
+            console.log(`Captured SSE from ${ctx.clientToProxyRequest.url}`);
 
-        // 获取响应体的数据流（SSE 是流式数据，可能会多次发送）
-        const sseData = bodyString;
+            // 获取响应体的数据流（SSE 是流式数据，可能会多次发送）
+            const sseData = bodyString;
 
-        // 将 SSE 数据根据事件分隔符 \n\n 进行分割
-        const events = sseData.split('\n\n');
+            // 将 SSE 数据根据事件分隔符 \n\n 进行分割
+            const events = sseData.split('\n\n');
 
-        // 遍历每个事件并处理
-        events.forEach(event => {
-            if (event.startsWith('data:')) {
-                // 去除 'data:' 前缀并整理数据
-                const eventData = event.slice(5).trim();
-                // 打印 SSE 事件数据
-                console.log(`SSE Event Data:\n${eventData}`);
-                processEventData(eventData,ctx.serverToProxyResponse.headers);
-            }
-        });
+            // 遍历每个事件并处理
+            events.forEach(event => {
+                if (event.startsWith('data:')) {
+                    // 去除 'data:' 前缀并整理数据
+                    const eventData = event.slice(5).trim();
+                    // 打印 SSE 事件数据
+                    console.log(`SSE Event Data:\n${eventData}`);
+                    processEventData(eventData,ctx.serverToProxyResponse.headers).then(()=>{
+                    }).catch(err=>{
+                        console.error(err);
+                        notifyAppError(err)
+                    })
+                }
+            });
+        }
+    }catch(err){
+        console.error(err);
+        notifyAppError(err)
     }
 }
 

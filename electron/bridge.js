@@ -9,7 +9,8 @@ const invokeJs = (invokeJsCode, callback) => {
             if (callback) callback(null, result);  // 调用回调并返回结果
         })
         .catch(err => {
-            console.error("JS 函数执行失败：" + err);
+            console.error("JS 函数执行失败：" , err);
+            notifyAppError(err)
             if (callback) callback(err);
         });
     }else{
@@ -19,15 +20,13 @@ const invokeJs = (invokeJsCode, callback) => {
 
 // 处理消息的函数，确保安全传递参数
 const processInvokeArguments = (invokeArguments) => {
-    if (!invokeArguments || invokeArguments.trim() === '""') {
+    invokeArguments = toStringOrJson(invokeArguments)
+    if (invokeArguments.trim() === '""') {
         invokeArguments = "`没有任何输出`";  // 返回默认的消息
     }
-
-    if (typeof invokeArguments === 'string') {
-        // 对参数进行适当的转义处理，避免引号冲突
-        if (!(invokeArguments.startsWith('`') && invokeArguments.endsWith('`'))) {
-            invokeArguments = `\`${invokeArguments.replace(/`/g, '\\`')}\``;
-        }
+    // 对参数进行适当的转义处理，避免引号冲突
+    if (!(invokeArguments.startsWith('`') && invokeArguments.endsWith('`'))) {
+        invokeArguments = `\`${invokeArguments.replace(/`/g, '\\`')}\``;
     }
     return invokeArguments;
 };
@@ -39,6 +38,25 @@ const notifyApp = ( message) => {
     `;
     invokeJs(jsTemplate);  // 传递窗口对象和 JS 模板
 };
+function toStringOrJson(obj) {
+   
+    const type = typeof obj;
+    console.log(`数据${obj},类型${type}`)
+    if (type === 'number' || type === 'bigint' || type === 'string' || type === 'object') {
+        return obj;
+    }
+     // 检查对象是否有 toString 方法，并且 toString 方法返回的不是默认的 [object Object]
+    if (obj && typeof obj.toString === 'function' && obj.toString() !== '[object Object]') {
+        return obj.toString();
+    }
+    // 如果 toString 不合适，使用 JSON.stringify
+    try {
+        return JSON.stringify(obj);
+    } catch (error) {
+        // JSON.stringify 会在遇到无法处理的对象时抛出异常（如循环引用）
+        return '[Unserializable Object]';
+    }
+}
 
 // 通知应用错误的函数
 const notifyAppError = (message) => {

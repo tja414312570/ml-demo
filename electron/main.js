@@ -27,7 +27,7 @@ async function injectScripts(win) {
   try {
       // 获取当前目录并构造 JavaScript 文件路径
       const currentDir = __dirname;
-      const scriptPath = path.join(currentDir, "js_bridge.js");
+      const scriptPath = path.join(currentDir, "bridge/js_bridge.js");
 
       // 读取 JavaScript 文件内容
       const jsContent = await fs.readFile(scriptPath, { encoding: 'utf-8' });

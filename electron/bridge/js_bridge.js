@@ -74,7 +74,7 @@
                 const App = {
                     data() {
                         return {
-                            message: 'Hello from Vue!'
+                            message: '解释器未就绪'
                         };
                     },
                     template: `
