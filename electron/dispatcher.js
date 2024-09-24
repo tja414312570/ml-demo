@@ -7,6 +7,7 @@ import { notifyApp, notifyAppError, sendApp ,uploadFile} from './bridge.js';
 
 import util from 'util';
 
+import { createWindow ,requiredWindow} from './window_manager.js';
 
 import {loadModules} from './modules.js'
 
@@ -120,10 +121,11 @@ async function dispatcherResponse(responseData) {
                 if (typeof executor.execute !== 'function') {
                     throw new Error(` “${language}“ executor executor.execute is not a function`);
                 }
-                const result = await executor.execute(code);
-                console.log(`执行结果:\n${result}`);
-                await notifyApp(`执行 ${language} 结果:\n${result}`);
-                await dispatcherResult(result);
+                const window = requiredWindow("代码窗口");
+                // const result = await executor.execute(code);
+                // console.log(`执行结果:\n${result}`);
+                // await notifyApp(`执行 ${language} 结果:\n${result}`);
+                // await dispatcherResult(result);
             } else {
                 await notifyApp(`不支持的代码语言: ${language}`);
             }
