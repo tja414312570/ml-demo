@@ -7,13 +7,24 @@ import { notifyApp, sendApp ,uploadFile} from './bridge.js';
 
 import util from 'util';
 
+
+import {loadModules} from './modules.js'
+
+const executors = {};
+
+loadModules('executor', (file, module) => {
+    executors[module.support] = module;
+    console.log(`load-module: ${file},${module.support}`);
+}).catch(console.error);
+
 // 使用 promisify 将子进程命令转换为 Promise
 const execFileAsync = promisify(execFile);
 const execAsync = promisify(exec);
 
 // 提取代码块的函数
 function extractCodeBlocksFromMarkdown(serverOutput) {
-    const pattern = /```(python|bash)\n([\s\S]*?)```/g;
+    const supportedLanguages = Object.keys(executors).join('|');
+    const pattern = new RegExp(`\`\`\`(${supportedLanguages})\\n([\\s\\S]*?)\`\`\``, 'g');
     const codeBlocks = [];
     let match;
 
@@ -23,55 +34,6 @@ function extractCodeBlocksFromMarkdown(serverOutput) {
 
     return codeBlocks;
 }
-
-// 执行 Python 代码
-async function executePythonCode(code) {
-    try {
-        console.log(`执行 Python 代码: ${code}`);
-        const tempFilePath = path.join(os.tmpdir(), `${Date.now()}.py`);
-        await fs.writeFile(tempFilePath, code, 'utf-8');
-
-        const env = {
-            ...process.env,
-            "https_proxy": "http://127.0.0.1:7890",
-            "http_proxy": "http://127.0.0.1:7890",
-            "all_proxy": "socks5://127.0.0.1:7890"
-        };
-
-        const { stdout, stderr } = await execFileAsync('python3', [tempFilePath], { env });
-        let output = stdout;
-        if (stderr) {
-            output += `\nError: ${stderr}`;
-        }
-
-        await fs.unlink(tempFilePath);
-        return output;
-    } catch (error) {
-        return `执行代码时出错: ${error.message}`;
-    }
-}
-
-// 执行 shell 命令
-async function runShellCommand(command) {
-    console.log(`执行 shell 命令: ${command}`);
-    try {
-        const env = {
-            ...process.env,
-            "https_proxy": "http://127.0.0.1:7890",
-            "http_proxy": "http://127.0.0.1:7890",
-            "all_proxy": "socks5://127.0.0.1:7890"
-        };
-
-        const { stdout, stderr } = await execAsync(command, { env });
-        return stdout + (stderr ? `\nError: ${stderr}` : '');
-    } catch (error) {
-        return `执行 shell 时出错: ${error.message}`;
-    }
-}
-
-// 上传文件的函数
-
-
 
 let responseData;
 // 处理 EventStream 数据并返回 JSON 的处理函数
@@ -139,19 +101,13 @@ async function dispatcherResponse(responseData) {
 
     if (codeBlocks.length > 0) {
         for (const [language, code] of codeBlocks) {
-            if (language === 'python') {
-                console.log(`检测到的 Python 代码:\n${code}`);
-                await notifyApp(`检测到的 Python 代码:\n${code}`);
-                const result = await executePythonCode(code);
+            if (executors[language]) {
+                console.log(`检测到的 ${language} 代码:\n${code}`);
+                await notifyApp(`检测到的 ${language} 代码:\n${code}`);
+                const executor = executors[language];
+                const result = await executor.execute(code);
                 console.log(`执行结果:\n${result}`);
-                await notifyApp(`执行 Python 结果:\n${result}`);
-                await dispatcherResult(JSON.stringify(result));
-            } else if (language === 'bash') {
-                console.log(`检测到的 Bash 代码:\n${code}`);
-                await notifyApp(`检测到的 Bash 代码:\n${code}`);
-                const result = await runShellCommand(code);
-                console.log(`执行 Bash 结果:\n${result}`);
-                await notifyApp(`执行 Bash 完成`);
+                await notifyApp(`执行 ${language} 结果:\n${result}`);
                 await dispatcherResult(JSON.stringify(result));
             } else {
                 await notifyApp(`不支持的代码语言: ${language}`);
@@ -271,8 +227,6 @@ const processResponse = (ctx, bodyString)=> {
 
 
 export {
-    executePythonCode,
-    runShellCommand,
     decodeResult,
     processEventData,
     dispatcherResponse,

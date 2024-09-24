@@ -74,6 +74,7 @@ const createWindow = () => {
     webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        webSecurity: false, // 禁用安全策略
         preload: path.join(__dirname, 'preload.js'),
         allowRunningInsecureContent: true // 允许不安全内容
     }
@@ -99,7 +100,7 @@ const createWindow = () => {
     proxyBypassRules: 'localhost'
   }).then(() => {
     console.log('Proxy is set successfully');
-    win.loadURL('https://share.github.cn.com/c/66f0bc12-4778-8007-90ee-5676751dfbbb');
+    win.loadURL('https://chat.openai.com/');
     
   }).catch((err) => {
     console.error('Failed to set proxy:', err);
