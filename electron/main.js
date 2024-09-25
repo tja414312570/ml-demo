@@ -118,6 +118,10 @@ app.on('window-all-closed', () => {
     }
 });
 app.whenReady().then(() => {
+  session.defaultSession.setCertificateVerifyProc((request, callback) => {
+    // 不进行任何证书验证，返回 true
+    callback(0); // 0 表示信任证书
+});
      // 启动代理服务器并指定上游代理
   const upstreamProxy = {
     host: '127.0.0.1',  // 上游代理服务器的地址

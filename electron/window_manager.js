@@ -25,7 +25,7 @@ const createWindow = (id)=>{
     return window;
 }
 const requiredWindow = (id)=>{
-    const window = windowManager[id];
+    let window = windowManager[id];
     if(!window){
         window = createWindow(id);
     }
