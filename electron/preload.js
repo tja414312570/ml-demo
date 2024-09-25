@@ -2,7 +2,6 @@
 const { ipcRenderer } = require('electron');
 
 window.addEventListener('DOMContentLoaded', () => {
-  console
   // 监听表单提交事件
   const loginForm = document.querySelector('form');
   if (loginForm) {

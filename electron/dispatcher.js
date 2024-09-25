@@ -122,6 +122,11 @@ async function dispatcherResponse(responseData) {
                     throw new Error(` “${language}“ executor executor.execute is not a function`);
                 }
                 const window = requiredWindow("代码窗口");
+                window.webContents.on('did-finish-load', () => {
+                    console.log('Page is fully loaded.');
+                    window.sendCode(code)
+                    // 你可以在这里执行任何你需要的操作
+                });
                 // const result = await executor.execute(code);
                 // console.log(`执行结果:\n${result}`);
                 // await notifyApp(`执行 ${language} 结果:\n${result}`);

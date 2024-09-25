@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Highlight.js Example with Webpack</title>
+</head>
+<link rel="stylesheet" href="./highlight/styles/sunburst.min.css">
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		/* background: #000;
+		color: #FFF; */
+	}
+	#language{
+		padding: 10px;
+		padding-bottom: 0;
+	}
+  code {
+	  white-space: pre;
+	}
+</style>
+<body>
+<div id="language">编辑器</div>
+<pre><code class="language-javascript" id="code-view">
+  </code></pre>
+
+  <!-- 引入打包后的 JavaScript 文件 -->
+  <script src="./highlight/highlight.min.js"></script>
+  <script >
+    const counter = document.getElementById('counter')
+
+    window.electronAPI.onCode((value) => {
+      // window.electronAPI.counterValue(newValue)
+      const highlight = hljs.highlightAuto(value)
+      document.querySelector("#code-view").innerHTML = highlight.value
+      document.querySelector("#language").innerHTML = highlight.language
+      console.log(highlight)
+      // hljs.highlightAll();
+    })
+   // hljs.highlightAll();
+  </script>
+</body>
+</html>

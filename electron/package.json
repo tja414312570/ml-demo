@@ -6,8 +6,8 @@
   "scripts": {
     "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "0x":"0x electron .",
-    "clinic":"clinic flame -- electron ."
+    "0x": "0x electron .",
+    "clinic": "clinic flame -- electron ."
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "electron": "^32.1.2",
+    "highlight.js": "^11.10.0",
     "http-proxy": "^1.18.1"
   },
   "description": ""

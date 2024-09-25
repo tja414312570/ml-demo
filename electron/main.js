@@ -8,6 +8,8 @@ import { promises as fs } from 'fs';
 import { notifyApp, notifyAppError } from './bridge.js';
 import { showErrorDialog } from './utils.js';
 
+import { requiredWindow } from './window_manager.js';
+
 // 获取当前模块路径
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -101,7 +103,7 @@ const createWindow = () => {
   }).then(() => {
     console.log('Proxy is set successfully');
     win.loadURL('https://chat.openai.com/');
-    
+    // win.loadFile("views/index.html")
   }).catch((err) => {
     console.error('Failed to set proxy:', err);
   });
@@ -131,7 +133,9 @@ app.whenReady().then(() => {
   };
   startProxyServer(upstreamProxy).then(proxy=>{
     createWindow()
+    // requiredWindow("code")
   }).catch(err=>{
+    console.error(err)
     showErrorDialog("代理未启动成功")
   })
 });
