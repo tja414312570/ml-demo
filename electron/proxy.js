@@ -1,28 +1,10 @@
 import { Proxy } from 'http-mitm-proxy'; // 导入 CommonJS 模块
-import fs from 'fs';
-import path from 'path';
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { fileURLToPath } from 'url';
 import zlib from 'zlib';
 import { processResponse } from './dispatcher.js'
 
-// 获取当前文件的路径
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 日志文件路径
-const logFilePath = path.join(__dirname, 'proxy_logs.txt');
-
-// 写日志到文件的辅助函数
-function logToFile(data) {
-  // console.log(data)
-  fs.appendFile(logFilePath, data + '\n', (err) => {
-    if (err) {
-      console.error('Error writing to log file:', err);
-    }
-  });
-}
+import {info} from './logger.js'
 
 export async function startProxyServer(upstreamProxy) {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
@@ -142,7 +124,7 @@ export async function startProxyServer(upstreamProxy) {
         logData += `错误原因: ${err}\n`;
         console.error(err);
       }).finally(() => {
-        logToFile(logData);
+        info(logData);
       })
     }
 
@@ -153,11 +135,11 @@ export async function startProxyServer(upstreamProxy) {
   process.on('uncaughtException', (err) => {
     if (err.code === 'ECONNRESET') {
       const errorLog = `Connection reset by peer: ${err}\n`;
-      logToFile(errorLog); // 写错误日志到文件
+      info(errorLog); // 写错误日志到文件
       console.warn('A connection was reset by the server:', err);
     } else {
       console.error('An unexpected error occurred:', err);
-      logToFile(`Unexpected error: ${err}\n`); // 写其他错误日志
+      info(`Unexpected error: ${err}\n`); // 写其他错误日志
     }
   });
   // proxy.onCertificateMissing = (ctx, files, callback) => {
@@ -182,7 +164,7 @@ export async function startProxyServer(upstreamProxy) {
   // 判断是否需要使用上游代理
   if (upstreamProxy) {
     const proxyUrl = `${upstreamProxy.protocol}//${upstreamProxy.host}:${upstreamProxy.port}`;
-    logToFile(`使用上游代理:${proxyUrl}`)
+    info(`使用上游代理:${proxyUrl}`)
     options.httpAgent = new HttpProxyAgent(proxyUrl);
     options.httpsAgent = new HttpsProxyAgent(proxyUrl);
   }
