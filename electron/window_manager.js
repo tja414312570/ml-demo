@@ -18,19 +18,22 @@ const createWindow = (id)=>{
         width: 1280,
         height: 760,
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
             contextIsolation: true,
             devTools:true,
-            preload: path.join(__dirname, 'views/preload.js'),
+            preload: path.join(__dirname, 'views/preload.mjs'),
         },
     });
     window.webContents.openDevTools();
     window.loadFile('views/index.html'); // 加载第二个窗口的 HTML 文件
     let i = 1;
     window.sendCode = (code)=>{
-        console.log("发送代码",code)
+        // notifyApp(`发送代码:${id}`)
         window.webContents.send('code', code)
     }
+    setInterval(()=>{
+        window.sendCode("var i = j;")
+    },1000)
     // 监听第二窗口关闭事件
     window.on('closed', () => {
         windowManager[id] = null
@@ -40,7 +43,9 @@ const createWindow = (id)=>{
 }
 const requiredWindow = (id)=>{
     let window = windowManager[id];
+    notifyApp(`打开窗口:${id}`)
     if(!window){
+        windowManager[id] = window;
         window = createWindow(id);
     }
     return window;
