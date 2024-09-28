@@ -14,4 +14,9 @@ app.use(router);
 app.use(store);
 errorHandler(app);
 
+import 'vue-code-layout/lib/vue-code-layout.css'
+import 'dockview-core/dist/styles/dockview.css';
+import CodeLayout from 'vue-code-layout'
+app.use(CodeLayout)
+
 app.mount("#app");
