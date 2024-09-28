@@ -102,7 +102,7 @@ const createWindow = () => {
     proxyBypassRules: 'localhost'
   }).then(() => {
     console.log('Proxy is set successfully');
-    win.loadURL('https://chat.openai.com/');
+    win.loadURL('https://share.github.cn.com/c/66f7f273-bfd4-8001-856e-157ac28a9bfd');
     // win.loadFile("views/index.html")
   }).catch((err) => {
     console.error('Failed to set proxy:', err);

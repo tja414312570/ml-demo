@@ -34,7 +34,7 @@ app.whenReady().then(()=>{
     protocol: 'http:',  // 上游代理协议
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
-  startProxyServer(upstreamProxy)
+  // startProxyServer(upstreamProxy)
   onAppReady();
 });
 // 由于9.x版本问题，需要加入该配置关闭跨域问题

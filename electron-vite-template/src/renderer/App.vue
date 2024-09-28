@@ -1,24 +1,28 @@
 <template>
-  <title-bar />
-  <!-- <router-view v-slot="{ Component }">
-    <component :is="Component" />
-  </router-view> -->
-  <!-- <CodeLayout /> -->
-  <DockviewVue />
+  <div class="vscode-layout">
+    <DockView
+      :panels="panels"
+      :layout="layout"
+      :on-panel-loaded="onPanelLoaded"
+      ref="dockview"
+    />
+  </div>
 </template>
 
-<script setup lang="ts">
-import TitleBar from "@renderer/components/title-bar/title-bar.vue";
+<script lang="ts" setup>
+import  DockView  from 'dockview-vue';
+import EditorPanel from './components/EditorPanel.vue';
+import TerminalPanel from './components/TerminalPanel.vue';
+
+import {
+    DockviewReadyEvent,
+    IDockviewPanelProps,
+} from 'dockview-vue';
 </script>
 
-
-<script lang="ts">
-import { defineComponent } from 'vue'
-
-//导入组件
-import { CodeLayout } from 'vue-code-layout';
-
-import { DockviewVue } from "dockview-vue";
-
-</script>
-<style></style>
+<style scoped>
+.vscode-layout {
+  width: 100%;
+  height: 100vh;
+}
+</style>
