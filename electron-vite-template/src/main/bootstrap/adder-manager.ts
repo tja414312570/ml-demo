@@ -1,5 +1,6 @@
 import { getConfigFromFile } from "@main/config/config-manager"
 import { Bootstrap } from "./bootstrap";
+import {app } from 'electron';
 
 const configure_name = "adder_list.json"
 class AdderManager implements Bootstrap{
@@ -19,4 +20,4 @@ class AdderManager implements Bootstrap{
     }
     
 }
-module.exports  = new AdderManager()
+module.exports  = new AdderManager() 

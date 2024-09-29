@@ -6,6 +6,7 @@ import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
 function getIpcRenderer() {
   const IpcRenderer = {};
   Object.keys(new IpcChannelMainClass()).forEach((channel) => {
+    console.log(`channel ${channel}`)
     IpcRenderer[channel] = {
       invoke: async (args: any) => ipcRenderer.invoke(channel, args),
     };

@@ -21,6 +21,10 @@ export interface IpcRendererEventListener<Send = void> {
   : (webContents: Electron.WebContents, args: Send) => void;
 }
 
+export class IpcChannelAdderClass{
+  GetList:IpcMainEventListener = null
+}
+
 export class IpcChannelMainClass {
   IsUseSysTitle: IpcMainEventListener<void, boolean> = null;
   /**

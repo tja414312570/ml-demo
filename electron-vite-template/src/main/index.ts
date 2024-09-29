@@ -7,6 +7,7 @@ import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
 import { useMenu } from "@main/hooks/menu-hook"
 import { startProxyServer } from "./services/proxy";
+
 import fs from "fs"
 
 app.setName('myApp');
@@ -43,7 +44,7 @@ app.whenReady().then(()=>{
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
   // startProxyServer(upstreamProxy)
-  // onAppReady();
+  onAppReady();
 });
 // 由于9.x版本问题，需要加入该配置关闭跨域问题
 app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
