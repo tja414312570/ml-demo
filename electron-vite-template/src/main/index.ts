@@ -7,6 +7,9 @@ import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
 import { useMenu } from "@main/hooks/menu-hook"
 import { startProxyServer } from "./services/proxy";
+import fs from "fs"
+
+app.setName('myApp');
 
 function onAppReady() {
   const { disableF12 } = useDisableButton();
@@ -26,7 +29,12 @@ function onAppReady() {
     console.log("已安装: vue-devtools");
   }
 }
-
+global.userDataPath = app.getPath('userData');
+if (fs.existsSync(global.userDataPath)) {
+  console.log('配置目录存在:', global.userDataPath);
+} else {
+  console.log('配置目录不存在:', global.userDataPath);
+}
 app.whenReady().then(()=>{
   const upstreamProxy = {
     host: '127.0.0.1',  // 上游代理服务器的地址
@@ -35,7 +43,7 @@ app.whenReady().then(()=>{
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
   // startProxyServer(upstreamProxy)
-  onAppReady();
+  // onAppReady();
 });
 // 由于9.x版本问题，需要加入该配置关闭跨域问题
 app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
