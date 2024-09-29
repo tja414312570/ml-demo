@@ -10,7 +10,26 @@
           每个面板都会调用此插槽来渲染，你可以根据 
           panel.name 来判断当前是那个面板，渲染对应内容 
         -->
-        <span>Panel {{ panel.name }}, content</span>
+
+        <v-list
+          :lines="false"
+          density="compact"
+          nav
+        >
+          <v-list-item
+            v-for="(item, i) in items"
+            :key="i"
+            :value="item"
+            color="primary"
+          >
+            <template v-slot:prepend>
+              <v-icon :icon="item.icon"></v-icon>
+            </template>
+
+            <v-list-item-title v-text="item.text"></v-list-item-title>
+          </v-list-item>
+        </v-list>
+        <span>Panel {{ debug(panel).name }}, content xxx</span>
       </template>
     </CodeLayout>
   </template>
@@ -22,6 +41,20 @@
   import IconSearch from './examples/assets/icons/IconSearch.vue';
   import type { MenuOptions } from '@imengyu/vue3-context-menu';
   
+  const items = [
+        { text: 'My Files', icon: 'mdi-folder' },
+        { text: 'Shared with me', icon: 'mdi-account-multiple' },
+        { text: 'Starred', icon: 'mdi-star' },
+        { text: 'Recent', icon: 'mdi-history' },
+        { text: 'Offline', icon: 'mdi-check-circle' },
+        { text: 'Uploads', icon: 'mdi-upload' },
+        { text: 'Backups', icon: 'mdi-cloud-upload' },
+      ]
+
+  const debug = (param)=>{
+    console.log(param)
+    return param;
+  }
   //2. 定义布局的基础定义，这些数据控制了
   //几个主要部分的大小、位置、是否显示等等状态
   const config = reactive<CodeLayoutConfig>({
@@ -34,8 +67,8 @@
     secondarySideBarWidth: 20,
     secondarySideBarMinWidth: 170,
     secondarySideBarAsActivityBar:true,
-    bottomPanelHeight: 50,
-    bottomPanelMinHeight: 40,
+    bottomPanelHeight: 30,
+    bottomPanelMinHeight: 20,
     bottomAlignment: 'center',
     panelHeaderHeight: 24,
     panelMinHeight: 150,
@@ -43,7 +76,7 @@
     titleBarShowCustomizeLayout: true,
     activityBar: true,
     primarySideBar: true,
-    secondarySideBar: false,
+    secondarySideBar: true,
     bottomPanel: true,
     statusBar: true,
     menuBar: true,
@@ -64,6 +97,7 @@
       tooltip: 'Explorer',
       name: 'explorer',
       badge: '2',
+      data:{key:'hello world'},
       iconLarge: () => h(IconFile),
     }, 'primarySideBar');
     codeLayout.value.addGroup({
@@ -84,6 +118,7 @@
       name: 'server.addr',
       noHide: true,
       startOpen: true,
+      data:{key:'hello world'},
       iconSmall: () => h(IconSearch),
       actions: [
         { 
