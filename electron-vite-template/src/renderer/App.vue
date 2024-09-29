@@ -1,14 +1,13 @@
 <template>
-    我的区域
     <!-- <CodeLayout /> -->
-     <div>
+     <!-- <div>
       <button v-for="(file, index) in tsFiles" :key="index" @click="loadIframe(file)">{{ file }}</button>
      </div>
     <div>
       {{iframeContent}}
       <iframe :src="iframeContent"  style="height: 100vh;" width="100%" height="500px"></iframe>
-    </div>
-    <CodeView />
+    </div> -->
+    <CodeView style="height: 100vh;" />
 </template>
 
 <script lang="ts" setup>
