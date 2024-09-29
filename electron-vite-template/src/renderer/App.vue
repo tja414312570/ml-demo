@@ -1,28 +1,40 @@
 <template>
-  <div class="vscode-layout">
-    <DockView
-      :panels="panels"
-      :layout="layout"
-      :on-panel-loaded="onPanelLoaded"
-      ref="dockview"
-    />
-  </div>
+    我的区域
+    <!-- <CodeLayout /> -->
+     <div>
+      <button v-for="(file, index) in tsFiles" :key="index" @click="loadIframe(file)">{{ file }}</button>
+     </div>
+    <div>
+      {{iframeContent}}
+      <iframe :src="iframeContent"  style="height: 100vh;" width="100%" height="500px"></iframe>
+    </div>
+    <CodeView />
 </template>
 
 <script lang="ts" setup>
-import  DockView  from 'dockview-vue';
-import EditorPanel from './components/EditorPanel.vue';
-import TerminalPanel from './components/TerminalPanel.vue';
+import { ref } from 'vue';
+import CodeView from './CodeView.vue';
 
-import {
-    DockviewReadyEvent,
-    IDockviewPanelProps,
-} from 'dockview-vue';
+  const modules = import.meta.glob('./ts/*.ts');
+
+  console.log(modules)
+  const tsFiles = Object.keys(modules)
+  for (const path in modules) {
+      console.log(path);
+  }
+  const iframeContent = ref("")
+  
+  const loadIframe = (tsFile) =>{
+    iframeContent.value  = `./dockview.html?tsFile=${tsFile}`;
+  } 
+  loadIframe(tsFiles[0])
 </script>
-
 <style scoped>
 .vscode-layout {
   width: 100%;
   height: 100vh;
+}
+ul,li{
+  list-style: none
 }
 </style>

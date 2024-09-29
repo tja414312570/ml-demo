@@ -54,3 +54,4 @@ app.config.errorHandler = (err) => {
     console.log(err);
 };
 app.mount(document.getElementById('app')!);
+console.log("nijiamia")

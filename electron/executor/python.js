@@ -23,7 +23,7 @@ export async function execute(code) {
             "all_proxy": "socks5://127.0.0.1:7890"
         };
 
-        const { stdout, stderr } = await execFileAsync('python3', [tempFilePath], { env });
+        const { stdout, stderr } = await execFileAsync('python', [tempFilePath], { env });
         let output = stdout;
         if (stderr) {
             output += `\nError: ${stderr}`;
@@ -32,6 +32,7 @@ export async function execute(code) {
         await fs.unlink(tempFilePath);
         return output;
     } catch (error) {
+        console.log(error)
         return `执行代码时出错: ${error.message}`;
     }
 }

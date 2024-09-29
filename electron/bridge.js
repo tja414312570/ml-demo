@@ -19,7 +19,7 @@ const invokeJs = (invokeJsCode, callback) => {
 };
 function sanitizeString(input) {
     // 替换无效的八进制转义序列（以 \0 开头的后面跟随1-3个数字）
-    return input.replace(/\\0[0-7]{1,3}/g, ''); // 移除所有无效八进制转义序列
+    return input.replace(/\\/g, '/').replace(/\\0[0-7]{1,3}/g, ''); // 移除所有无效八进制转义序列
 }
 
 // 处理消息的函数，确保安全传递参数
