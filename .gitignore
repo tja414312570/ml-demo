@@ -6,3 +6,7 @@
 /electron/dist/
 /electron/certs/
 /electron/.http-mitm-proxy/
+electron/package-lock.json
+electron/net-log.json
+electron/package-lock.json
+electron/net-log.json

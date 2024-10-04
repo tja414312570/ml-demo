@@ -7,7 +7,9 @@
       {{iframeContent}}
       <iframe :src="iframeContent"  style="height: 100vh;" width="100%" height="500px"></iframe>
     </div> -->
+    <v-theme-provider theme="dark" with-background>
     <CodeView style="height: 100vh;" />
+  </v-theme-provider>
 </template>
 
 <script lang="ts" setup>

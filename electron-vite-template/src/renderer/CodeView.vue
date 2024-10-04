@@ -5,30 +5,13 @@
       style="height: 400px"
        :mainMenuConfig="menuData"
     >
-      <template #panelRender="{ panel }">
+      <template #panelRender="{ panel }" >
         <!--
           每个面板都会调用此插槽来渲染，你可以根据 
           panel.name 来判断当前是那个面板，渲染对应内容 
         -->
-
-        <v-list
-          :lines="false"
-          density="compact"
-          nav
-        >
-          <v-list-item
-            v-for="(item, i) in items"
-            :key="i"
-            :value="item"
-            color="primary"
-          >
-            <template v-slot:prepend>
-              <v-icon :icon="item.icon"></v-icon>
-            </template>
-
-            <v-list-item-title v-text="item.text"></v-list-item-title>
-          </v-list-item>
-        </v-list>
+        <component :is="getPannel(panel.name)" :panel="panel" />
+       
         <span>Panel {{ debug(panel).name }}, content xxx</span>
       </template>
     </CodeLayout>
@@ -36,21 +19,15 @@
   
   <script lang="ts" setup>
   import { ref, reactive, onMounted, nextTick, h } from 'vue';
-  // import { type CodeLayoutConfig, type CodeLayoutInstance, defaultCodeLayoutConfig } from 'vue-code-layout';
+  import { type CodeLayoutConfig, type CodeLayoutInstance, defaultCodeLayoutConfig } from 'vue-code-layout';
   import IconFile from './examples/assets/icons/IconFile.vue';
   import IconSearch from './examples/assets/icons/IconSearch.vue';
   import type { MenuOptions } from '@imengyu/vue3-context-menu';
+  import {getPannel,addPannel} from './ts/pannel-manager'
+  import ServerList from './components/ServerList.vue';
+  import {serverApi} from './api/server-api'
   
-  const items = [
-        { text: 'My Files', icon: 'mdi-folder' },
-        { text: 'Shared with me', icon: 'mdi-account-multiple' },
-        { text: 'Starred', icon: 'mdi-star' },
-        { text: 'Recent', icon: 'mdi-history' },
-        { text: 'Offline', icon: 'mdi-check-circle' },
-        { text: 'Uploads', icon: 'mdi-upload' },
-        { text: 'Backups', icon: 'mdi-cloud-upload' },
-      ]
-
+  addPannel("server.addr",ServerList)
   const debug = (param)=>{
     console.log(param)
     return param;
@@ -66,7 +43,7 @@
     activityBarPosition: 'side',
     secondarySideBarWidth: 20,
     secondarySideBarMinWidth: 170,
-    secondarySideBarAsActivityBar:true,
+    secondarySideBarAsActivityBar: true,
     bottomPanelHeight: 30,
     bottomPanelMinHeight: 20,
     bottomAlignment: 'center',
@@ -80,7 +57,8 @@
     bottomPanel: true,
     statusBar: true,
     menuBar: true,
-    bottomPanelMaximize: false
+    bottomPanelMaximize: false,
+    secondaryActivityBarPosition: 'side'
   });
   
   //定义实例
@@ -110,26 +88,36 @@
   
     //获取底栏实例网格
     const bottomGroup = codeLayout.value.getRootGrid('bottomPanel');
-  
+   
     //向第一侧边栏刚刚添加的组中再加入面板
+    const server = {
+        onAdd(arg) {
+          console.log(`添加服务器:${arg}`)
+        },
+        onOpen(arg){
+          console.log(`打开服务器:${arg}`)
+        }
+      }as serverApi
     groupExplorer.addPanel({
       title: '服务器',
       tooltip: 'gpt服务器地址',
       name: 'server.addr',
       noHide: true,
       startOpen: true,
-      data:{key:'hello world'},
+      data:{api:server},
       iconSmall: () => h(IconSearch),
       actions: [
         { 
-          name: 'test',
+          name: '搜索',
+          tooltip:'搜索服务',
           icon: () => h(IconSearch),
-          onClick() {},
+          onClick() {server.actionSearch("192")},
         },
         { 
-          name: 'test2',
+          name: '添加',
+          tooltip:'添加服务',
           icon: () => h(IconFile),
-          onClick() {},
+          onClick() {server.actionAdd()},
         },
       ]
     });
@@ -138,6 +126,9 @@
       tooltip: '已加载的插件',
       name: 'explorer.outline',
       iconSmall: () => h(IconSearch),
+      data: {
+      generateContent: () => h('div', '这是插件面板内容')
+    },
       actions: [
         { 
           name: 'test',
@@ -151,7 +142,11 @@
         },
       ]
     });
-  
+   
+
+
+
+
     //向底栏加入面板
     bottomGroup.addPanel({
       title: '输出',
