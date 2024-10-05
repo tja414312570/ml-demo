@@ -14,6 +14,13 @@
        
         <span>Panel {{ debug(panel).name }}, content xxx</span>
       </template>
+      <!-- https://github.com/imengyu/vue-code-layout/blob/master/examples/views/BasicUseage.vue -->
+      <template #centerArea>
+          <MainWebView />
+      </template>
+      <template #statusBar>
+        <span>Custom render Status bar area</span>
+      </template>
     </CodeLayout>
   </template>
   
@@ -26,8 +33,17 @@
   import {getPannel,addPannel} from './ts/pannel-manager'
   import ServerList from './components/ServerList.vue';
   import {serverApi} from './api/server-api'
-  
+import MainWebView from './components/MainWebView.vue';
+import CodeEdit from './components/CodeEdit.vue';
+import XtermView from './components/XtermView.vue';
+  const MONACO_EDITOR_OPTIONS = {
+  automaticLayout: true,
+  formatOnType: true,
+  formatOnPaste: true,
+}; 
   addPannel("server.addr",ServerList)
+  addPannel("code.view",CodeEdit)
+  addPannel("bottom.terminal",XtermView)
   const debug = (param)=>{
     console.log(param)
     return param;
@@ -142,23 +158,45 @@
         },
       ]
     });
-   
+    const secondarySideBar = codeLayout.value.getRootGrid('secondarySideBar'); //获取第二侧边栏组
+
+    console.log("secondarySideBar",secondarySideBar)
+    // secondarySideBar.addPanel({
+    //   title: '插件',
+    //   tooltip: '已加载的插件',
+    //   name: 'explorer.outline',
+    //   iconSmall: () => h(IconSearch),
+    //   data: {
+    //   generateContent: () => h('div', '这是插件面板内容')
+    // },
+    //   actions: [
+    //     { 
+    //       name: 'test',
+    //       icon: () => h(IconSearch),
+    //       onClick() {},
+    //     },
+    //     { 
+    //       name: 'test2',
+    //       icon: () => h(IconFile),
+    //       onClick() {},
+    //     },
+    //   ]
+    // })
+
+    const groupRight1 = codeLayout.value.addGroup({
+        title: '代码试图',
+        tooltip: '代码试图',
+        name: 'code.view',
+        iconLarge: () => h(IconFile),
+      }, 'secondarySideBar');
 
 
 
-
-    //向底栏加入面板
-    bottomGroup.addPanel({
-      title: '输出',
-      tooltip: '输出',
-      name: 'bottom.ports',
-      startOpen: true,
-      iconSmall: () => h(IconSearch),
-    });
-    bottomGroup.addPanel({
+      bottomGroup.addPanel({
       title: '终端',
       tooltip: '终端',
       name: 'bottom.terminal',
+      startOpen: true,
       actions: [
         { 
           name: 'test',
@@ -172,6 +210,14 @@
         },
       ]
     });
+    //向底栏加入面板
+    bottomGroup.addPanel({
+      title: '输出',
+      tooltip: '输出',
+      name: 'bottom.ports',
+      iconSmall: () => h(IconSearch),
+    });
+   
   }
   
   onMounted(() => {

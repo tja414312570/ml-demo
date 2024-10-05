@@ -74,7 +74,7 @@ const api = props.panel.data.api as serverApi;
 const searchQuery = ref('');  // 搜索关键字
 const showSearch = ref(false);  // 控制搜索框显示/隐藏
 const servers = ref([
-  { id: 1, address: '192.168.1.1', icon: 'mdi-server' },
+  { id: 1, address: 'https://chatgpt.com/', icon: 'mdi-server' },
   { id: 2, address: '192.168.1.2', icon: 'mdi-server' },
 ]);
 

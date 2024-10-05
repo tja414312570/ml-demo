@@ -3,6 +3,19 @@ import { platform, release, arch } from "os";
 import { onUnmounted } from "vue";
 import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
 
+contextBridge.exposeInMainWorld('ipcRenderer', {
+  send: (channel, data) => ipcRenderer.send(channel, data),
+  on: (channel, func) => {
+    if (typeof func === 'function') {
+      ipcRenderer.on(channel, (event, ...args) => func(event,...args));
+    } else {
+      console.error(`The callback provided to ipcRenderer.on for channel "${channel}" is not a function.`);
+    }
+  },
+  invoke: (channel, data) => ipcRenderer.invoke(channel, data)
+});
+
+
 function getIpcRenderer() {
   const IpcRenderer = {};
   Object.keys(new IpcChannelMainClass()).forEach((channel) => {

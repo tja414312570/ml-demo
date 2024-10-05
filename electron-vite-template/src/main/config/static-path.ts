@@ -20,9 +20,9 @@ const filePath = {
   },
   getPreloadFile(fileName: string) {
     if (env !== 'development') {
-      return join(app.getAppPath(), "dist", "electron", "main", `${fileName}.js`)
+      return join(app.getAppPath(), "dist", "electron", "preload", `${fileName}.js`)
     }
-    return join(app.getAppPath(), `${fileName}.js`)
+    return join(app.getAppPath(),'..','preload', `${fileName}.js`)
 
   }
 }

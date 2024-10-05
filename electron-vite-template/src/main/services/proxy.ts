@@ -2,7 +2,7 @@ import { IContext, IProxyOptions, Proxy } from 'http-mitm-proxy'; // 导入 Comm
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import zlib from 'zlib';
-// import { processResponse } from './dispatcher.js'
+import { processResponse } from './dispatcher'
 
 import {info} from '../utils/logger'
 
@@ -106,11 +106,11 @@ export async function startProxyServer(upstreamProxy) {
     );
 
     if (isStaticResource) {
-      const cspHeader = ctx.serverToProxyResponse.headers['content-security-policy'];
-      if (contentType.includes('html') && cspHeader) {
-          delete ctx.serverToProxyResponse.headers['content-security-policy'];
-          console.log('Content-Security-Policy header removed.');
-      }
+      // const cspHeader = ctx.serverToProxyResponse.headers['content-security-policy'];
+      // if (contentType.includes('html') && cspHeader) {
+      //     delete ctx.serverToProxyResponse.headers['content-security-policy'];
+      //     console.log('Content-Security-Policy header removed.');
+      // }
       console.log("静态资源请求，放行", requestOptions.host);
     } else {
       // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
@@ -118,7 +118,7 @@ export async function startProxyServer(upstreamProxy) {
       let logData = `拦截处理:${requestOptions.method}:${requestOptions.port === 443 ? 'https' : 'http'}://${requestOptions.host}${requestOptions.path}\n`;
       let promise = processResponseBody(ctx);
       promise.then(bodyStr => {
-        // processResponse(ctx, bodyStr);
+        processResponse(ctx, bodyStr);
         logData += `响应数据: ${bodyStr}\n`;
       }).catch(err => {
         logData += `错误原因: ${err}\n`;
