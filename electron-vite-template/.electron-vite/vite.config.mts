@@ -37,6 +37,12 @@ export default defineConfig({
     cssCodeSplit: false,
   },
   server: {},
-  plugins: [vueJsx(), vuePlugin(), viteIkarosTools()],
+  plugins: [vueJsx(), vuePlugin({
+    template: {
+      compilerOptions: {
+        isCustomElement: tag => tag === 'webview',
+      },
+    },
+  }), viteIkarosTools()],
   optimizeDeps: {},
 });

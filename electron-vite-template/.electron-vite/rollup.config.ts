@@ -8,34 +8,37 @@ import json from "@rollup/plugin-json";
 import esbuild from "rollup-plugin-esbuild";
 import obfuscator from "rollup-plugin-obfuscator";
 import { defineConfig } from "rollup";
+import * as glob from "glob"; // 引入glob模块
 import { getConfig } from "./utils";
+
 const config = getConfig();
 
 export default (env = "production", type = "main") => {
+  const inputFiles =
+    type === "main"
+      ? path.join(__dirname, "..", "src", "main", "index.ts") // 主进程文件
+      : glob.sync(path.join(__dirname, "..", "src", "preload", "*.ts")); // 查找所有 .ts 文件
+
   return defineConfig({
-    input:
-      type === "main"
-        ? path.join(__dirname, "..", "src", "main", "index.ts")
-        : path.join(__dirname, "..", "src", "preload", "index.ts"),
-    output: {
-      file: path.join(
-        __dirname,
-        "..",
-        "dist",
-        "electron",
-        "main",
-        `${type === "main" ? type : "preload"}.js`
-      ),
-      format: "cjs",
-      name: type === "main" ? "MainProcess" : "MainPreloadProcess",
-      sourcemap: false,
-    },
+    input: inputFiles, // 单个文件或多个文件
+    output: type === "main"
+      ? { // 如果是 main，使用单文件输出
+        file: path.join(__dirname, "..", "dist", "electron", "main", "main.js"),
+        format: "cjs",
+        name: "MainProcess",
+        inlineDynamicImports: true,
+        sourcemap: false,
+      }
+      : { // 如果是 preload，使用输出目录
+        dir: path.join(__dirname, "..", "dist", "electron", "preload"),
+        format: "cjs",
+        sourcemap: false,
+      },
     plugins: [
       replace({
         preventAssignment: true,
         "process.env.userConfig": config ? JSON.stringify(config) : "{}",
       }),
-      // 提供路径和读取别名
       nodeResolve({
         preferBuiltins: true,
         browser: false,
@@ -46,23 +49,16 @@ export default (env = "production", type = "main") => {
       }),
       json(),
       esbuild({
-        // All options are optional
-        include: /\.[jt]s?$/, // default, inferred from `loaders` option
-        exclude: /node_modules/, // default
-        // watch: process.argv.includes('--watch'), // rollup 中有配置
-        sourceMap: false, // default
+        include: /\.[jt]s?$/,
+        exclude: /node_modules/,
+        sourceMap: false,
         minify: env === "production",
-        target: "es2017", // default, or 'es20XX', 'esnext'
-        // Like @rollup/plugin-replace
+        target: "es2017",
         define: {
           __VERSION__: '"x.y.z"',
         },
-        // Add extra loaders
         loaders: {
-          // Add .json files support
-          // require @rollup/plugin-commonjs
           ".json": "json",
-          // Enable JSX in .js files too
           ".js": "jsx",
         },
       }),
@@ -79,6 +75,7 @@ export default (env = "production", type = "main") => {
     ],
     external: [
       ...builtinModules,
+      "node-pty",
       "axios",
       "electron",
       "express",
