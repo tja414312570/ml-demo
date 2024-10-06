@@ -13,6 +13,7 @@ import rollupOptions from "./rollup.config";
 
 const mainOpt = rollupOptions(process.env.NODE_ENV, "main");
 const preloadOpt = rollupOptions(process.env.NODE_ENV, "preload");
+const pluginsOpt = rollupOptions(process.env.NODE_ENV, "executor");
 
 let electronProcess: ChildProcess | null = null;
 let manualRestart = false;
@@ -97,6 +98,36 @@ function startRenderer(): Promise<void> {
   });
 }
 
+function startPlugin(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const MainWatcher = watch(pluginsOpt);
+    MainWatcher.on("change", (filename) => {
+      // 主进程日志部分
+      logStats(
+        `${config.dev.chineseLog ? "插件文件变更" : "Plugin-FileChange"}`,
+        filename
+      );
+    });
+    MainWatcher.on("event", (event) => {
+      if (event.code === "END") {
+        if (electronProcess) {
+          manualRestart = true;
+          electronProcess.pid && process.kill(electronProcess.pid);
+          electronProcess = null;
+          startElectron();
+
+          setTimeout(() => {
+            manualRestart = false;
+          }, 5000);
+        }
+
+        resolve();
+      } else if (event.code === "ERROR") {
+        reject(event.error);
+      }
+    });
+  });
+}
 function startMain(): Promise<void> {
   return new Promise((resolve, reject) => {
     const MainWatcher = watch(mainOpt);
@@ -244,6 +275,7 @@ async function init() {
 
   try {
     await startRenderer();
+    await startPlugin();
     await startMain();
     await startPreload();
     startElectron();

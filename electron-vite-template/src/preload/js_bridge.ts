@@ -29,7 +29,8 @@ const js_bridge = () => {
         textarea.dispatchEvent(inputEvent);
         console.log("输入值完成", message)
       } else {
-        alert("没有找到输入框")
+        // alert("没有找到输入框")
+        myApp.foundSendBtn()
       }
 
       // 找到具有 data-testid="send-button" 的按钮

@@ -1,43 +1,41 @@
 <template>
-    <vue-monaco-editor
-      v-model:value="code"
-      language="shell"
-      theme="vs-dark"
-      :options="MONACO_EDITOR_OPTIONS"
-      @mount="handleMount"
-    />
-  </template>
-  
-  <script lang="ts" setup>
-  import { ref, shallowRef } from 'vue'
-  
-  const MONACO_EDITOR_OPTIONS = {
-    automaticLayout: true,
-    formatOnType: true,
-    formatOnPaste: true,
+  <div style="position: relative;">
+    <CodeTools :code="code" :language="orange_language" />
+  </div>
+  <div style="top: 40px;bottom:0;left:0;right:0;position: absolute;">
+    <div ref="terminalWrapper" style="position: relative;width: 100%;height: 100%;">
+      <vue-monaco-editor v-model:value="code" :language="language" theme="vs-dark" :options="MONACO_EDITOR_OPTIONS"
+        @mount="handleMount" />
+    </div>
+  </div>
+
+</template>
+
+<script lang="ts" setup>
+import { ref, shallowRef } from 'vue'
+import CodeTools from './CodeTools.vue';
+
+const MONACO_EDITOR_OPTIONS = {
+  automaticLayout: true,
+  formatOnType: true,
+  formatOnPaste: true,
+}
+const language = ref('shell')
+const orange_language = ref(language.value)
+const code = ref(`ls -l`)
+window.codeViewApi.onCode(code_content => {
+  code.value = code_content.code;
+  orange_language.value = code_content.language
+  if (code_content.language === 'shell' || code_content.language === 'bash' || code_content.language === 'cmd') {
+    code_content.language = 'shell'
   }
-  
-  const code = ref(`#!/bin/bash
-# 创建一个名为 myenv 的虚拟环境
-python3 -m venv myenv
+  language.value = code_content.language;
+})
+const editorRef = shallowRef()
+const handleMount = editor => (editorRef.value = editor)
 
-# 激活虚拟环境
-source myenv/bin/activate
-
-# 安装 requests 和 pandas 包
-pip install requests pandas
-
-# 输出已安装的包
-pip list
-
-# 结束虚拟环境
-deactivate
-`)
-  const editorRef = shallowRef()
-  const handleMount = editor => (editorRef.value = editor)
-  
-  // your action
-  function formatCode() {
-    editorRef.value?.getAction('editor.action.formatDocument').run()
-  }
-  </script>
+// your action
+function formatCode() {
+  editorRef.value?.getAction('editor.action.formatDocument').run()
+}
+</script>

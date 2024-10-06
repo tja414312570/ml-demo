@@ -9,7 +9,7 @@ import { useMenu } from "@main/hooks/menu-hook"
 import { startProxyServer } from "./services/proxy";
 
 import fs, { glob } from "fs"
-import { notify } from "./services/notify-manager";
+import { notify } from "./ipc/notify-manager";
 
 app.setName('myApp');
 

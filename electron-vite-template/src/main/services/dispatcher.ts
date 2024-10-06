@@ -4,27 +4,16 @@ import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
 import { notifyApp, notifyAppError, sendApp, uploadFile } from './bridge';
-import { notify, notifyError } from './notify-manager'
+import { notify, notifyError } from '../ipc/notify-manager'
 
 import util from 'util';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
 
 import { loadModules } from './modules'
+import { previewCode } from '@main/ipc/code-manager';
 
-const executors = {};
-
-loadModules('executor', (file, module) => {
-    if (!module.execute) {
-        throw new Error(` “${file}“ executor not implements execute function`);
-    }
-    // 检查 executor.execute 是否是函数
-    if (typeof module.execute !== 'function') {
-        throw new Error(` “${file}“ executor executor.execute is not a function`);
-    }
-    executors[module.support] = module;
-    console.log(`load-module: ${file},${module.support}`);
-}).catch(console.error);
+import { executors } from './code-executor';
 
 // 使用 promisify 将子进程命令转换为 Promise
 const execFileAsync = promisify(execFile);
@@ -122,22 +111,14 @@ async function dispatcherResponse(responseData) {
                 if (typeof executor.execute !== 'function') {
                     throw new Error(` “${language}“ executor executor.execute is not a function`);
                 }
-                // const window = requiredWindow("代码窗口");
-                // window.webContents.on('did-finish-load', () => {
-                //     console.log('Page is fully loaded.');
-                //     window.sendCode(code)
-                //     // 你可以在这里执行任何你需要的操作
-                // });
-                const result = await executor.execute(code);
-                console.log(`执行结果:\n${result}`);
-                await notify(`执行 ${language} 结果:\n${result}`);
-                await dispatcherResult(result);
+                previewCode({ code, language })
+                // TODO  
             } else {
                 await notify(`不支持的代码语言: ${language}`);
             }
         }
     } else {
-        console.log("未检测到代码块");
+        console.log("未检测到代码块", responseData);
         await notify("未检测到代码块");
     }
 }

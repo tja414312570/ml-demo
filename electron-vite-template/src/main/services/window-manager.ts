@@ -4,6 +4,8 @@ import { winURL, loadingURL, getPreloadFile } from "../config/static-path";
 import { useProcessException } from "@main/hooks/exception-hook";
 import * as pty from 'node-pty';
 import path from "path";
+import { CodeContent } from "@main/ipc/code-manager";
+import { executeCode } from "./code-executor";
 
 
 class MainInit {
@@ -86,6 +88,9 @@ class MainInit {
       ptyProcess.write(data);
     });
 
+    ipcMain.handle('codeViewApi.execute', (event, code: CodeContent) => {
+      return executeCode(code)
+    })
     // 调整终端大小
     ipcMain.on('terminal-resize', (event, cols, rows) => {
       if (cols > 0 && rows > 0) {

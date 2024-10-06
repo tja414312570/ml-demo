@@ -17,7 +17,7 @@ export default (env = "production", type = "main") => {
   const inputFiles =
     type === "main"
       ? path.join(__dirname, "..", "src", "main", "index.ts") // 主进程文件
-      : glob.sync(path.join(__dirname, "..", "src", "preload", "*.ts")); // 查找所有 .ts 文件
+      : glob.sync(path.join(__dirname, "..", "src", type, "*.ts")); // 查找所有 .ts 文件
 
   return defineConfig({
     input: inputFiles, // 单个文件或多个文件
@@ -27,12 +27,12 @@ export default (env = "production", type = "main") => {
         format: "cjs",
         name: "MainProcess",
         inlineDynamicImports: true,
-        sourcemap: false,
+        sourcemap: true,
       }
       : { // 如果是 preload，使用输出目录
-        dir: path.join(__dirname, "..", "dist", "electron", "preload"),
+        dir: path.join(__dirname, "..", "dist", "electron", type),
         format: "cjs",
-        sourcemap: false,
+        sourcemap: true,
       },
     plugins: [
       replace({
@@ -45,13 +45,13 @@ export default (env = "production", type = "main") => {
         extensions: [".mjs", ".ts", ".js", ".json", ".node"],
       }),
       commonjs({
-        sourceMap: false,
+        sourceMap: true,
       }),
       json(),
       esbuild({
         include: /\.[jt]s?$/,
         exclude: /node_modules/,
-        sourceMap: false,
+        sourceMap: true,
         minify: env === "production",
         target: "es2017",
         define: {

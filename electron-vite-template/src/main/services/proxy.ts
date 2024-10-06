@@ -4,14 +4,14 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import zlib from 'zlib';
 import { processResponse } from './dispatcher'
 
-import {info} from '../utils/logger'
+import { info } from '../utils/logger'
 
 export async function startProxyServer(upstreamProxy) {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
 
   // 拦截 HTTP 请求
   proxy.onRequest((ctx, callback) => {
-    console.log("请求", ctx.proxyToServerRequestOptions.host)
+    // console.log("请求", ctx.proxyToServerRequestOptions.host)
     const requestData = ctx.clientToProxyRequest;
     let body = [];
 
@@ -25,7 +25,7 @@ export async function startProxyServer(upstreamProxy) {
     callback(); // 继续请求
   });
 
-  const processResponseBody = (ctx:IContext) => {
+  const processResponseBody = (ctx: IContext) => {
     return new Promise((resolve, reject) => {
       // 如果响应是压缩的，进行解压
       const response = ctx.serverToProxyResponse;
@@ -111,7 +111,7 @@ export async function startProxyServer(upstreamProxy) {
       //     delete ctx.serverToProxyResponse.headers['content-security-policy'];
       //     console.log('Content-Security-Policy header removed.');
       // }
-      console.log("静态资源请求，放行", requestOptions.host);
+      // console.log("静态资源请求，放行", requestOptions.host);
     } else {
       // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
       console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
@@ -132,7 +132,7 @@ export async function startProxyServer(upstreamProxy) {
   });
 
   // 处理 ECONNRESET 错误
-  process.on('uncaughtException', (err:any) => {
+  process.on('uncaughtException', (err: any) => {
     if (err.code === 'ECONNRESET') {
       const errorLog = `Connection reset by peer: ${err}\n`;
       info(errorLog); // 写错误日志到文件
@@ -160,7 +160,7 @@ export async function startProxyServer(upstreamProxy) {
     console.error('Proxy error:', err);
   });
 
-  let options:IProxyOptions = { port: 3001, host: '127.0.0.1' };
+  let options: IProxyOptions = { port: 3001, host: '127.0.0.1' };
   // 判断是否需要使用上游代理
   if (upstreamProxy) {
     const proxyUrl = `${upstreamProxy.protocol}//${upstreamProxy.host}:${upstreamProxy.port}`;

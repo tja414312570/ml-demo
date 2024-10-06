@@ -11,6 +11,7 @@ import { errorLog, doneLog } from "./log";
 
 const mainOpt = rollupOptions(process.env.NODE_ENV, "main");
 const preloadOpt = rollupOptions(process.env.NODE_ENV, "preload");
+const pluginsOpt = rollupOptions(process.env.NODE_ENV, "executor");
 const isCI = process.env.CI || false;
 
 if (process.env.BUILD_TARGET === "web") web();
@@ -18,8 +19,7 @@ else unionBuild();
 
 async function clean() {
   await deleteAsync([
-    "dist/electron/main/*",
-    "dist/electron/renderer/*",
+    "dist/electron/*",
     "dist/web/*",
     "build/*",
     "!build/icons",
@@ -55,6 +55,17 @@ async function unionBuild() {
           try {
             const build = await rollup(preloadOpt);
             await build.write(preloadOpt.output as OutputOptions);
+          } catch (error) {
+            errorLog(`failed to build main process\n`);
+            return Promise.reject(error);
+          }
+        },
+      }, {
+        title: "building plugin process",
+        task: async () => {
+          try {
+            const build = await rollup(pluginsOpt);
+            await build.write(pluginsOpt.output as OutputOptions);
           } catch (error) {
             errorLog(`failed to build main process\n`);
             return Promise.reject(error);

@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from "electron";
 import { onUnmounted } from "vue";
 import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
+import { CodeContent } from "@main/ipc/code-manager";
 
 contextBridge.exposeInMainWorld('ipcRenderer', {
   send: (channel, data) => ipcRenderer.send(channel, data),
@@ -14,6 +15,16 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   invoke: (channel, data) => ipcRenderer.invoke(channel, data)
 });
 
+
+contextBridge.exposeInMainWorld('codeViewApi', {
+  onCode: (callback: Function) => ipcRenderer.on('codeViewApi.code', (event, notifyData) => {
+    callback(notifyData);
+  }),
+  executeCode: (code: CodeContent) => ipcRenderer.invoke("codeViewApi.execute", code),
+  onCodeExecuted: (callback: Function) => ipcRenderer.on('codeViewApi.code.executed', (event, notifyData) => {
+    callback(notifyData);
+  }),
+});
 
 contextBridge.exposeInMainWorld('notificationAPI', {
   onReady: () => ipcRenderer.send('notificationAPI-ready'),

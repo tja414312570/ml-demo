@@ -5,9 +5,11 @@
           每个面板都会调用此插槽来渲染，你可以根据 
           panel.name 来判断当前是那个面板，渲染对应内容 
         -->
-      <component :is="getPannel(panel.name)" :panel="panel" />
+      <keep-alive>
+        <component :is="getPannel(panel.name)" :panel="panel" />
+      </keep-alive>
 
-      <span>Panel {{ debug(panel).name }}, content xxx</span>
+      <!-- <span>Panel {{ debug(panel).name }}, content xxx</span> -->
     </template>
     <!-- https://github.com/imengyu/vue-code-layout/blob/master/examples/views/BasicUseage.vue -->
     <template #centerArea>
@@ -32,6 +34,7 @@ import MainWebView from './components/MainWebView.vue';
 import CodeEdit from './components/CodeEdit.vue';
 import XtermView from './components/XtermView.vue';
 import StatusBar from './components/StatusBar.vue';
+import CodeOutput from './components/CodeOutput.vue';
 const MONACO_EDITOR_OPTIONS = {
   automaticLayout: true,
   formatOnType: true,
@@ -40,6 +43,7 @@ const MONACO_EDITOR_OPTIONS = {
 addPannel("server.addr", ServerList)
 addPannel("code.view", CodeEdit)
 addPannel("bottom.terminal", XtermView)
+addPannel("bottom.output", CodeOutput)
 const debug = (param) => {
   console.log(param)
   return param;
@@ -53,9 +57,6 @@ const config = reactive<CodeLayoutConfig>({
   primarySideBarWidth: 20,
   primarySideBarMinWidth: 170,
   activityBarPosition: 'side',
-  secondarySideBarWidth: 20,
-  secondarySideBarMinWidth: 170,
-  secondarySideBarAsActivityBar: true,
   bottomPanelHeight: 30,
   bottomPanelMinHeight: 20,
   bottomAlignment: 'center',
@@ -65,11 +66,14 @@ const config = reactive<CodeLayoutConfig>({
   titleBarShowCustomizeLayout: true,
   activityBar: true,
   primarySideBar: true,
-  secondarySideBar: true,
   bottomPanel: true,
   statusBar: true,
   menuBar: true,
   bottomPanelMaximize: false,
+  secondarySideBar: true,
+  secondarySideBarWidth: 20,
+  secondarySideBarMinWidth: 170,
+  secondarySideBarAsActivityBar: true,
   secondaryActivityBarPosition: 'side'
 });
 
@@ -183,6 +187,16 @@ function loadLayout() {
     title: '代码试图',
     tooltip: '代码试图',
     name: 'code.view',
+    tabStyle: "single",
+    badge: "12",
+    startOpen: true,
+    actions: [
+      {
+        name: '调试',
+        tooltip: "运行调试",
+        icon: () => h(IconSearch),
+        onClick() { },
+      },],
     iconLarge: () => h(IconFile),
   }, 'secondarySideBar');
 
@@ -210,7 +224,7 @@ function loadLayout() {
   bottomGroup.addPanel({
     title: '输出',
     tooltip: '输出',
-    name: 'bottom.ports',
+    name: 'bottom.output',
     iconSmall: () => h(IconSearch),
   });
 

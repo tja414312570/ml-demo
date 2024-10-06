@@ -75,10 +75,22 @@ const clearNotification = () => {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    overflow: hidden;
 }
 
 .notification-text {
+
     font-size: 12px;
+    overflow: hidden;
+    /* 隐藏超出容器的内容 */
+    text-overflow: ellipsis;
+    /* 当内容溢出时显示省略号 */
+    white-space: nowrap;
+    /* 强制内容在一行显示，禁止换行 */
+    word-break: break-all;
+    /* 在单词内任意位置断行 */
+    overflow-wrap: break-word;
+    /* 优先在单词边界断行 */
 }
 
 .notification-text.error {

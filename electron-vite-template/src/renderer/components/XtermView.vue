@@ -69,9 +69,16 @@ onMounted(async () => {
 
   // 监听从主进程发来的数据
   ipcRenderer.on('terminal-output', (event, data) => {
-    console.log('Data received from terminal:', data);  // 调试终
+    console.log('Data received from terminal:', event, data);  // 调试终
     terminal.write(data);
   });
+
+  ipcRenderer.on('terminal-input', (event, data) => {
+    console.log('Data received from code:', data);  // 调试终
+    // terminal.write(data);
+    ipcRenderer.send('terminal-input', data);
+  });
+
 
   // 监听终端输入并发送到主进程
   terminal.onData((data) => {
