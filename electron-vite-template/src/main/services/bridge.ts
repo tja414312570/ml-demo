@@ -1,19 +1,20 @@
-import {showErrorDialog} from "../utils/dialog"
+import { showErrorDialog } from "@main/utils/dialog";
+
 // 执行 JS 代码的通用函数
 const invokeJs = (invokeJsCode, callback) => {
     console.log(`执行 JS 代码:\n${invokeJsCode}`);
-    if( global.window){
+    if (global.window) {
         global.window.webContents.executeJavaScript(invokeJsCode)
-        .then(result => {
-            console.log("JS 函数执行成功！" + result);
-            if (callback) callback(null, result);  // 调用回调并返回结果
-        })
-        .catch(err => {
-            console.error("JS 函数执行失败：" , err);
-            notifyAppError(err)
-            if (callback) callback(err);
-        });
-    }else{
+            .then(result => {
+                console.log("JS 函数执行成功！" + result);
+                if (callback) callback(null, result);  // 调用回调并返回结果
+            })
+            .catch(err => {
+                console.error("JS 函数执行失败：", err);
+                notifyAppError(err)
+                if (callback) callback(err);
+            });
+    } else {
         showErrorDialog("窗口未初始化")
     }
 };
@@ -37,20 +38,20 @@ const processInvokeArguments = (invokeArguments) => {
 };
 
 // 通知应用的函数
-const notifyApp = ( message) => {
+const notifyApp = (message) => {
     const jsTemplate = `
         document.myApp.notify(${processInvokeArguments(message)});
     `;
     invokeJs(jsTemplate);  // 传递窗口对象和 JS 模板
 };
 function toStringOrJson(obj) {
-   
+
     const type = typeof obj;
     console.log(`数据${obj},类型${type}`)
     if (type === 'number' || type === 'bigint' || type === 'string' || type === 'object') {
         return obj;
     }
-     // 检查对象是否有 toString 方法，并且 toString 方法返回的不是默认的 [object Object]
+    // 检查对象是否有 toString 方法，并且 toString 方法返回的不是默认的 [object Object]
     if (obj && typeof obj.toString === 'function' && obj.toString() !== '[object Object]') {
         return obj.toString();
     }
@@ -78,13 +79,13 @@ const sendApp = (message) => {
     invokeJs(jsTemplate);  // 传递窗口对象和 JS 模板
 };
 
-const uploadFile = (files)=>{
+const uploadFile = (files) => {
     async function uploadFile(page, filePath) {
         const inputFile = await page.$('input[type="file"]');
         console.log("上传文件路径:", filePath);
         await inputFile.setInputFiles(files);
     }
-    
+
 }
 // 集中导出所有函数
 export {

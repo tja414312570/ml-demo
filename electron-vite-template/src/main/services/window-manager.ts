@@ -44,7 +44,8 @@ class MainInit {
         allowRunningInsecureContent: true // 允许不安全内容
       },
     });
-
+    global.mainWindow = this.mainWindow;
+    console.log("初始化", global.mainWindow);
     const currentSession = session.defaultSession;
     currentSession.clearCache()
       .then(() => {
@@ -110,13 +111,13 @@ class MainInit {
     }).then(() => {
       console.log('所有存储数据已清理');
     });
-    ses.cookies.set({
-      url: 'https://chatgpt.com',
-      name: 'cf_clearance',
-      value: 'L_v9JpEHQIqc_67rTr3.6I3WjXQhCbX0Ry8CEhEO_4I-1728131342-1.2.1.1-4nuPoUfRrJV9c2wMNH61FVQu1p40XeOECzf8KgZXDyfmmwXfIhdyfV53_UGAPw_ft1uss8ptzgvRedtgK._wM3I6KFOdK894fUxech.JCDlNaOV2L.4N7aUvyymdDNoRdc7twfs3yFzvPgOTanaEaZQ2RCxW7dwpamI.lX5R9t3_QTa6Ah1EYDobucTx8fwiFLRJVLnd5KwKR6w3pgg72vhuVMN0UoJaykWAj2aGC6DzZKxlXQRe_5bouBjnpltDweRo1OxMt7wqWg9whoFgz2Uz4ggrqzkjZLv3hFOYQ2FtgaHYoRVTr7R6yz82Er7H2g.qOncbQQnGb5Zurf_k5P_NU2MYQUW_3_M5fDqm3YDdNbN9J9FPXB4W8UpoTIbEvsyqnp9SUYB4wirHGkMrqkXadXmfSQuAYY.MN9uHXmzxFwlsu3E9djx7hrCSr9Ve' // 将浏览器中的有效 cf_clearance Cookie 值填入
-    }).then(() => {
-      console.log('Cloudflare clearance cookie 已设置');
-    });
+    // ses.cookies.set({
+    //   url: 'https://chatgpt.com',
+    //   name: 'cf_clearance',
+    //   value: 'L_v9JpEHQIqc_67rTr3.6I3WjXQhCbX0Ry8CEhEO_4I-1728131342-1.2.1.1-4nuPoUfRrJV9c2wMNH61FVQu1p40XeOECzf8KgZXDyfmmwXfIhdyfV53_UGAPw_ft1uss8ptzgvRedtgK._wM3I6KFOdK894fUxech.JCDlNaOV2L.4N7aUvyymdDNoRdc7twfs3yFzvPgOTanaEaZQ2RCxW7dwpamI.lX5R9t3_QTa6Ah1EYDobucTx8fwiFLRJVLnd5KwKR6w3pgg72vhuVMN0UoJaykWAj2aGC6DzZKxlXQRe_5bouBjnpltDweRo1OxMt7wqWg9whoFgz2Uz4ggrqzkjZLv3hFOYQ2FtgaHYoRVTr7R6yz82Er7H2g.qOncbQQnGb5Zurf_k5P_NU2MYQUW_3_M5fDqm3YDdNbN9J9FPXB4W8UpoTIbEvsyqnp9SUYB4wirHGkMrqkXadXmfSQuAYY.MN9uHXmzxFwlsu3E9djx7hrCSr9Ve' // 将浏览器中的有效 cf_clearance Cookie 值填入
+    // }).then(() => {
+    //   console.log('Cloudflare clearance cookie 已设置');
+    // });
 
     ses.webRequest.onHeadersReceived((details, callback) => {
       delete details.responseHeaders['content-security-policy']
@@ -228,10 +229,7 @@ class MainInit {
     this.loadWindow.loadURL(loadingURL);
     this.loadWindow.show();
     this.loadWindow.setAlwaysOnTop(true);
-    // 延迟两秒可以根据情况后续调快，= =，就相当于个，sleep吧，就那种。 = =。。。
-    setTimeout(() => {
-      this.createMainWindow();
-    }, 100);
+    this.createMainWindow();
   }
   // 初始化窗口函数
   initWindow() {

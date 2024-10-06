@@ -1,5 +1,4 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent, shell } from "electron";
-import { platform, release, arch } from "os";
 import { onUnmounted } from "vue";
 import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
 
@@ -7,7 +6,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   send: (channel, data) => ipcRenderer.send(channel, data),
   on: (channel, func) => {
     if (typeof func === 'function') {
-      ipcRenderer.on(channel, (event, ...args) => func(event,...args));
+      ipcRenderer.on(channel, (event, ...args) => func(event, ...args));
     } else {
       console.error(`The callback provided to ipcRenderer.on for channel "${channel}" is not a function.`);
     }
@@ -15,6 +14,19 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   invoke: (channel, data) => ipcRenderer.invoke(channel, data)
 });
 
+
+contextBridge.exposeInMainWorld('notificationAPI', {
+  onReady: () => ipcRenderer.send('notificationAPI-ready'),
+  sendNotification: (message, isError = false) => ipcRenderer.send('notify', { message, isError }),
+  clearNotification: () => ipcRenderer.send('clear-notification'),
+  // 监听通知事件
+  onNotify: (callback) => ipcRenderer.on('show-notification', (event, notifyData) => {
+    callback(notifyData);
+  }),
+
+  // 监听清理通知事件
+  onClearNotification: (callback) => ipcRenderer.on('clear-notification', callback),
+});
 
 function getIpcRenderer() {
   const IpcRenderer = {};
@@ -45,12 +57,6 @@ function getIpcRenderer() {
 }
 
 contextBridge.exposeInMainWorld("ipcRendererChannel", getIpcRenderer());
-
-contextBridge.exposeInMainWorld("systemInfo", {
-  platform: platform(),
-  release: release(),
-  arch: arch(),
-});
 
 contextBridge.exposeInMainWorld("shell", shell);
 

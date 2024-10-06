@@ -3,13 +3,14 @@ import { execFile, exec } from 'child_process';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
-import { notifyApp, notifyAppError, sendApp ,uploadFile} from './bridge';
+import { notifyApp, notifyAppError, sendApp, uploadFile } from './bridge';
+import { notify, notifyError } from './notify-manager'
 
 import util from 'util';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
 
-import {loadModules} from './modules'
+import { loadModules } from './modules'
 
 const executors = {};
 
@@ -46,10 +47,10 @@ function extractCodeBlocksFromMarkdown(serverOutput) {
 let responseData;
 // 处理 EventStream 数据并返回 JSON 的处理函数
 // 异步处理 JSON 数据
-async function processEventData(body,headers) {
+async function processEventData(body, headers) {
 
-    console.log("收到的请求头信息：",body);
-    
+    console.log("收到的请求头信息：", body);
+
     if (body) {
         if (body === '[DONE]') {
             console.log("EventStream 完成，等待处理...");
@@ -103,7 +104,7 @@ async function processEventData(body,headers) {
 // 调度响应并执行 Python 或 Bash 代码
 async function dispatcherResponse(responseData) {
     console.log(`处理命令: ${responseData}`);
-    await notifyApp(`处理命令: ${responseData}`);
+    await notify(`处理命令: ${responseData}`);
 
     const codeBlocks = extractCodeBlocksFromMarkdown(responseData);
 
@@ -111,7 +112,7 @@ async function dispatcherResponse(responseData) {
         for (const [language, code] of codeBlocks) {
             if (executors[language]) {
                 console.log(`检测到的 ${language} 代码:\n${code}`);
-                await notifyApp(`检测到的 ${language} 代码:\n${code}`);
+                await notify(`检测到的 ${language} 代码:\n${code}`);
                 const executor = executors[language];
                 // 检查 executor 是否存在
                 if (!executor.execute) {
@@ -129,15 +130,15 @@ async function dispatcherResponse(responseData) {
                 // });
                 const result = await executor.execute(code);
                 console.log(`执行结果:\n${result}`);
-                await notifyApp(`执行 ${language} 结果:\n${result}`);
+                await notify(`执行 ${language} 结果:\n${result}`);
                 await dispatcherResult(result);
             } else {
-                await notifyApp(`不支持的代码语言: ${language}`);
+                await notify(`不支持的代码语言: ${language}`);
             }
         }
     } else {
         console.log("未检测到代码块");
-        await notifyApp("未检测到代码块");
+        await notify("未检测到代码块");
     }
 }
 
@@ -196,7 +197,7 @@ async function dispatcherResult(param, isDecodeResult = false) {
 
 let currentData = '';
 
-const decodeEventStream = (ctx,data)=> {
+const decodeEventStream = (ctx, data) => {
     // 将事件流根据两个换行符进行分割
     const events = data.split('\n\n');
 
@@ -207,8 +208,8 @@ const decodeEventStream = (ctx,data)=> {
                 console.log('Received Event:', eventData);
                 // 如果事件流发送 '[DONE]'，处理最终的响应数据
                 if (eventData === '[DONE]') {
-                    processResponse(ctx,currentData);
-                } 
+                    processResponse(ctx, currentData);
+                }
                 // 检查数据中是否包含特定标志 '"finished_successfully"'
                 else if (eventData.includes('"finished_successfully"')) {
                     currentData = eventData;
@@ -220,8 +221,8 @@ const decodeEventStream = (ctx,data)=> {
     });
 }
 
-const processResponse = async (ctx, bodyString)=> {
-    try{
+const processResponse = async (ctx, bodyString) => {
+    try {
         const contentType = ctx.serverToProxyResponse.headers['content-type'] || '';
 
         // 检查是否为 SSE (text/event-stream)
@@ -241,17 +242,17 @@ const processResponse = async (ctx, bodyString)=> {
                     const eventData = event.slice(5).trim();
                     // 打印 SSE 事件数据
                     console.log(`SSE Event Data:\n${eventData}`);
-                    processEventData(eventData,ctx.serverToProxyResponse.headers).then(()=>{
-                    }).catch(err=>{
+                    processEventData(eventData, ctx.serverToProxyResponse.headers).then(() => {
+                    }).catch(err => {
                         console.error(err);
-                        notifyAppError(err)
+                        notifyError(err)
                     })
                 }
             });
         }
-    }catch(err){
+    } catch (err) {
         console.error(err);
-        notifyAppError(err)
+        notifyError(err)
     }
 }
 
