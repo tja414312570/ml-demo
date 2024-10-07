@@ -8,27 +8,39 @@
   </div>
 </template>
 
-<script setup>
+<script lang='ts' setup>
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { Terminal } from 'xterm';
 import { debounce } from 'lodash';
 import { FitAddon } from 'xterm-addon-fit';
+import { getIpcApi } from '../ts/ipc-api'
 const fitAddon = new FitAddon();
 const terminalRef = ref(null);
 const terminalWrapper = ref(null);
 let terminal = null;
 let resizeObserver = null;
+const ipcListener: { [key: string]: (event, data) => void; } = {};
+let executeing = false;
+let results = []
+const end_tag = "=== Done ===";
+const cnm = (event, data) => {
+  executeing = true;
+  console.log('Data received from code:', data, executeing);  // 调试终
+  // terminal.write(data);
+  terminalApi.send('terminal-input', data + ' ; echo ' + end_tag + '\n');
+};
 
+const terminalApi: any = getIpcApi("ipcRenderer")
 onMounted(async () => {
   // 等待 DOM 更新完成
-  await nextTick();
+  console.log("初始化终端:", terminalWrapper)
   // 初始化 xterm.js 终端
   terminal = new Terminal({
     theme: {
       background: '#1e1e1e',  // 背景色
       foreground: '#dcdcdc',  // 前景色
       cursor: '#ffffff',      // 光标颜色
-      selection: '#c0c0c0',   // 选中颜色
+      selectionForeground: '#c0c0c0',   // 选中颜色
       black: '#000000',
       red: '#ff5555',
       green: '#50fa7b',
@@ -60,30 +72,39 @@ onMounted(async () => {
   terminal.options.fontSize = 12;
 
 
-
   terminal.loadAddon(fitAddon);
   terminal.open(terminalRef.value);
 
   // 调整终端大小
   fitAddon.fit();
-
-  // 监听从主进程发来的数据
-  ipcRenderer.on('terminal-output', (event, data) => {
-    console.log('Data received from terminal:', event, data);  // 调试终
+  ipcListener['terminal-input'] = cnm
+  console.log("引用是否相等:", cnm === ipcListener['terminal-input'])
+  ipcListener['terminal-output'] = function terminal_output(event, data) {
+    console.log('从终端收到数据:', terminalRef, executeing, data, data.trim(), end_tag, data.trim() === end_tag);  // 调试终
     terminal.write(data);
-  });
+    if (executeing) {
+      results.push(data)
+      if (data.trim() === end_tag) {
+        executeing = false;
+        console.log("代码执行完毕", results.join())
+        terminalApi.send('terminal-execute-completed', results.join());
+        results = []
+      }
+    }
+  }
 
-  ipcRenderer.on('terminal-input', (event, data) => {
-    console.log('Data received from code:', data);  // 调试终
-    // terminal.write(data);
-    ipcRenderer.send('terminal-input', data);
-  });
-
+  for (const key in ipcListener) {
+    if (ipcListener.hasOwnProperty(key)) {
+      const value = ipcListener[key];
+      console.log(`Key: ${key}, Value: A valid function`);
+      terminalApi.on(key, value);
+    }
+  }
 
   // 监听终端输入并发送到主进程
   terminal.onData((data) => {
     console.log('Data send from terminal:', data);  // 调试终
-    ipcRenderer.send('terminal-input', data);
+    terminalApi.send('terminal-input', data);
   });
   // 使用 ResizeObserver 监听容器大小变化并调整终端大小
   resizeObserver = new ResizeObserver(() => {
@@ -93,7 +114,7 @@ onMounted(async () => {
   resizeObserver.observe(terminalWrapper.value);
 
   terminal.prompt = () => {
-    ipcRenderer.send('terminal-into', '\r');
+    terminalApi.send('terminal-into', '\r');
   };
   terminal.clear()
   terminal.writeln('Welcome to SvelteStorm 5.0');
@@ -105,7 +126,7 @@ onMounted(async () => {
   const debouncedResize = debounce((cols, rows) => {
     console.log("resize:", cols, rows)
     if (cols > 0 && rows > 0) {
-      ipcRenderer.send('terminal-resize', cols, rows);
+      terminalApi.send('terminal-resize', cols, rows);
     }
   }, 100);
   terminal.onResize((size) => {
@@ -114,7 +135,7 @@ onMounted(async () => {
     // debouncedResize(cols, rows);
     console.log("resize:", cols, rows)
     if (cols > 0 && rows > 0) {
-      ipcRenderer.send('terminal-resize', cols, rows);
+      terminalApi.send('terminal-resize', cols, rows);
     }
   });
   window.addEventListener('resize', () => fitAddon.fit());
@@ -123,10 +144,13 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   // 销毁终端
+  console.log("销毁终端")
+  console.log("引用是否相等:", cnm === ipcListener['terminal-input'])
   if (terminal) {
     terminal.dispose();
     window.removeEventListener('resize', fitAddon.fit);
   }
+  terminalApi.off()
   if (resizeObserver) {
     resizeObserver.disconnect();
   }

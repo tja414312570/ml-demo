@@ -2,6 +2,7 @@ import { CodeContent, executeCodeCompleted } from "@main/ipc/code-manager";
 import { loadModules } from "./modules";
 import { notify } from "@main/ipc/notify-manager";
 import { send_ipc_render } from "@main/ipc/send_ipc";
+import { ipcMain } from "electron";
 
 export const executors = {};
 
@@ -26,6 +27,10 @@ loadModules('../executor', (file, module) => {
     console.log(`load-module: ${file},${module.support}`);
 }).catch(console.error);
 
+ipcMain.on('terminal-execute-completed', (event, input) => {
+    console.log("搜到执行结果", input)
+    executeCodeCompleted(input)
+});
 export const executeCode = async (code_body: CodeContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language } = code_body;

@@ -1,7 +1,7 @@
 "use strict";
 
 import { useMainDefaultIpc } from "./services/ipc-main";
-import { app, ipcMain, session } from "electron";
+import { app, ipcMain, IpcMainEvent, session } from "electron";
 import InitWindow from "./services/window-manager";
 import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
@@ -10,6 +10,7 @@ import { startProxyServer } from "./services/proxy";
 
 import fs, { glob } from "fs"
 import { notify } from "./ipc/notify-manager";
+import { listeners } from "process";
 
 app.setName('myApp');
 
