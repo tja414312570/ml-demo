@@ -1,0 +1,10 @@
+{
+    "name": "SamplePlugin",
+    "version": "1.0.0",
+    "description": "A sample plugin for demonstrating packaging with TypeScript.",
+    "pluginType": "custom",
+    "supportedHooks": ["sampleHook"],
+    "author": "Your Name",
+    "license": "MIT"
+  }
+  
