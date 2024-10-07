@@ -5,6 +5,7 @@
     "pluginType": "custom",
     "supportedHooks": ["sampleHook"],
     "author": "Your Name",
+    "main":"./bundle.js",
     "license": "MIT",
     "type":"bridge",
     "match":["https://chat.openai.com/*","https://chatgpt.com/*","https://share.github.cn.com/*"]
