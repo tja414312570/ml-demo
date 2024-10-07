@@ -114,7 +114,7 @@ export async function startProxyServer(upstreamProxy) {
       // console.log("静态资源请求，放行", requestOptions.host);
     } else {
       // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
-      console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
+      // console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
       let logData = `拦截处理:${requestOptions.method}:${requestOptions.port === 443 ? 'https' : 'http'}://${requestOptions.host}${requestOptions.path}\n`;
       let promise = processResponseBody(ctx);
       promise.then(bodyStr => {

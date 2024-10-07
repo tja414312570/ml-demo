@@ -38,32 +38,32 @@ let responseData;
 // 异步处理 JSON 数据
 async function processEventData(body, headers) {
 
-    console.log("收到的请求头信息：", body);
+    // console.log("收到的请求头信息：", body);
 
     if (body) {
         if (body === '[DONE]') {
             console.log("EventStream 完成，等待处理...");
-            for (const [key, value] of Object.entries(headers)) {
-                switch (key) {
-                    case "content-length":
-                        console.log(`内容长度: ${value}`);
-                        break;
-                    case "authorization":
-                        console.log(`授权: ${value.slice(0, 10)}...（部分隐藏）`);
-                        break;
-                    case "accept":
-                        console.log(`接受内容类型: ${value}`);
-                        break;
-                    case "referer":
-                        console.log(`来源页面: ${value}`);
-                        break;
-                    case "cookie":
-                        console.log(`Cookie 信息: ${value.slice(0, 30)}...（部分隐藏）`);
-                        break;
-                    default:
-                        console.log(`${key}: ${value}`);
-                }
-            }
+            // for (const [key, value] of Object.entries(headers)) {
+            //     switch (key) {
+            //         case "content-length":
+            //             console.log(`内容长度: ${value}`);
+            //             break;
+            //         case "authorization":
+            //             console.log(`授权: ${value.slice(0, 10)}...（部分隐藏）`);
+            //             break;
+            //         case "accept":
+            //             console.log(`接受内容类型: ${value}`);
+            //             break;
+            //         case "referer":
+            //             console.log(`来源页面: ${value}`);
+            //             break;
+            //         case "cookie":
+            //             console.log(`Cookie 信息: ${value.slice(0, 30)}...（部分隐藏）`);
+            //             break;
+            //         default:
+            //             console.log(`${key}: ${value}`);
+            //     }
+            // }
             await dispatcherResponse(responseData);
         } else {
             const bodyData = JSON.parse(body);

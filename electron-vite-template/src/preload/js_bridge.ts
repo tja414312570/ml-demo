@@ -244,5 +244,6 @@ const js_bridge = () => {
 const webviewApi: any = getIpcApi('webview-api')
 webviewApi.on("webviewApi.send-content", (event, message) => {
   console.log("搜到webview消息：", event, message)
+  document.myApp.send(message)
 })
 js_bridge()
