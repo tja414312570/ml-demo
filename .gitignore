@@ -10,3 +10,4 @@ electron/package-lock.json
 electron/net-log.json
 electron/package-lock.json
 electron/net-log.json
+electron-vite-template/plugins/proxy/package-lock.json
