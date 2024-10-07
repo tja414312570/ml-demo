@@ -6,6 +6,7 @@ import * as pty from 'node-pty';
 import path from "path";
 import { CodeContent } from "@main/ipc/code-manager";
 import { executeCode } from "./code-executor";
+import { bindListenerChannel, getWebContentIds, removeListenerChannel } from "./web-content-listener";
 
 
 class MainInit {
@@ -62,6 +63,21 @@ class MainInit {
       console.log('Auth cache cleared successfully.');
     });
 
+    ipcMain.handle('ipc-core.get-current-webcontents-id', (event, input) => {
+      return event.sender.id;
+    });
+    ipcMain.on('ipc-core.bind-channel-listener', (event, channel_info) => {
+      const { webContentId, channel } = channel_info;
+      console.log("绑定渠道", webContentId, channel)
+      bindListenerChannel(channel, webContentId)
+      console.log(`渠道：${channel},窗口：${JSON.stringify(getWebContentIds(channel))}`)
+    });
+    ipcMain.on('ipc-core.remove-channel-listener', (event, channel_info) => {
+      const { webContentId, channel } = channel_info;
+      console.log("移除渠道", webContentId, channel)
+      removeListenerChannel(channel, webContentId)
+      console.log(`渠道：${channel},窗口：${JSON.stringify(getWebContentIds(channel))}`)
+    });
     // 创建 PTY 实例
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
     const ptyProcess = pty.spawn(shell, [], {
@@ -76,6 +92,7 @@ class MainInit {
     ipcMain.on('terminal-input', (event, input) => {
       ptyProcess.write(input);
     });
+
     ipcMain.handle('load-script', (event, fileName) => {
       console.log("加载脚本：", fileName, getPreloadFile(fileName))
       return path.join("file://", getPreloadFile(fileName))

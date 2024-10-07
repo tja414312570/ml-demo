@@ -1,3 +1,5 @@
+import { getIpcApi } from '../renderer/ts/ipc-api'
+
 const js_bridge = () => {
   if (document.myApp) {
     console.log("桥接程序已初始化", document.myApp)
@@ -239,4 +241,8 @@ const js_bridge = () => {
   myApp.createApp();
   return "ok";
 }
+const webviewApi: any = getIpcApi('webview-api')
+webviewApi.on("webviewApi.send-content", (event, message) => {
+  console.log("搜到webview消息：", event, message)
+})
 js_bridge()

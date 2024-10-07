@@ -27,9 +27,6 @@ const removeListener = (_id_) => {
     }
   }
 }
-function isListener(args: any[]) {
-  return args.some(arg => typeof arg === 'function');;
-}
 
 const ipcRenderMapper = {
   _id_: undefined,

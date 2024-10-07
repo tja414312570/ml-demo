@@ -1,8 +1,18 @@
-import { contextBridge, ipcRenderer } from "electron";
-const api = 'dym_module'
-contextBridge.exposeInMainWorld(api, {
-  loadScript: (file_name) => ipcRenderer.send("load-script", file_name),
-});
+import { ipcRenderer } from "electron";
+
+import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
+
+const api = 'webview-api'
+
+exposeInMainWorld(api, {
+  on: (channel, callback) => {
+    console.log("webview监听:", channel)
+    ipcRenderMapper.on(channel, (event, message) => {
+      console.log("webview消息:", message)
+      callback(event, message)
+    })
+  }
+})
 
 window.addEventListener('DOMContentLoaded', () => {
   console.log('DOM 已经加载完成');

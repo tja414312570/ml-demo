@@ -3,6 +3,7 @@ import { loadModules } from "./modules";
 import { notify } from "@main/ipc/notify-manager";
 import { send_ipc_render } from "@main/ipc/send_ipc";
 import { ipcMain } from "electron";
+import { sendMessage } from "@main/ipc/webview-api";
 
 export const executors = {};
 
@@ -35,8 +36,9 @@ export const executeCode = async (code_body: CodeContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language } = code_body;
     const executor = executors[language];
-    // const result = await executor.execute(code);
-    send_ipc_render('terminal-input', code)
+    const result = await executor.execute(code);
+    sendMessage(result)
+    // send_ipc_render('terminal-input', code)
     // console.log(`执行结果:\n${result}`);
     // notify(`执行 ${language} 结果:\n${result}`);
     // executeCodeCompleted({ code, language, result })

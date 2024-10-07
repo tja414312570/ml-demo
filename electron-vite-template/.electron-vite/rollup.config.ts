@@ -10,6 +10,7 @@ import obfuscator from "rollup-plugin-obfuscator";
 import { defineConfig } from "rollup";
 import * as glob from "glob"; // 引入glob模块
 import { getConfig } from "./utils";
+import getPreloadConfigs from './rollup.preload.config'
 
 const config = getConfig();
 
@@ -18,6 +19,13 @@ export default (env = "production", type = "main") => {
     type === "main"
       ? path.join(__dirname, "..", "src", "main", "index.ts") // 主进程文件
       : glob.sync(path.join(__dirname, "..", "src", type, "*.ts")); // 查找所有 .ts 文件
+
+  if (type === 'preload') {
+    // 生成并返回 `preload` 的配置
+    return getPreloadConfigs(env);
+  }
+
+
 
   return defineConfig({
     input: inputFiles, // 单个文件或多个文件
