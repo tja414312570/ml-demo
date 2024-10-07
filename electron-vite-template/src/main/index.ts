@@ -2,7 +2,7 @@ import path from "path";
 import pluginManager from "./moduld/plugin-manager";
 
 // 加载所有插件
-pluginManager.loadPlugins('/Volumes/mac_data/git/ml-demo/electron-vite-template/plugins');
+pluginManager.loadPlugins('/Volumes/mac_data/git/ml-demo/electron-vite-template/plugins/');
 
 // 模拟当前 URL 场景（实际中你可以从请求或上下文中获取 URL）
 const currentURL = 'https://chat.openai.com/some/path';

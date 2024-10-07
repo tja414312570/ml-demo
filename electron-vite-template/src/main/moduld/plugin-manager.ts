@@ -38,7 +38,7 @@ class PluginManager {
         this.pluginDirs.push(pluginsDir);
         const pluginDirs = fs.readdirSync(pluginsDir);
         for (const pluginDir of pluginDirs) {
-            const manifestPath = path.join(pluginDir, pluginDir, 'manifest.json');
+            const manifestPath = path.join(pluginsDir, pluginDir, 'manifest.json');
             if (fs.existsSync(manifestPath)) {
                 const manifest = this.loadManifest(manifestPath);
                 if (manifest) {
