@@ -10,7 +10,12 @@ import * as fs from 'fs'
 pluginManager.setContext(pluginContext)
 
 // 加载所有插件
-const pluginInfo: PluginInfo = pluginManager.loadPlugin(path.join(__dirname, '../../../plugins/proxy'));
+let pluginInfo: PluginInfo = pluginManager.loadPlugin(path.join(__dirname, '../../../plugins/proxy'));
+console.log(`获取插件1:` + pluginInfo.name)
+pluginInfo = pluginManager.getPluginFromId(pluginInfo.id);
+console.log(`获取插件2:` + pluginInfo.name)
+const plugins: Set<PluginInfo> = pluginManager.getPluginsFromType(pluginInfo.type);
+console.log(`获取插件3:` + JSON.stringify([...plugins]))
 const module: any = pluginInfo.getModule();
 module.onResponse("来自组件")
 

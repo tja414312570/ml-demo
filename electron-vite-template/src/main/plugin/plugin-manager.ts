@@ -1,21 +1,42 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginExtensionContext, PluginInfo, PluginManifest } from './type/plugin';
+import { PluginExtensionContext, PluginInfo, PluginManifest, PluginType } from './type/plugin';
 import assert from 'assert';
 import { v4 as uuidv4 } from 'uuid';
-import { showErrorDialog } from '@main/utils/dialog';
+import { MapSet } from '../utils/MapSet';
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
 // 插件管理类
 class PluginManager {
-    private pluginDirs: Array<string> = [];           // 插件目录
-    private plugins: PluginInfo[] = []; // 已加载的插件列表
+    private pluginDirs: Set<string> = new Set();           // 插件目录
+    private pluginSet: Set<PluginInfo> = new Set(); // 已加载的插件列表
     private ctx: PluginExtensionContext;
+    private idMapping: { [key: string]: PluginInfo } = {}
+    private typeMapping: MapSet<PluginInfo> = new MapSet();
     constructor() {
 
     }
     public setContext(ctx: PluginExtensionContext) {
         this.ctx = ctx;
+    }
+    add(pluginInfo: PluginInfo) {
+        this.idMapping[pluginInfo.id] = pluginInfo;
+        this.pluginSet.add(pluginInfo);
+        this.typeMapping.add(pluginInfo.type, pluginInfo)
+    }
+    remove(pluginInfo: PluginInfo) {
+        this.pluginSet.delete(pluginInfo)
+        delete this.idMapping[pluginInfo.id];
+        this.typeMapping.remove(pluginInfo.type, pluginInfo)
+    }
+    public getPluginsFromType(type: PluginType): Set<PluginInfo> | undefined | null {
+        return this.typeMapping.get(type);
+    }
+    public getAllPlugins(): Set<PluginInfo> {
+        return this.pluginSet;
+    }
+    public getPluginFromId(id: string): PluginInfo {
+        return this.idMapping[id];
     }
     private wrapperModule(instance: any, pluginInfo: PluginInfo) {
         return new Proxy(instance, {
@@ -47,7 +68,7 @@ class PluginManager {
             version: manifest.version,
             description: manifest.description,
             module: null,
-            type: manifest.type,
+            type: manifest.type as any,
             match: manifest.match,
             load: () => {
                 const orgin = require(pluginInfo.file);
@@ -63,6 +84,7 @@ class PluginManager {
                 }
                 pluginInfo.module.onUnmounted(this.ctx);
                 this.ctx.remove(pluginInfo);
+                this.remove(pluginInfo)
                 // 清除 require.cache 中的模块缓存
                 delete require.cache[require.resolve(pluginInfo.file)];
                 console.log(`插件 ${manifest.name} 已卸载`);
@@ -74,12 +96,13 @@ class PluginManager {
                 return pluginInfo.module;
             }
         };
-        this.plugins.push(pluginInfo);
+        this.add(pluginInfo)
         return pluginInfo;
     }
+
     // 加载所有插件
     public loadPluginFromDir(pluginsDir: string) {
-        this.pluginDirs.push(pluginsDir);
+        this.pluginDirs.add(pluginsDir);
         const pluginDirs = fs.readdirSync(pluginsDir);
         for (const pluginDir of pluginDirs) {
             this.loadPlugin(pluginDir)
@@ -96,24 +119,24 @@ class PluginManager {
         return manifestInfo;
     }
 
-    // 根据 URL 匹配插件
-    public getPluginsByURL(url: string): PluginInfo[] {
-        return this.plugins.filter((plugin) => {
-            if (!plugin.match || plugin.match.length === 0) return false;
-            return plugin.match.some((pattern) => this.urlMatch(url, pattern));
-        });
-    }
+    // // 根据 URL 匹配插件
+    // public getPluginsByURL(url: string): PluginInfo[] {
+    //     return this.plugins.filter((plugin) => {
+    //         if (!plugin.match || plugin.match.length === 0) return false;
+    //         return plugin.match.some((pattern) => this.urlMatch(url, pattern));
+    //     });
+    // }
 
-    // 简单的 URL 匹配函数（支持简单通配符匹配）
-    private urlMatch(url: string, pattern: string): boolean {
-        const regex = new RegExp(
-            '^' +
-            pattern
-                .replace(/\*/g, '.*')
-                .replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&') + '$'
-        );
-        return regex.test(url);
-    }
+    // // 简单的 URL 匹配函数（支持简单通配符匹配）
+    // private urlMatch(url: string, pattern: string): boolean {
+    //     const regex = new RegExp(
+    //         '^' +
+    //         pattern
+    //             .replace(/\*/g, '.*')
+    //             .replace(/[-/\\^$+?.()|[\]{}]/g, '\\$&') + '$'
+    //     );
+    //     return regex.test(url);
+    // }
 }
 
 export default new PluginManager();

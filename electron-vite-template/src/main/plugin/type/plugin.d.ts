@@ -8,9 +8,9 @@ export interface PluginManifest {
     main: string;              // 插件的入口文件
     pluginType: string;        // 插件类型
     supportedHooks: string[];  // 插件支持的钩子
-    author?: string;
+    author: string;
     license?: string;
-    type?: string;             // 自定义插件的类型（如 bridge）
+    type: string;             // 自定义插件的类型（如 bridge）
     match?: string[];          // 匹配规则（如 URL 匹配）
 }
 
@@ -23,7 +23,7 @@ export interface PluginInfo {
     file: string;
     description: string;
     module: Pluginlifecycle & any;                // 插件导出的钩子函数
-    type?: string;             // 插件类型（根据 manifest 中的 type 字段）
+    type: PluginType;             // 插件类型（根据 manifest 中的 type 字段）
     match?: string[];          // 匹配规则
     load: () => void;
     unload: () => void;
@@ -41,4 +41,8 @@ export interface PluginExtensionContext {
      * @param plugin 
      */
     remove(plugin: Pluginlifecycle & any): void;
+}
+
+export enum PluginType {
+    'bridge', 'executor'
 }

@@ -1,10 +1,11 @@
-export type ChannelMapType = { [key: string]: Array<number> };
-const channels: ChannelMapType = {}
-export const getWebContentIds = (channel: string) => {
+import { MapSet } from "@main/utils/MapSet";
+
+const channels: MapSet<number> = new MapSet
+export const getWebContentIds = (channel: string): Set<number> => {
     return channels[channel];
 }
 
-export const getAllChannel = (): ChannelMapType => {
+export const getAllChannel = (): MapSet<number> => {
     return channels;
 }
 

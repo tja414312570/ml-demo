@@ -70,13 +70,11 @@ class MainInit {
       const { webContentId, channel } = channel_info;
       console.log("绑定渠道", webContentId, channel)
       bindListenerChannel(channel, webContentId)
-      console.log(`渠道：${channel},窗口：${JSON.stringify(getWebContentIds(channel))}`)
     });
     ipcMain.on('ipc-core.remove-channel-listener', (event, channel_info) => {
       const { webContentId, channel } = channel_info;
       console.log("移除渠道", webContentId, channel)
       removeListenerChannel(channel, webContentId)
-      console.log(`渠道：${channel},窗口：${JSON.stringify(getWebContentIds(channel))}`)
     });
     // 创建 PTY 实例
     const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';

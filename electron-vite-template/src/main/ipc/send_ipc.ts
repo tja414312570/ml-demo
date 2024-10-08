@@ -4,8 +4,8 @@ import { webContents } from "electron";
 
 export const send_ipc_render = (event_: string, message: any) => {
     if (global.mainWindow) {
-        const webContentIds: Array<number> | undefined = getWebContentIds(event_)
-        if (webContentIds && webContentIds.length > 0) {
+        const webContentIds: Set<number> | undefined = getWebContentIds(event_)
+        if (webContentIds && webContentIds.size > 0) {
             webContentIds.forEach(webContentId => {
                 const webContent = webContents.fromId(webContentId)
                 if (webContent) {
