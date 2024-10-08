@@ -9,8 +9,9 @@ import * as fs from 'fs'
 
 pluginManager.setContext(pluginContext)
 
+pluginManager.loadPluginFromDir(path.join(__dirname, '../../../plugins'))
 // 加载所有插件
-let pluginInfo: PluginInfo = pluginManager.loadPlugin(path.join(__dirname, '../../../plugins/proxy'));
+let pluginInfo: PluginInfo = [...pluginManager.getAllPlugins()][0];
 console.log(`获取插件1:` + pluginInfo.name)
 pluginInfo = pluginManager.getPluginFromId(pluginInfo.id);
 console.log(`获取插件2:` + pluginInfo.name)

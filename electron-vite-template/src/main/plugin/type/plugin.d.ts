@@ -20,7 +20,8 @@ export interface PluginInfo {
     manifest: any;
     name: string;
     version: string;
-    file: string;
+    main: string;
+    dir: string;
     description: string;
     module: Pluginlifecycle & any;                // 插件导出的钩子函数
     type: PluginType;             // 插件类型（根据 manifest 中的 type 字段）

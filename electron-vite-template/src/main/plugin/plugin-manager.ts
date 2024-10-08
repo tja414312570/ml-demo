@@ -50,11 +50,18 @@ class PluginManager {
             }
         });
     }
-    public loadPlugin(plugin_path: string) {
+    public loadPlugin(plugin_path: string, strict = true) {
         assert(this.ctx, `加载组件前请先设置上下文`)
         assert.ok(fs.existsSync(plugin_path), `插件目录不存在:${plugin_path}`)
         const manifestPath = path.join(plugin_path, 'manifest.json');
-        assert.ok(fs.existsSync(plugin_path), `插件清单文件不存在:${manifestPath}`)
+        if (!strict) {
+            if (!fs.existsSync(manifestPath)) {
+                console.warn(`插件清单文件不存在，请检查此目录是否为插件目录:${manifestPath}`)
+                return;
+            }
+        } else {
+            assert.ok(fs.existsSync(manifestPath), `插件清单文件不存在，请检查此目录是否为插件目录:${plugin_path}`)
+        }
         const manifest = this.loadManifest(manifestPath);
         const pluginMain = path.join(plugin_path, manifest.main);
         assert.ok(fs.existsSync(plugin_path), `插件入口文件不存在: ${pluginMain}`)
@@ -64,14 +71,15 @@ class PluginManager {
             id: uuidv4(),
             manifest: manifest,
             name: manifest.name,
-            file: pluginMain,
+            main: pluginMain,
+            dir: plugin_path,
             version: manifest.version,
             description: manifest.description,
             module: null,
             type: manifest.type as any,
             match: manifest.match,
             load: () => {
-                const orgin = require(pluginInfo.file);
+                const orgin = require(pluginInfo.main);
                 assert.ok(orgin.default, `插件${manifest.name}的入口文件没有提供默认导出,文件位置:${pluginMain}`)
                 assert.ok(typeof orgin.default === 'object' && orgin.default !== null, `插件${manifest.name}的入口文件导出非对象,文件位置:${pluginMain}`)
                 pluginInfo.module = this.wrapperModule(orgin.default, pluginInfo); // 或使用 import(pluginEntryPath) 来加载模块
@@ -86,7 +94,7 @@ class PluginManager {
                 this.ctx.remove(pluginInfo);
                 this.remove(pluginInfo)
                 // 清除 require.cache 中的模块缓存
-                delete require.cache[require.resolve(pluginInfo.file)];
+                delete require.cache[require.resolve(pluginInfo.main)];
                 console.log(`插件 ${manifest.name} 已卸载`);
             },
             getModule: function (): void {
@@ -97,6 +105,7 @@ class PluginManager {
             }
         };
         this.add(pluginInfo)
+        console.log(`已加载插件信息,名称：${pluginInfo.name}，类型：${pluginInfo.type},位置:${pluginInfo.dir},主程序文件：${manifest.main}`)
         return pluginInfo;
     }
 
@@ -104,8 +113,8 @@ class PluginManager {
     public loadPluginFromDir(pluginsDir: string) {
         this.pluginDirs.add(pluginsDir);
         const pluginDirs = fs.readdirSync(pluginsDir);
-        for (const pluginDir of pluginDirs) {
-            this.loadPlugin(pluginDir)
+        for (const childDir of pluginDirs) {
+            this.loadPlugin(path.join(pluginsDir, childDir), false)
         }
     }
     // 加载插件清单文件
