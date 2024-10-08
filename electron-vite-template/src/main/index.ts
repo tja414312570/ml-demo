@@ -2,10 +2,7 @@ import path from "path";
 import pluginManager from "./moduld/plugin-manager";
 import { Pluginlifecycle } from "src/type/plugin-lifecycle";
 
-interface MyInterface {
-    rnm(): void;
-    anotherMethod(): string;
-}
+const keys: (keyof Pluginlifecycle)[] = ['onBeforeMounted', 'onMounted', 'onUnmounted'];
 
 // 加载所有插件
 pluginManager.loadPlugins('./plugins/');
