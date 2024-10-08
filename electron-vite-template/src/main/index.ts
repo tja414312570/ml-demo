@@ -1,10 +1,8 @@
 import path from "path";
 import pluginManager from "./plugin/plugin-manager";
 
-import { Pluginlifecycle } from "@main/plugin/type/plugin-lifecycle";
 import { PluginInfo } from "./plugin/type/plugin";
 import pluginContext from "./plugin/plugin-context";
-import * as fs from 'fs'
 
 
 pluginManager.setContext(pluginContext)

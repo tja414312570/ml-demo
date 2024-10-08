@@ -87,7 +87,7 @@ class PluginManager {
                 pluginInfo.module.onMounted(this.ctx);
             },
             unload: () => {
-                if (!module) {
+                if (!pluginInfo.module) {
                     return;
                 }
                 pluginInfo.module.onUnmounted(this.ctx);
