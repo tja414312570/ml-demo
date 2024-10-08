@@ -39,8 +39,12 @@ class PluginManager {
         return this.idMapping[id];
     }
     private wrapperModule(instance: any, pluginInfo: PluginInfo) {
+
         return new Proxy(instance, {
             get(target, prop) {
+                if (pluginInfo.unloaded) {
+                    throw new Error(`插件 ${pluginInfo.name} 已卸载，无法访问属性或方法 ${String(prop)}`);
+                }
                 if (prop === "toJSON" || prop in target) {
                     // 如果方法存在，则调用原始对象的方法
                     return target[prop];
@@ -78,6 +82,7 @@ class PluginManager {
             module: null,
             type: manifest.type as any,
             match: manifest.match,
+            onUnloadCallback: [],
             load: () => {
                 const orgin = require(pluginInfo.main);
                 assert.ok(orgin.default, `插件${manifest.name}的入口文件没有提供默认导出,文件位置:${pluginMain}`)
@@ -95,12 +100,14 @@ class PluginManager {
                 this.remove(pluginInfo)
                 // 清除 require.cache 中的模块缓存
                 delete require.cache[require.resolve(pluginInfo.main)];
+                pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
                 console.log(`插件 ${manifest.name} 已卸载`);
             },
-            getModule: function (): void {
+            getModule: (onUnloadCallback: () => void): void => {
                 if (!pluginInfo.module) {
                     pluginInfo.load()
                 }
+                pluginInfo.onUnloadCallback.push(onUnloadCallback);
                 return pluginInfo.module;
             }
         };

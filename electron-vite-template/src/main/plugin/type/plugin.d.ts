@@ -28,7 +28,8 @@ export interface PluginInfo {
     match?: string[];          // 匹配规则
     load: () => void;
     unload: () => void;
-    getModule: () => void;
+    getModule: (onUnloadCallback: () => void) => void;
+    onUnloadCallback: Array<() => void>;
 }
 
 export interface PluginExtensionContext {
