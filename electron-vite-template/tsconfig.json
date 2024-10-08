@@ -13,7 +13,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "target": "es2017",
+    "target": "ES2022",
     "paths": {
       "@config/*": ["config/*"],
       "@renderer/*": ["src/renderer/*"],
@@ -21,7 +21,7 @@
       "@store/*": ["src/renderer/store/modules/*"]
     },
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom"]
+    "lib": ["ES2022", "dom"]
   },
   "include": ["src/**/*", "customTypes/*"],
   "exclude": ["node_modules"]
