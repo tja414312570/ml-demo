@@ -11,6 +11,7 @@ import { defineConfig } from "rollup";
 import * as glob from "glob"; // 引入glob模块
 import { getConfig } from "./utils";
 import getPreloadConfigs from './rollup.preload.config'
+import { assert } from "console";
 
 const config = getConfig();
 
@@ -25,7 +26,7 @@ export default (env = "production", type = "main") => {
     return getPreloadConfigs(env);
   }
 
-
+  assert(inputFiles.length > 0, `类型${type},在环境${env}没有输入文件`)
 
   return defineConfig({
     input: inputFiles, // 单个文件或多个文件

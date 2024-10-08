@@ -134,7 +134,7 @@ function startMain(): Promise<void> {
     MainWatcher.on("change", (filename) => {
       // 主进程日志部分
       logStats(
-        `${config.dev.chineseLog ? "主进程文件变更" : "Main-FileChange"}`,
+        `${config.dev.chineseLog ? "插件文件变更" : "Plugin-FileChange"}`,
         filename
       );
     });
@@ -275,7 +275,6 @@ async function init() {
 
   try {
     await startRenderer();
-    await startPlugin();
     await startMain();
     await startPreload();
     startElectron();
