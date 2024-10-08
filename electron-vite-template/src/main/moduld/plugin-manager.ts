@@ -23,6 +23,7 @@ interface LoadedPlugin {
     hooks: any;                // 插件导出的钩子函数
     type?: string;             // 插件类型（根据 manifest 中的 type 字段）
     match?: string[];          // 匹配规则
+    unload: () => void;
 }
 
 // 插件管理类
@@ -81,6 +82,11 @@ class PluginManager {
                 hooks: pluginHooks,
                 type: manifest.type,
                 match: manifest.match,
+                unload: function () {
+                    // 清除 require.cache 中的模块缓存
+                    delete require.cache[require.resolve(pluginEntryPath)];
+                    console.log(`插件 ${manifest.name} 已卸载`);
+                }
             };
         } catch (error) {
             console.error(`加载插件失败: ${manifest.name}`, error);
