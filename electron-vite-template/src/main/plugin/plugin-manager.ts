@@ -6,6 +6,8 @@ import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
+// 定义常见的特殊属性集合
+const special_key_props = new Set(["toString", "valueOf", "then", "toJSON", "onMounted"]);
 // 插件管理类
 class PluginManager {
 
@@ -39,16 +41,24 @@ class PluginManager {
     public getPluginFromId(id: string): PluginInfo {
         return this.idMapping[id];
     }
+
+
     private wrapperModule(pluginInfo: PluginInfo) {
         const proxyHandler: ProxyHandler<any> | any = {
             _plugin: pluginInfo,
             get(_target: any, prop: string) {
-                if (!pluginInfo.module || pluginInfo.status !== PluginStatus.load) {
+                const module = pluginInfo.module;
+                // 1. 直接处理特殊属性和 Symbol
+                if (special_key_props.has(prop) || typeof prop === "symbol") {
+                    return module[prop];
+                }
+                // 2. 检查插件状态
+                if (!module || pluginInfo.status !== PluginStatus.load) {
                     throw new Error(`插件 ${pluginInfo.name} 当前状态：${pluginInfo.status}，无法访问属性或方法 ${String(prop)}`);
                 }
-                if (prop === "toJSON" || prop in pluginInfo.module) {
+                if (prop in module) {
                     // 如果方法存在，则调用原始对象的方法
-                    return pluginInfo.module[prop];
+                    return module[prop];
                 } else {
                     throw new Error(`组件${pluginInfo.name}不存在方法或属性'${String(prop)}'`)
                 }
@@ -58,8 +68,8 @@ class PluginManager {
     }
     resolvePluginModule<T>(type: PluginType, filter?: (pluginsOfType: Set<PluginInfo>) => PluginInfo | Set<PluginInfo> | undefined): Promise<T> {
         return new Promise<T>((resolve, rejects) => {
-            let pluginsOfType: Set<PluginInfo> | PluginInfo = this.getPluginsFromType(type);
-            if (pluginsOfType.size === 0) {
+            let pluginsOfType: Set<PluginInfo> | PluginInfo | undefined = this.getPluginsFromType(type);
+            if (!pluginsOfType || pluginsOfType.size === 0) {
                 rejects(`类型${type}没有相关注册插件!`)
                 return;
             }
@@ -75,7 +85,8 @@ class PluginManager {
             }
             if ((pluginsOfType instanceof Set)) {
                 if (pluginsOfType.size === 1) {
-                    const module = this.getModule(pluginsOfType.keys().next as any);
+                    const pluginInfo = pluginsOfType.values().next().value;
+                    const module = this.getModule(pluginInfo as any);
                     resolve(module)
                 } else {
                     //等待选择
@@ -84,9 +95,38 @@ class PluginManager {
             }
         })
     }
+    public load(pluginInfo: PluginInfo & PluginProxy) {
+        assert.ok(pluginInfo.status === PluginStatus.ready, `插件${pluginInfo.manifest.name}状态不正常：${pluginInfo.status}，不允许加载`)
+        const orgin = require(pluginInfo.main) as any;
+        assert.ok(orgin.default, `插件${pluginInfo.manifest.name}的入口文件没有提供默认导出,文件位置:${pluginInfo.manifest.main}`)
+        assert.ok(typeof orgin.default === 'object' && orgin.default !== null, `插件${pluginInfo.manifest.name}的入口文件导出非对象,文件位置:${pluginInfo.manifest.main}`)
+        pluginInfo.module = orgin.default; // 或使用 import(pluginEntryPath) 来加载模块
+        pluginInfo.proxy = this.wrapperModule(pluginInfo);
+        this.ctx.register(pluginInfo);
+        pluginInfo.module.onMounted(this.ctx);
+        pluginInfo.status = PluginStatus.load;
+    }
+    public unloadFromId(id: string) {
+        const pluginInfo = this.getPluginFromId(id);
+        this.unload(pluginInfo);
+    }
+    public unload(pluginInfo: PluginInfo) {
+        if (!pluginInfo.module) {
+            return;
+        }
+        pluginInfo.module.onUnmounted(this.ctx);
+        pluginInfo.status = PluginStatus.unload;
+        this.ctx.remove(pluginInfo);
+        this.remove(pluginInfo)
+        // 清除 require.cache 中的模块缓存
+        delete require.cache[require.resolve(pluginInfo.main)];
+        delete pluginInfo.module;
+        // pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
+        console.log(`插件 ${pluginInfo.manifest.name} 已卸载`);
+    }
     private getModule(pluginInfo: PluginInfo & PluginProxy): any {
         if (!pluginInfo.module) {
-            pluginInfo.load()
+            this.load(pluginInfo)
         }
         return pluginInfo.proxy;
     }
@@ -105,7 +145,6 @@ class PluginManager {
         const manifest = this.loadManifest(manifestPath);
         const pluginMain = path.join(plugin_path, manifest.main);
         assert.ok(fs.existsSync(plugin_path), `插件入口文件不存在: ${pluginMain}`)
-        const _this = this;
         // 动态加载插件入口文件
         const pluginInfo: PluginInfo & PluginProxy = {
             id: uuidv4(),
@@ -119,29 +158,9 @@ class PluginManager {
             proxy: null,
             type: manifest.type as any,
             match: manifest.match,
-            onUnloadCallback: [],
             status: PluginStatus.ready,
-            load: () => {
-                const orgin = require(pluginInfo.main);
-                assert.ok(orgin.default, `插件${manifest.name}的入口文件没有提供默认导出,文件位置:${pluginMain}`)
-                assert.ok(typeof orgin.default === 'object' && orgin.default !== null, `插件${manifest.name}的入口文件导出非对象,文件位置:${pluginMain}`)
-                pluginInfo.module = orgin.default; // 或使用 import(pluginEntryPath) 来加载模块
-                pluginInfo.proxy = this.wrapperModule(pluginInfo);
-                this.ctx.register(pluginInfo);
-                pluginInfo.module.onMounted(this.ctx);
-            },
-            unload: () => {
-                if (!pluginInfo.module) {
-                    return;
-                }
-                pluginInfo.module.onUnmounted(this.ctx);
-                this.ctx.remove(pluginInfo);
-                this.remove(pluginInfo)
-                // 清除 require.cache 中的模块缓存
-                delete require.cache[require.resolve(pluginInfo.main)];
-                delete pluginInfo.module;
-                pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
-                console.log(`插件 ${manifest.name} 已卸载`);
+            getModule() {
+                pluginInfo.proxy;
             },
         };
         this.add(pluginInfo)

@@ -1,4 +1,4 @@
-import { Pluginlifecycle } from "@main/plugin/type/plugin-lifecycle";
+import { Pluginlifecycle } from './plugin-lifecycle';
 
 // 定义插件的接口
 export interface PluginManifest {
@@ -26,14 +26,12 @@ export interface PluginInfo {
     module: Pluginlifecycle & any;                // 插件导出的钩子函数
     type: PluginType;             // 插件类型（根据 manifest 中的 type 字段）
     match?: string[];          // 匹配规则
-    load: () => void;
     status: PluginStatus;
-    unload: () => void;
-    onUnloadCallback: Array<() => void>;
 }
 
 export interface PluginProxy {
     proxy: any
+    getModule(): any
 }
 
 
@@ -51,9 +49,10 @@ export interface PluginExtensionContext {
 }
 
 export enum PluginType {
-    'bridge', 'executor'
+    bridge = 'bridge',
+    executor = 'executor'
 }
 
 export enum PluginStatus {
-    'ready', 'load', 'unload', 'disable'
+    ready = 'ready', load = 'load', unload = 'unload', disable = 'disable'
 }

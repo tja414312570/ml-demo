@@ -10,6 +10,7 @@ class ChatGptBridge implements Bridge,Pluginlifecycle{
   onUnmounted(ctx: PluginExtensionContext): void {
   }
   onResponse(body: any): void {
+    throw new Error(body as string)
   }
   
 }

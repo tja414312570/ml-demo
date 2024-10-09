@@ -1,3 +1,3 @@
 export interface Bridge{
-    onResponse(body):void
+    onResponse(bod:any):void
 }
