@@ -10,6 +10,7 @@ import obfuscator from "rollup-plugin-obfuscator";
 import { defineConfig } from "rollup";
 import { readdirSync, readFileSync } from "fs";
 import { getConfig } from "./utils";
+import assert from "assert";
 
 const config = getConfig();
 
@@ -58,7 +59,7 @@ export default (env = "production") => {
     const createOutputConfig = (filePath) => {
         const fileName = path.basename(filePath, ".ts");
         const includeCustomDependencies = hasCustomDependencies(filePath);
-
+        assert(filePath, `文件${filePath},在环境${env}没有输入文件`)
         return defineConfig({
             input: filePath,
             output: {

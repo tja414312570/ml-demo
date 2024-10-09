@@ -27,10 +27,15 @@ export interface PluginInfo {
     type: PluginType;             // 插件类型（根据 manifest 中的 type 字段）
     match?: string[];          // 匹配规则
     load: () => void;
+    status: PluginStatus;
     unload: () => void;
-    getModule: (onUnloadCallback: () => void) => void;
     onUnloadCallback: Array<() => void>;
 }
+
+export interface PluginProxy {
+    proxy: any
+}
+
 
 export interface PluginExtensionContext {
     /**
@@ -47,4 +52,8 @@ export interface PluginExtensionContext {
 
 export enum PluginType {
     'bridge', 'executor'
+}
+
+export enum PluginStatus {
+    'ready', 'load', 'unload', 'disable'
 }

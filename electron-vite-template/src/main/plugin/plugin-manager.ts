@@ -1,13 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginExtensionContext, PluginInfo, PluginManifest, PluginType } from './type/plugin';
-import assert from 'assert';
+import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType } from './type/plugin';
 import { v4 as uuidv4 } from 'uuid';
 import { MapSet } from '../utils/MapSet';
+import assert from 'assert';
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
 // 插件管理类
 class PluginManager {
+
     private pluginDirs: Set<string> = new Set();           // 插件目录
     private pluginSet: Set<PluginInfo> = new Set(); // 已加载的插件列表
     private ctx: PluginExtensionContext;
@@ -38,21 +39,56 @@ class PluginManager {
     public getPluginFromId(id: string): PluginInfo {
         return this.idMapping[id];
     }
-    private wrapperModule(instance: any, pluginInfo: PluginInfo) {
-
-        return new Proxy(instance, {
-            get(target, prop) {
-                if (pluginInfo.unloaded) {
-                    throw new Error(`插件 ${pluginInfo.name} 已卸载，无法访问属性或方法 ${String(prop)}`);
+    private wrapperModule(pluginInfo: PluginInfo) {
+        const proxyHandler: ProxyHandler<any> | any = {
+            _plugin: pluginInfo,
+            get(_target: any, prop: string) {
+                if (!pluginInfo.module || pluginInfo.status !== PluginStatus.load) {
+                    throw new Error(`插件 ${pluginInfo.name} 当前状态：${pluginInfo.status}，无法访问属性或方法 ${String(prop)}`);
                 }
-                if (prop === "toJSON" || prop in target) {
+                if (prop === "toJSON" || prop in pluginInfo.module) {
                     // 如果方法存在，则调用原始对象的方法
-                    return target[prop];
+                    return pluginInfo.module[prop];
                 } else {
                     throw new Error(`组件${pluginInfo.name}不存在方法或属性'${String(prop)}'`)
                 }
             }
-        });
+        }
+        return new Proxy({}, proxyHandler);
+    }
+    resolvePluginModule<T>(type: PluginType, filter?: (pluginsOfType: Set<PluginInfo>) => PluginInfo | Set<PluginInfo> | undefined): Promise<T> {
+        return new Promise<T>((resolve, rejects) => {
+            let pluginsOfType: Set<PluginInfo> | PluginInfo = this.getPluginsFromType(type);
+            if (pluginsOfType.size === 0) {
+                rejects(`类型${type}没有相关注册插件!`)
+                return;
+            }
+            if (filter && typeof filter === 'function') {
+                try {
+                    pluginsOfType = filter(pluginsOfType);
+                } catch (err) {
+                    rejects(err)
+                }
+            }
+            if (!pluginsOfType) {
+                rejects(`类型${type}没有合适的注册插件!`)
+            }
+            if ((pluginsOfType instanceof Set)) {
+                if (pluginsOfType.size === 1) {
+                    const module = this.getModule(pluginsOfType.keys().next as any);
+                    resolve(module)
+                } else {
+                    //等待选择
+
+                }
+            }
+        })
+    }
+    private getModule(pluginInfo: PluginInfo & PluginProxy): any {
+        if (!pluginInfo.module) {
+            pluginInfo.load()
+        }
+        return pluginInfo.proxy;
     }
     public loadPlugin(plugin_path: string, strict = true) {
         assert(this.ctx, `加载组件前请先设置上下文`)
@@ -71,7 +107,7 @@ class PluginManager {
         assert.ok(fs.existsSync(plugin_path), `插件入口文件不存在: ${pluginMain}`)
         const _this = this;
         // 动态加载插件入口文件
-        const pluginInfo: PluginInfo = {
+        const pluginInfo: PluginInfo & PluginProxy = {
             id: uuidv4(),
             manifest: manifest,
             name: manifest.name,
@@ -80,14 +116,17 @@ class PluginManager {
             version: manifest.version,
             description: manifest.description,
             module: null,
+            proxy: null,
             type: manifest.type as any,
             match: manifest.match,
             onUnloadCallback: [],
+            status: PluginStatus.ready,
             load: () => {
                 const orgin = require(pluginInfo.main);
                 assert.ok(orgin.default, `插件${manifest.name}的入口文件没有提供默认导出,文件位置:${pluginMain}`)
                 assert.ok(typeof orgin.default === 'object' && orgin.default !== null, `插件${manifest.name}的入口文件导出非对象,文件位置:${pluginMain}`)
-                pluginInfo.module = this.wrapperModule(orgin.default, pluginInfo); // 或使用 import(pluginEntryPath) 来加载模块
+                pluginInfo.module = orgin.default; // 或使用 import(pluginEntryPath) 来加载模块
+                pluginInfo.proxy = this.wrapperModule(pluginInfo);
                 this.ctx.register(pluginInfo);
                 pluginInfo.module.onMounted(this.ctx);
             },
@@ -100,16 +139,10 @@ class PluginManager {
                 this.remove(pluginInfo)
                 // 清除 require.cache 中的模块缓存
                 delete require.cache[require.resolve(pluginInfo.main)];
+                delete pluginInfo.module;
                 pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
                 console.log(`插件 ${manifest.name} 已卸载`);
             },
-            getModule: (onUnloadCallback: () => void): void => {
-                if (!pluginInfo.module) {
-                    pluginInfo.load()
-                }
-                pluginInfo.onUnloadCallback.push(onUnloadCallback);
-                return pluginInfo.module;
-            }
         };
         this.add(pluginInfo)
         console.log(`已加载插件信息,名称：${pluginInfo.name}，类型：${pluginInfo.type},位置:${pluginInfo.dir},主程序文件：${manifest.main}`)
