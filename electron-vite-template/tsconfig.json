@@ -23,6 +23,6 @@
     "typeRoots": ["node_modules/@types"],
     "lib": ["ES2022", "dom"]
   },
-  "include": ["src/**/*", "customTypes/*"],
+  "include": ["src/**/*", "customTypes/*", "test/index.ts"],
   "exclude": ["node_modules"]
 }

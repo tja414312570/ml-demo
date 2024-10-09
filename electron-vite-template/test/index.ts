@@ -1,14 +1,14 @@
 import path from "path";
-import pluginManager from "./plugin/plugin-manager";
+import pluginManager from "../src/main/plugin/plugin-manager";
 
-import { PluginInfo, PluginType } from "./plugin/type/plugin";
-import pluginContext from "./plugin/plugin-context";
-import { Bridge } from "./plugin/type/bridge";
+import { PluginInfo, PluginType } from "../src/main/plugin/type/plugin";
+import pluginContext from "../src/main/plugin/plugin-context";
+import { Bridge } from "../src/main/plugin/type/bridge";
 
 
 pluginManager.setContext(pluginContext)
 
-pluginManager.loadPluginFromDir(path.join(__dirname, '../../../plugins'))
+pluginManager.loadPluginFromDir(path.join(__dirname, '../plugins'))
 const type = PluginType.bridge;
 pluginManager.resolvePluginModule<Bridge>(type).then(module => {
     console.log(`获取插件成功${module}`)
