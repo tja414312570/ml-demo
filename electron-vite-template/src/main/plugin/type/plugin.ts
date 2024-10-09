@@ -46,6 +46,10 @@ export interface PluginExtensionContext {
      * @param plugin 
      */
     remove(plugin: Pluginlifecycle & any): void;
+    /**
+     * 通知管理
+     */
+    notifyManager:{notify:(message:string)=>void,notifyError:(message:string)=>void}
 }
 
 export enum PluginType {

@@ -12,10 +12,10 @@
 
         <div class="status-bar-right">
             <!-- 始终显示通知内容和图标 -->
-            <div v-if="notification" :class="['notification-text', { 'error': notification.isError }]">
+            <div v-if="notification" :class="['notification-text', { 'error': notification.is_error }]">
                 {{ notification.message }}
             </div>
-            <v-icon small>mdi-bell</v-icon>
+            <v-icon small :class="{ 'error': notification.is_error }">mdi-bell</v-icon>
             <button v-if="notification" @click="clearNotification">清除通知</button>
         </div>
     </div>
@@ -26,7 +26,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 
 // 使用 ref 定义响应式数据
 const editor_status = ref('编辑器状态信息');
-const notification = ref<{ message: string; isError: boolean } | null>(null);
+const notification = ref<{ message: string; is_error: boolean } | null>(null);
 
 // 监听来自预加载脚本的通知
 onMounted(() => {
@@ -93,7 +93,8 @@ const clearNotification = () => {
     /* 优先在单词边界断行 */
 }
 
-.notification-text.error {
+.notification-text.error,
+.mdi-bell.error {
     color: red;
     /* 错误通知显示为红色 */
 }

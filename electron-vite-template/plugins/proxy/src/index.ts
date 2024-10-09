@@ -1,17 +1,66 @@
-import { sayHello } from "./hello";
 import {Bridge} from '../../../src/main/plugin/type/bridge'
 import {Pluginlifecycle} from '../../../src/main/plugin/type/plugin-lifecycle'
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
+import { IContext } from 'http-mitm-proxy';
+import { decompressedBody } from './decode';
+import { processResponse } from './dispatcher';
+import { resolve } from 'path';
 
 class ChatGptBridge implements Bridge,Pluginlifecycle{
+  pluginContext:PluginExtensionContext | undefined;
+  onRequest(ctx: IContext):  Promise<string|void> {
+    // console.log("请求", ctx.proxyToServerRequestOptions.host)
+    return new Promise<string|void>((resolve,rejects)=>{
+      const requestData = ctx.clientToProxyRequest;
+      let body: Uint8Array[] = [];
+      requestData.on('data', (chunk) => {
+        body.push(chunk);
+      }).on('end', () => {
+        const requestBody = Buffer.concat(body).toString();
+        // const logData = `请求拦截: ${requestData.url}\nRequest Body: ${body}\n`;
+        // console.log(logData);
+        resolve(requestBody);
+      });
+      
+    })
+  }
+  onResponse(ctx: IContext):  Promise<string|void> {
+    return new Promise<string|void>(async (resolve)=>{
+      const response = ctx.serverToProxyResponse;
+  
+      // 获取响应的 Content-Type
+      const contentType = response?.headers['content-type'] || '';
+  
+      // 检查是否是静态资源，如 HTML、CSS、图片等
+      const isStaticResource = (
+        contentType.includes('html') ||      // HTML 页面
+        contentType.includes('css') ||       // CSS 样式表
+        contentType.includes('image') ||         // 图片（如 png, jpg, gif 等）
+        contentType.includes('javascript') ||  // JS 文件
+        contentType.includes('font')             // 字体文件
+      );
+  
+      if (isStaticResource) {
+       resolve();
+       return;
+      }
+      // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
+      // console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
+      // let logData = `拦截处理:${requestOptions?.method}:${requestOptions?.port === 443 ? 'https' : 'http'}://${requestOptions?.host}${requestOptions?.path}\n`;
+      const decodeResult = await decompressedBody(ctx);
+      // logData += `响应数据: ${decodeResult}\n`;
+      // console.log(logData);
+      const sseData = processResponse(response?.headers, decodeResult);
+      resolve(sseData)
+    })
+  }
   onMounted(ctx: PluginExtensionContext): void {
-    sayHello("Plugin")
+    this.pluginContext = ctx;
+      global.pluginContext = ctx;
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }
-  onResponse(body: any): void {
-    throw new Error(body as string)
-  }
+ 
   
 }
 export default new ChatGptBridge();

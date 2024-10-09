@@ -9,6 +9,6 @@
     "noEmitOnError": true,         // 防止在有错误时生成输出文件
     "outDir": "./dist"             // 输出目录
   },
-  "include": ["src/**/*.ts"],       // 包含的源文件路径
+  "include": ["src/**/*.ts","types/**/*.d.ts" ],       // 包含的源文件路径
   "exclude": ["node_modules"]       // 排除的文件夹
 }

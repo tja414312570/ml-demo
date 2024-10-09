@@ -246,4 +246,4 @@ webviewApi.on("webviewApi.send-content", (event, message) => {
   console.log("搜到webview消息：", event, message)
   document.myApp.send(message)
 })
-js_bridge()
+// js_bridge()

@@ -4,6 +4,7 @@ import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, Plugin
 import { v4 as uuidv4 } from 'uuid';
 import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
+import pluginContext from './plugin-context';
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
 // 定义常见的特殊属性集合
@@ -13,14 +14,10 @@ class PluginManager {
 
     private pluginDirs: Set<string> = new Set();           // 插件目录
     private pluginSet: Set<PluginInfo> = new Set(); // 已加载的插件列表
-    private ctx: PluginExtensionContext;
     private idMapping: { [key: string]: PluginInfo } = {}
     private typeMapping: MapSet<PluginInfo> = new MapSet();
     constructor() {
 
-    }
-    public setContext(ctx: PluginExtensionContext) {
-        this.ctx = ctx;
     }
     add(pluginInfo: PluginInfo) {
         this.idMapping[pluginInfo.id] = pluginInfo;
@@ -102,8 +99,8 @@ class PluginManager {
         assert.ok(typeof orgin.default === 'object' && orgin.default !== null, `插件${pluginInfo.manifest.name}的入口文件导出非对象,文件位置:${pluginInfo.manifest.main}`)
         pluginInfo.module = orgin.default; // 或使用 import(pluginEntryPath) 来加载模块
         pluginInfo.proxy = this.wrapperModule(pluginInfo);
-        this.ctx.register(pluginInfo);
-        pluginInfo.module.onMounted(this.ctx);
+        pluginContext.register(pluginInfo);
+        pluginInfo.module.onMounted(pluginContext);
         pluginInfo.status = PluginStatus.load;
     }
     public unloadFromId(id: string) {
@@ -114,9 +111,9 @@ class PluginManager {
         if (!pluginInfo.module) {
             return;
         }
-        pluginInfo.module.onUnmounted(this.ctx);
+        pluginInfo.module.onUnmounted(pluginContext);
         pluginInfo.status = PluginStatus.unload;
-        this.ctx.remove(pluginInfo);
+        pluginContext.remove(pluginInfo);
         this.remove(pluginInfo)
         // 清除 require.cache 中的模块缓存
         delete require.cache[require.resolve(pluginInfo.main)];
@@ -131,7 +128,6 @@ class PluginManager {
         return pluginInfo.proxy;
     }
     public loadPlugin(plugin_path: string, strict = true) {
-        assert(this.ctx, `加载组件前请先设置上下文`)
         assert.ok(fs.existsSync(plugin_path), `插件目录不存在:${plugin_path}`)
         const manifestPath = path.join(plugin_path, 'manifest.json');
         if (!strict) {

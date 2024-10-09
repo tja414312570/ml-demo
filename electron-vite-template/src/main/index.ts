@@ -11,9 +11,13 @@ import { startProxyServer } from "./services/proxy";
 import fs, { glob } from "fs"
 import { notify } from "./ipc/notify-manager";
 import { listeners } from "process";
-
+import pluginContext from './plugin/plugin-context'
+import pluginManager from "./plugin/plugin-manager";
+import path from "path";
+const innerPluginPath = path.join(__dirname, '../../../plugins');
+console.log(`加载内置插件，位置：${innerPluginPath}`)
+pluginManager.loadPluginFromDir(innerPluginPath)
 app.setName('myApp');
-
 function onAppReady() {
   // const { disableF12 } = useDisableButton();
   // const { renderProcessGone } = useProcessException();

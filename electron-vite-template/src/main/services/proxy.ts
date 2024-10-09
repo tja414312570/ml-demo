@@ -1,135 +1,46 @@
-import { IContext, IProxyOptions, Proxy } from 'http-mitm-proxy'; // 导入 CommonJS 模块
+import { IProxyOptions, Proxy } from 'http-mitm-proxy'; // 导入 CommonJS 模块
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import zlib from 'zlib';
-import { processResponse } from './dispatcher'
 
 import { info } from '../utils/logger'
+import pluginManager from '@main/plugin/plugin-manager';
+import { PluginType } from '@main/plugin/type/plugin';
+import { Bridge } from '@main/plugin/type/bridge';
+import { notifyError } from '@main/ipc/notify-manager';
 
 export async function startProxyServer(upstreamProxy) {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
 
   // 拦截 HTTP 请求
   proxy.onRequest((ctx, callback) => {
-    // console.log("请求", ctx.proxyToServerRequestOptions.host)
-    const requestData = ctx.clientToProxyRequest;
-    let body = [];
-
-    // requestData.on('data', (chunk) => {
-    //   body.push(chunk);
-    // }).on('end', () => {
-    //   body = Buffer.concat(body).toString();
-    //   const logData = `Request intercepted: ${requestData.url}\nRequest Body: ${body}\n`;
-    //   logToFile(logData);
-    // });
-    callback(); // 继续请求
+    pluginManager.resolvePluginModule<Bridge>(PluginType.bridge)
+      .then(module => {
+        module.onRequest(ctx);
+        callback(); // 继续请求
+      }).catch(err => {
+        console.error(err);
+        notifyError(`处理请求出现错误:${String(err)}`)
+        callback(err)
+      })
   });
 
-  const processResponseBody = (ctx: IContext) => {
-    return new Promise((resolve, reject) => {
-      // 如果响应是压缩的，进行解压
-      const response = ctx.serverToProxyResponse;
-      const requestOptions = ctx.proxyToServerRequestOptions;
-
-      // 获取响应的 Content-Type 和 Content-Encoding
-      const contentType = response.headers['content-type'] || '';
-      const contentEncoding = response.headers['content-encoding'] || '';
-
-      // 检查是否是压缩响应
-      const isCompressed = contentEncoding.includes('gzip') || contentEncoding.includes('deflate') || contentEncoding.includes('br');
-
-      let body: any = [];
-
-      response.on('data', (chunk) => {
-        body.push(chunk);
-      });
-
-      response.on('end', () => {
-        body = Buffer.concat(body);
-
-        // 如果响应是压缩的，进行解压
-        if (isCompressed) {
-          if (contentEncoding.includes('gzip')) {
-            zlib.gunzip(body, (err, decompressedBody) => {
-              if (!err) {
-                resolve(decompressedBody.toString());
-              } else {
-                console.error('Gzip 解压失败:', err);
-                reject(err);
-              }
-            });
-          } else if (contentEncoding.includes('deflate')) {
-            zlib.inflate(body, (err, decompressedBody) => {
-              if (!err) {
-                resolve(decompressedBody.toString());
-              } else {
-                console.error('Deflate 解压失败:', err);
-                reject(err);
-              }
-            });
-          } else if (contentEncoding.includes('br')) {
-            zlib.brotliDecompress(body, (err, decompressedBody) => {
-              if (!err) {
-                resolve(decompressedBody.toString());
-              } else {
-                console.error('Brotli 解压失败:', err);
-                reject(err);
-              }
-            });
-          }
-        } else {
-          // 如果没有压缩，直接返回响应体
-          resolve(body.toString());
-        }
-      });
-
-      response.on('error', (err) => {
-        reject(err);
-      });
-    });
-  }
   // 拦截 HTTP 响应
   proxy.onResponse((ctx, callback) => {
-    const response = ctx.serverToProxyResponse;
-    const requestOptions = ctx.proxyToServerRequestOptions;
-
-    // 获取响应的 Content-Type
-    const contentType = response.headers['content-type'] || '';
-
-    // 检查是否是静态资源，如 HTML、CSS、图片等
-    const isStaticResource = (
-      contentType.includes('html') ||      // HTML 页面
-      contentType.includes('css') ||       // CSS 样式表
-      contentType.includes('image') ||         // 图片（如 png, jpg, gif 等）
-      contentType.includes('javascript') ||  // JS 文件
-      contentType.includes('font')             // 字体文件
-    );
-
-    if (isStaticResource) {
-      // const cspHeader = ctx.serverToProxyResponse.headers['content-security-policy'];
-      // if (contentType.includes('html') && cspHeader) {
-      //     delete ctx.serverToProxyResponse.headers['content-security-policy'];
-      //     console.log('Content-Security-Policy header removed.');
-      // }
-      // console.log("静态资源请求，放行", requestOptions.host);
-    } else {
-      // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
-      // console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
-      let logData = `拦截处理:${requestOptions.method}:${requestOptions.port === 443 ? 'https' : 'http'}://${requestOptions.host}${requestOptions.path}\n`;
-      let promise = processResponseBody(ctx);
-      promise.then(bodyStr => {
-        processResponse(ctx, bodyStr);
-        logData += `响应数据: ${bodyStr}\n`;
+    pluginManager.resolvePluginModule<Bridge>(PluginType.bridge)
+      .then(module => {
+        module.onResponse(ctx).then((body: string) => {
+          if (body) {
+            console.log("解析出数据：" + body)
+          }
+        });
+        callback(); // 继续请求
       }).catch(err => {
-        logData += `错误原因: ${err}\n`;
-        console.error(err);
-      }).finally(() => {
-        info(logData);
+        console.error("处理响应异常", err);
+        notifyError(`处理请求出现错误:${String(err)}`)
+        callback(err)
       })
-    }
+  })
 
-    callback(); // 继续响应
-  });
 
   // 处理 ECONNRESET 错误
   process.on('uncaughtException', (err: any) => {
