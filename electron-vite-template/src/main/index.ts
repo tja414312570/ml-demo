@@ -14,6 +14,7 @@ import { listeners } from "process";
 import pluginContext from './plugin/plugin-context'
 import pluginManager from "./plugin/plugin-manager";
 import path from "path";
+import { showErrorDialog } from "./utils/dialog";
 const innerPluginPath = path.join(__dirname, '../../../plugins');
 console.log(`加载内置插件，位置：${innerPluginPath}`)
 pluginManager.loadPluginFromDir(innerPluginPath)
@@ -54,6 +55,9 @@ app.whenReady().then(() => {
     protocol: 'http:',  // 上游代理协议
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
+  ipcMain.on('error-notify', (event, message) => {
+    showErrorDialog(message)
+  })
   startProxyServer(upstreamProxy).then(proxy => {
     onAppReady();
     ipcMain.on('notificationAPI-ready', () => {

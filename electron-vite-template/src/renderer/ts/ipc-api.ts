@@ -1,4 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
+function showCustomAlert(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.innerText = message;
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '10px';
+    alertDiv.style.left = '50%';
+    alertDiv.style.transform = 'translateX(-50%)';
+    alertDiv.style.backgroundColor = 'white';
+    alertDiv.style.padding = '10px';
+    alertDiv.style.border = '1px solid black';
+    alertDiv.style.zIndex = 1000;
+    document.body.appendChild(alertDiv);
+}
+
+
 
 class IpcApi {
     private uuid: string;
@@ -9,7 +24,10 @@ class IpcApi {
         this.uuid = uuidv4();  // 生成 UUID
         this.channel = channel;  // 初始化 channel
         if (!window[channel]) {
-            alert("没有找到渠道:" + channel);
+            const message = `IPC-API错误，没有找到渠道:${channel} `
+            window['core-api'].send('error-notify', message)
+            showCustomAlert(message)
+            throw new Error(message)
         }
         this.ipcApi = window[channel]
     }
