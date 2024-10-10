@@ -15,7 +15,7 @@
             <div v-if="notification" :class="['notification-text', { 'error': notification.is_error }]">
                 {{ notification.message }}
             </div>
-            <v-icon small :class="{ 'error': notification.is_error }">mdi-bell</v-icon>
+            <!-- <v-icon small :class="{ 'error': notification?.is_error }">mdi-bell</v-icon> -->
             <button v-if="notification" @click="clearNotification">清除通知</button>
         </div>
     </div>

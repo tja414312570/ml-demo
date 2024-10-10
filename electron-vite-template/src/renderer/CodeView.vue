@@ -13,7 +13,7 @@
     </template>
     <!-- https://github.com/imengyu/vue-code-layout/blob/master/examples/views/BasicUseage.vue -->
     <template #centerArea>
-      <MainWebView />
+      <!-- <MainWebView /> -->
     </template>
     <template #statusBar>
       <StatusBar />
@@ -35,6 +35,7 @@ import CodeEdit from './components/CodeEdit.vue';
 import XtermView from './components/XtermView.vue';
 import StatusBar from './components/StatusBar.vue';
 import CodeOutput from './components/CodeOutput.vue';
+import PluginView from './components/PluginView.vue';
 const MONACO_EDITOR_OPTIONS = {
   automaticLayout: true,
   formatOnType: true,
@@ -44,6 +45,8 @@ addPannel("server.addr", ServerList)
 addPannel("code.view", CodeEdit)
 addPannel("bottom.terminal", XtermView)
 addPannel("bottom.output", CodeOutput)
+
+addPannel('primarySideBar.plugin', PluginView)
 const debug = (param) => {
   console.log(param)
   return param;
@@ -140,7 +143,8 @@ function loadLayout() {
   groupExplorer.addPanel({
     title: '插件',
     tooltip: '已加载的插件',
-    name: 'explorer.outline',
+    startOpen: true,
+    name: 'primarySideBar.plugin',
     iconSmall: () => h(IconSearch),
     data: {
       generateContent: () => h('div', '这是插件面板内容')

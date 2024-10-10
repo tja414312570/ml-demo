@@ -33,6 +33,7 @@ const onReady = (): Promise<number> => {
 }
 
 export const ipcRenderMapper = {
+  ...ipcRenderer,
   _id_: undefined,
   _web_content_id_: undefined,
   _setId_: (call: string | Function) => {

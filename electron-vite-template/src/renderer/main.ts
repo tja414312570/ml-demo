@@ -5,7 +5,7 @@ import "./styles/index.scss";
 import "./permission";
 import App from "./App.vue";
 import router from "./router";
-import { errorHandler } from "./error";
+// import { errorHandler } from "./error";
 import "./utils/hackIpcRenderer";
 
 // Vuetify 配置
@@ -15,7 +15,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { VIcon } from 'vuetify/components'; // 导入实际的 v-icon 组件
 import { mdiHome } from '@mdi/js';  // 或者你自定义的图标
-import '@mdi/font/css/materialdesignicons.css';  
+import '@mdi/font/css/materialdesignicons.css';
 
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 
@@ -39,7 +39,7 @@ app.use(VueMonacoEditorPlugin, {
   },
 })
 app.use(vuetify);
-errorHandler(app);
+// errorHandler(app);
 app.config.compilerOptions.isCustomElement = tag => tag === 'webview';
 import 'vue-code-layout/lib/vue-code-layout.css'
 import 'dockview-core/dist/styles/dockview.css';

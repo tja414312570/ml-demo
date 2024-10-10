@@ -6,13 +6,11 @@ import pluginContext from "../src/main/plugin/plugin-context";
 import { Bridge } from "../src/main/plugin/type/bridge";
 
 
-pluginManager.setContext(pluginContext)
-
 pluginManager.loadPluginFromDir(path.join(__dirname, '../plugins'))
 const type = PluginType.bridge;
 pluginManager.resolvePluginModule<Bridge>(type).then(module => {
     console.log(`获取插件成功${module}`)
-    module.onResponse("来自组件")
+    // module.onResponse("来自组件")
 }).catch(err => {
     console.error(`错误:`, err)
 })
