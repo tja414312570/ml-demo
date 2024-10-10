@@ -1,6 +1,7 @@
 <template>
     <div>
         <!-- 插件列表 -->
+        <v-progress-linear v-show="loading" color="teal" indeterminate stream></v-progress-linear>
         <v-list>
             <v-list-item v-for="plugin in plugins" :key="plugin.id" class="plugin-item">
                 <v-list-item-content>
@@ -11,7 +12,7 @@
                 <!-- 插件类型和操作按钮区域 -->
                 <v-list-item-action class="action-buttons">
                     <!-- 显示插件类型 -->
-                    <v-chip class="plugin-type" small>{{ plugin.manifest.pluginType }}</v-chip>
+                    <v-chip class="plugin-type" small>{{ plugin.manifest.type }}</v-chip>
                     <div style="flex:1" class="action-group">
                         <!-- 查看详情按钮 -->
                         <v-tooltip bottom>
@@ -67,7 +68,7 @@
                                 }}</v-list-item-content>
                         </v-list-item>
                         <v-list-item>
-                            <v-list-item-content>类型: {{ selectedPlugin?.manifest.pluginType }}</v-list-item-content>
+                            <v-list-item-content>类型: {{ selectedPlugin?.manifest.type }}</v-list-item-content>
                         </v-list-item>
                         <v-list-item>
                             <v-list-item-content>支持钩子:
@@ -93,19 +94,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, vShow } from 'vue';
 
 
 import { getIpcApi } from '@renderer/ts/ipc-api';
 
 const pluginViewApi: any = getIpcApi('plugin-view-api');
-onMounted(() => {
-    pluginViewApi.invoke('get-plugin-list').then(pluginList => {
-        console.log("获取到插件列表", pluginList)
-    }).catch(err => {
-        console.error("获取到插件失败", err)
-    })
-})
+const loading = ref(true);
 
 interface PluginManifest {
     name: string;
@@ -129,24 +124,17 @@ interface PluginInfo {
 const dialog = ref(false);
 const selectedPlugin = ref<PluginInfo | null>(null);
 
-const plugins = ref<PluginInfo[]>([
-    {
-        id: '1',
-        manifest: {
-            name: 'SamplePlugin',
-            version: '1.0.0',
-            description: 'A sample plugin for demonstrating packaging with TypeScript.',
-            main: './dist/bundle.js',
-            pluginType: 'custom',
-            supportedHooks: ['sampleHook'],
-            author: 'Your Name',
-            license: 'MIT',
-            type: 'bridge',
-            match: ['https://chat.openai.com/*', 'https://chatgpt.com/*', 'https://share.github.cn.com/*']
-        },
-        enabled: true
-    }
-]);
+const plugins = ref<PluginInfo[]>([]);
+onMounted(() => {
+    pluginViewApi.invoke('get-plugin-list').then(pluginList => {
+        console.log("获取到插件列表", pluginList)
+        plugins.value = pluginList
+        loading.value = false
+    }).catch(err => {
+        console.error("获取到插件失败", err)
+    })
+})
+
 
 // 方法：切换插件启用/禁用状态
 const togglePlugin = (plugin: PluginInfo) => {

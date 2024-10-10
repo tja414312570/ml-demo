@@ -32,8 +32,7 @@ const onReady = (): Promise<number> => {
   })
 }
 
-export const ipcRenderMapper = {
-  ...ipcRenderer,
+export const ipcRenderMapper = new Proxy({
   _id_: undefined,
   _web_content_id_: undefined,
   _setId_: (call: string | Function) => {
@@ -49,7 +48,7 @@ export const ipcRenderMapper = {
       console.error(new Error("注销监听器失败，请使用代理"))
       return;
     }
-    console.log("监听器：", channel)
+    console.log("绑定监听器：", channel)
     bindListener(ipcRenderMapper._id_, channel, listener)
     ipcRenderer.send('ipc-core.bind-channel-listener', { webContentId: ipcRenderMapper._web_content_id_, channel })
     return ipcRenderer.on(channel, listener);
@@ -86,7 +85,15 @@ export const ipcRenderMapper = {
     ipcRenderer.send('ipc-core.remove-channel-listener', { webContentId: _id_, channel })
     console.log(`Listener for ${channel} on ${channel} removed`);
   }
-}
+}, {
+  get(target, prop) {
+    if (prop in target) {
+      return target[prop];
+    } else {
+      return (...args: any) => ipcRenderer[prop](...args)
+    }
+  }
+});
 const api_wrapoer = {
   _setId_: ipcRenderMapper._setId_,
   off: ipcRenderMapper.off,

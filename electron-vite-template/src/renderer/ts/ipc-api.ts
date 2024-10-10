@@ -62,6 +62,11 @@ export function getIpcApi(channel: string): IpcApi {
                         _getIpcApi__()._setId_(_getId__());
                         const result = _getIpcApi__()[prop](...args);  // 可以根据需求返回其他默认值
                         return result;
+                    } catch (err) {
+                        const message = `ipc通信异常:${String(err)}`
+                        window['core-api'].send('error-notify', message)
+                        showCustomAlert(message)
+                        throw new Error(message, { cause: err })
                     } finally {
                         _getIpcApi__()._setId_(undefined);
                     }

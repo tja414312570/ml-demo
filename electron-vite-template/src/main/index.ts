@@ -15,6 +15,7 @@ import pluginContext from './plugin/plugin-context'
 import pluginManager from "./plugin/plugin-manager";
 import path from "path";
 import { showErrorDialog } from "./utils/dialog";
+import './plugin/ipc-bind'
 const innerPluginPath = path.join(__dirname, '../../../plugins');
 console.log(`加载内置插件，位置：${innerPluginPath}`)
 pluginManager.loadPluginFromDir(innerPluginPath)
