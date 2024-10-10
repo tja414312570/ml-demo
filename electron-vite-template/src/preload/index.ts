@@ -3,6 +3,7 @@ import { onUnmounted } from "vue";
 import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
 import { CodeContent } from "@main/ipc/code-manager";
 import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
+import './index-plugin-view'
 // const wrapper = (api: any) => {
 //   return new Proxy(api, {
 //     get(target, prop) {

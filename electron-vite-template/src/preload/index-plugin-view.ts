@@ -1,6 +1,9 @@
+import { ipcRenderer } from "electron";
 import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
 const api = 'plugin-view-api'
 
+
+console.log("ipcRenderMapper:", ipcRenderer, ipcRenderMapper)
 exposeInMainWorld(api, {
     on: (channel, callback) => {
         console.log("webview监听:", channel)
