@@ -24,6 +24,8 @@ const language = ref('shell')
 const orange_language = ref(language.value)
 const code = ref(`ls -l`)
 window.codeViewApi.onCode(code_content => {
+  console.log('指令信息:', code_content)
+  code_content = code_content[0]
   code.value = code_content.code;
   orange_language.value = code_content.language
   if (code_content.language === 'shell' || code_content.language === 'bash' || code_content.language === 'cmd') {

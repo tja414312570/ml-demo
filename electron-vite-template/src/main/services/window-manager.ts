@@ -5,7 +5,7 @@ import { useProcessException } from "@main/hooks/exception-hook";
 import * as pty from 'node-pty';
 import path from "path";
 import { CodeContent } from "@main/ipc/code-manager";
-import { executeCode } from "./code-executor";
+import { executeCode } from "./executor";
 import { bindListenerChannel, getWebContentIds, removeListenerChannel } from "./web-content-listener";
 
 

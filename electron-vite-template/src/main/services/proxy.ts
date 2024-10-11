@@ -7,6 +7,7 @@ import pluginManager from '@main/plugin/plugin-manager';
 import { PluginType } from '@main/plugin/type/plugin';
 import { Bridge } from '@main/plugin/type/bridge';
 import { notifyError } from '@main/ipc/notify-manager';
+import { dispatch } from './dispatcher';
 
 export async function startProxyServer(upstreamProxy) {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
@@ -31,6 +32,7 @@ export async function startProxyServer(upstreamProxy) {
         module.onResponse(ctx).then((body: string) => {
           if (body) {
             console.log("解析出数据：" + body)
+            dispatch(ctx.serverToProxyResponse.headers, body);
           }
         });
         callback(); // 继续请求

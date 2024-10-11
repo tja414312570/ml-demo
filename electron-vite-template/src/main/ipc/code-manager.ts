@@ -1,5 +1,5 @@
 import { send_ipc_render } from "./send_ipc"
-export type CodeContent = {
+export type InstructContent = {
     code: string,
     language: string
 }
@@ -8,7 +8,10 @@ export type ExecuteResult = {
     language: string,
     result: string
 }
-export const previewCode = (code: CodeContent) => {
+export const wrapperInstruct = (instruction: string, content: string): InstructContent => {
+    return { language: instruction, code: content }
+}
+export const previewCode = (code: Array<InstructContent>) => {
     send_ipc_render('codeViewApi.code', code)
 }
 

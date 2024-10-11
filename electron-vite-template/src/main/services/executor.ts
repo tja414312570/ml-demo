@@ -4,10 +4,8 @@ import { notify } from "@main/ipc/notify-manager";
 import { send_ipc_render } from "@main/ipc/send_ipc";
 import { ipcMain } from "electron";
 import { sendMessage } from "@main/ipc/webview-api";
-
-export const executors = {};
-
-
+import pluginManager from "@main/plugin/plugin-manager";
+import { PluginType } from "@main/plugin/type/plugin";
 // loadModules('../executor', (file, module) => {
 //     if (!module.execute) {
 //         throw new Error(` “${file}“ executor not implements execute function`);
