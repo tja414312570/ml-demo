@@ -32,7 +32,14 @@ const onReady = (): Promise<number> => {
   })
 }
 
-export const ipcRenderMapper = new Proxy({
+interface IpcRendererExtended extends IpcRenderer {
+  _id_?: string | undefined;
+  _web_content_id_?: number | undefined;
+  _setId_: (call: string | Function) => void;
+  offAll: () => void;
+}
+
+export const ipcRenderMapper: IpcRendererExtended = new Proxy({
   _id_: undefined,
   _web_content_id_: undefined,
   _setId_: (call: string | Function) => {
@@ -93,7 +100,7 @@ export const ipcRenderMapper = new Proxy({
       return (...args: any) => ipcRenderer[prop](...args)
     }
   }
-});
+}) as any;
 const api_wrapoer = {
   _setId_: ipcRenderMapper._setId_,
   off: ipcRenderMapper.off,

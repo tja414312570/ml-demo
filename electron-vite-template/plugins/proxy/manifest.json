@@ -7,7 +7,7 @@
     "icon":"./dist/assets/logo.svg",
     "main":"./dist/bundle.js",
     "license": "MIT",
-    "type":"bridge",
+    "type":"agent",
     "match":["https://chat.openai.com/*","https://chatgpt.com/*","https://share.github.cn.com/*"]
   }
   

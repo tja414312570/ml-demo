@@ -49,11 +49,11 @@ export interface PluginExtensionContext {
     /**
      * 通知管理
      */
-    notifyManager:{notify:(message:string)=>void,notifyError:(message:string)=>void}
+    notifyManager: { notify: (message: string) => void, notifyError: (message: string) => void }
 }
 
 export enum PluginType {
-    bridge = 'bridge',
+    agent = 'agent',
     executor = 'executor'
 }
 

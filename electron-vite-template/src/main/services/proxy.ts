@@ -13,7 +13,7 @@ export async function startProxyServer(upstreamProxy) {
 
   // 拦截 HTTP 请求
   proxy.onRequest((ctx, callback) => {
-    pluginManager.resolvePluginModule<Bridge>(PluginType.bridge)
+    pluginManager.resolvePluginModule<Bridge>(PluginType.agent)
       .then(module => {
         module.onRequest(ctx);
         callback(); // 继续请求
@@ -26,7 +26,7 @@ export async function startProxyServer(upstreamProxy) {
 
   // 拦截 HTTP 响应
   proxy.onResponse((ctx, callback) => {
-    pluginManager.resolvePluginModule<Bridge>(PluginType.bridge)
+    pluginManager.resolvePluginModule<Bridge>(PluginType.agent)
       .then(module => {
         module.onResponse(ctx).then((body: string) => {
           if (body) {
