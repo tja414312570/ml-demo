@@ -1,7 +1,7 @@
 import { contextBridge, ipcMain, ipcRenderer, IpcRendererEvent, shell } from "electron";
 import { onUnmounted } from "vue";
 import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
-import { CodeContent } from "@main/ipc/code-manager";
+import { InstructContent } from "@main/ipc/code-manager";
 import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
 import './index-plugin-view'
 // const wrapper = (api: any) => {
@@ -53,7 +53,7 @@ contextBridge.exposeInMainWorld('codeViewApi', {
   onCode: (callback: Function) => ipcRenderer.on('codeViewApi.code', (event, notifyData) => {
     callback(notifyData);
   }),
-  executeCode: (code: CodeContent) => ipcRenderer.invoke("codeViewApi.execute", code),
+  executeCode: (code: InstructContent) => ipcRenderer.invoke("codeViewApi.execute", code),
   onCodeExecuted: (callback: Function) => ipcRenderer.on('codeViewApi.code.executed', (event, notifyData) => {
     callback(notifyData);
   }),

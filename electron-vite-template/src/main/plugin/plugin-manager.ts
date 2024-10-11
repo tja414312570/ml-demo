@@ -80,7 +80,10 @@ class PluginManager {
             if (!pluginsOfType) {
                 rejects(`类型${type}没有合适的注册插件!`)
             }
-            if ((pluginsOfType instanceof Set)) {
+            if (!(pluginsOfType instanceof Set) && typeof pluginsOfType === 'object') {
+                resolve(this.getModule(pluginsOfType as PluginInfo & PluginProxy))
+            }
+            else if ((pluginsOfType instanceof Set)) {
                 if (pluginsOfType.size === 1) {
                     const pluginInfo = pluginsOfType.values().next().value;
                     const module = this.getModule(pluginInfo as any);
@@ -161,6 +164,9 @@ class PluginManager {
             },
         };
         this.add(pluginInfo)
+        if (pluginInfo.type === PluginType.executor) {
+            this.load(pluginInfo)
+        }
         console.log(`已加载插件信息,名称：${pluginInfo.name}，类型：${pluginInfo.type},位置:${pluginInfo.dir},主程序文件：${manifest.main}`)
         return pluginInfo;
     }

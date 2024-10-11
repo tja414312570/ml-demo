@@ -75,7 +75,6 @@ app.on("window-all-closed", () => {
 });
 app.on("browser-window-created", () => {
   console.log("window-created", global.mainWindow);
-  // 
 });
 
 if (process.defaultApp) {

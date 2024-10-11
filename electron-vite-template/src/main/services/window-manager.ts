@@ -4,9 +4,11 @@ import { winURL, loadingURL, getPreloadFile } from "../config/static-path";
 import { useProcessException } from "@main/hooks/exception-hook";
 import * as pty from 'node-pty';
 import path from "path";
-import { CodeContent } from "@main/ipc/code-manager";
+import { InstructContent } from "@main/ipc/code-manager";
 import { executeCode } from "./executor";
 import { bindListenerChannel, getWebContentIds, removeListenerChannel } from "./web-content-listener";
+import pluginContext from "@main/plugin/plugin-context";
+import { wrapper } from "@main/plugin/Iproxy";
 
 
 class MainInit {
@@ -85,7 +87,7 @@ class MainInit {
       cwd: process.env.HOME,
       env: process.env,
     });
-
+    pluginContext.pty = wrapper<any>(ptyProcess)
     // 监听来自 xterm.js 的输入
     ipcMain.on('terminal-input', (event, input) => {
       ptyProcess.write(input);
@@ -97,13 +99,15 @@ class MainInit {
     });
     // 将 PTY 输出发送到前端
     ptyProcess.on('data', (data) => {
+      console.log("收到终端:", data)
       this.mainWindow.webContents.send('terminal-output', data);
     });
     ipcMain.on('terminal-into', (event, data) => {
+      console.log("写入终端:", data)
       ptyProcess.write(data);
     });
 
-    ipcMain.handle('codeViewApi.execute', (event, code: CodeContent) => {
+    ipcMain.handle('codeViewApi.execute', (event, code: InstructContent) => {
       return executeCode(code)
     })
     // 调整终端大小

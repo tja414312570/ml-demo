@@ -1,4 +1,7 @@
+import { IpcMainEvent, WebContents, WebFrameMain } from 'electron';
 import { Pluginlifecycle } from './plugin-lifecycle';
+import { IEvent } from 'node-pty';
+import EventEmitter from 'events';
 
 // 定义插件的接口
 export interface PluginManifest {
@@ -52,8 +55,164 @@ export interface PluginExtensionContext {
      * 通知管理
      */
     notifyManager: { notify: (message: string) => void, notifyError: (message: string) => void }
+    ipcMain: IIpcMain;
+    pty: IPty
 }
 
+/**
+   * An interface representing a pseudoterminal, on Windows this is emulated via the winpty library.
+   */
+export interface IPty {
+    /**
+     * The process ID of the outer process.
+     */
+    readonly pid: number;
+
+    /**
+     * The column size in characters.
+     */
+    readonly cols: number;
+
+    /**
+     * The row size in characters.
+     */
+    readonly rows: number;
+
+    /**
+     * The title of the active process.
+     */
+    readonly process: string;
+
+    /**
+     * (EXPERIMENTAL)
+     * Whether to handle flow control. Useful to disable/re-enable flow control during runtime.
+     * Use this for binary data that is likely to contain the `flowControlPause` string by accident.
+     */
+    handleFlowControl: boolean;
+
+    /**
+     * Adds an event listener for when a data event fires. This happens when data is returned from
+     * the pty.
+     * @returns an `IDisposable` to stop listening.
+     */
+    readonly onData: IEvent<string>;
+
+    /**
+     * Adds an event listener for when an exit event fires. This happens when the pty exits.
+     * @returns an `IDisposable` to stop listening.
+     */
+    readonly onExit: IEvent<{ exitCode: number, signal?: number }>;
+
+    /**
+     * Resizes the dimensions of the pty.
+     * @param columns The number of columns to use.
+     * @param rows The number of rows to use.
+     */
+    resize(columns: number, rows: number): void;
+
+    /**
+     * Clears the pty's internal representation of its buffer. This is a no-op
+     * unless on Windows/ConPTY. This is useful if the buffer is cleared on the
+     * frontend in order to synchronize state with the backend to avoid ConPTY
+     * possibly reprinting the screen.
+     */
+    clear(): void;
+
+    /**
+     * Writes data to the pty.
+     * @param data The data to write.
+     */
+    write(data: string): void;
+
+    /**
+     * Kills the pty.
+     * @param signal The signal to use, defaults to SIGHUP. This parameter is not supported on
+     * Windows.
+     * @throws Will throw when signal is used on Windows.
+     */
+    kill(signal?: string): void;
+
+    /**
+     * Pauses the pty for customizable flow control.
+     */
+    pause(): void;
+
+    /**
+     * Resumes the pty for customizable flow control.
+     */
+    resume(): void;
+}
+export interface IIpcMain {
+
+    /**
+     * Adds a handler for an `invoke`able IPC. This handler will be called whenever a
+     * renderer calls `ipcRenderer.invoke(channel, ...args)`.
+     *
+     * If `listener` returns a Promise, the eventual result of the promise will be
+     * returned as a reply to the remote caller. Otherwise, the return value of the
+     * listener will be used as the value of the reply.
+     *
+     * The `event` that is passed as the first argument to the handler is the same as
+     * that passed to a regular event listener. It includes information about which
+     * WebContents is the source of the invoke request.
+     *
+     * Errors thrown through `handle` in the main process are not transparent as they
+     * are serialized and only the `message` property from the original error is
+     * provided to the renderer process. Please refer to #24427 for details.
+     */
+    handle(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
+    /**
+     * Handles a single `invoke`able IPC message, then removes the listener. See
+     * `ipcMain.handle(channel, listener)`.
+     */
+    handleOnce(channel: string, listener: (event: IpcMainInvokeEvent, ...args: any[]) => (Promise<any>) | (any)): void;
+    /**
+     * Listens to `channel`, when a new message arrives `listener` would be called with
+     * `listener(event, args...)`.
+     */
+    on(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
+    /**
+     * Adds a one time `listener` function for the event. This `listener` is invoked
+     * only the next time a message is sent to `channel`, after which it is removed.
+     */
+    once(channel: string, listener: (event: IpcMainEvent, ...args: any[]) => void): this;
+    /**
+     * Removes listeners of the specified `channel`.
+     */
+    removeAllListeners(channel?: string): this;
+    /**
+     * Removes any handler for `channel`, if present.
+     */
+    removeHandler(channel: string): void;
+    /**
+     * Removes the specified `listener` from the listener array for the specified
+     * `channel`.
+     */
+    removeListener(channel: string, listener: (...args: any[]) => void): this;
+}
+
+export interface IpcMainInvokeEvent extends Event {
+
+    // Docs: https://electronjs.org/docs/api/structures/ipc-main-invoke-event
+
+    /**
+     * The ID of the renderer frame that sent this message
+     */
+    frameId: number;
+    /**
+     * The internal ID of the renderer process that sent this message
+     */
+    processId: number;
+    /**
+     * Returns the `webContents` that sent the message
+     */
+    sender: WebContents;
+    /**
+     * The frame that sent this message
+     *
+     */
+    readonly senderFrame: WebFrameMain;
+}
 export enum PluginType {
     agent = 'agent',
     executor = 'executor'

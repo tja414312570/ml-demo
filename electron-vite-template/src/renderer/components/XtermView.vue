@@ -19,16 +19,12 @@ const terminalRef = ref(null);
 const terminalWrapper = ref(null);
 let terminal = null;
 let resizeObserver = null;
-const ipcListener: { [key: string]: (event, data) => void; } = {};
-let executeing = false;
-let results = []
-const end_tag = "=== Done ===";
-const cnm = (event, data) => {
-  executeing = true;
-  console.log('Data received from code:', data, executeing);  // 调试终
-  // terminal.write(data);
-  terminalApi.send('terminal-input', data + ' ; echo ' + end_tag + '\n');
-};
+// const cnm = (event, data) => {
+//   executeing = true;
+//   console.log('Data received from code:', data, executeing);  // 调试终
+//   // terminal.write(data);
+//   terminalApi.send('terminal-input', data + ' ; echo ' + end_tag + '\n');
+// };
 
 const terminalApi: any = getIpcApi("ipcRenderer")
 onMounted(async () => {
@@ -77,29 +73,11 @@ onMounted(async () => {
 
   // 调整终端大小
   fitAddon.fit();
-  ipcListener['terminal-input'] = cnm
-  console.log("引用是否相等:", cnm === ipcListener['terminal-input'])
-  ipcListener['terminal-output'] = function terminal_output(event, data) {
-    console.log('从终端收到数据:', terminalRef, executeing, data, data.trim(), end_tag, data.trim() === end_tag);  // 调试终
+  terminalApi.on('terminal-output', (event, data) => {
+    console.log('从终端收到数据:', terminalRef);  // 调试终
     terminal.write(data);
-    if (executeing) {
-      results.push(data)
-      if (data.trim() === end_tag) {
-        executeing = false;
-        console.log("代码执行完毕", results.join())
-        terminalApi.send('terminal-execute-completed', results.join());
-        results = []
-      }
-    }
-  }
 
-  for (const key in ipcListener) {
-    if (ipcListener.hasOwnProperty(key)) {
-      const value = ipcListener[key];
-      console.log(`Key: ${key}, Value: A valid function`);
-      terminalApi.on(key, value);
-    }
-  }
+  });
 
   // 监听终端输入并发送到主进程
   terminal.onData((data) => {
@@ -145,7 +123,6 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   // 销毁终端
   console.log("销毁终端")
-  console.log("引用是否相等:", cnm === ipcListener['terminal-input'])
   if (terminal) {
     terminal.dispose();
     window.removeEventListener('resize', fitAddon.fit);

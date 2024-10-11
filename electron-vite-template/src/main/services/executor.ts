@@ -5,7 +5,9 @@ import { send_ipc_render } from "@main/ipc/send_ipc";
 import { ipcMain } from "electron";
 import { sendMessage } from "@main/ipc/webview-api";
 import pluginManager from "@main/plugin/plugin-manager";
-import { PluginType } from "@main/plugin/type/plugin";
+import { PluginInfo, PluginType } from "@main/plugin/type/plugin";
+import { InstructExecutor } from "@main/plugin/type/bridge";
+import { showErrorDialog } from "@main/utils/dialog";
 // loadModules('../executor', (file, module) => {
 //     if (!module.execute) {
 //         throw new Error(` “${file}“ executor not implements execute function`);
@@ -33,9 +35,27 @@ ipcMain.on('terminal-execute-completed', (event, input) => {
 export const executeCode = async (code_body: CodeContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language } = code_body;
-    const executor = executors[language];
-    const result = await executor.execute(code);
-    sendMessage(result)
+    pluginManager.resolvePluginModule(PluginType.executor, (pluginInfoList: Set<PluginInfo>) => {
+        for (const pluginInfo of pluginInfoList) {
+            if (pluginInfo.instruct.indexOf(language) != -1) {
+                return pluginInfo;
+            }
+        }
+        return null;
+    }).then((module: InstructExecutor) => {
+        module.execute(code_body).then((result: string) => {
+            console.log("执行结果", result)
+            sendMessage(result)
+        }).catch(err => {
+            console.error(err)
+            showErrorDialog(`执行指令异常:${String(err)}`)
+        })
+    }).catch(err => {
+        console.error(err)
+        showErrorDialog(`执行器异常:${String(err)}`)
+    })
+    // const result = await executor.execute(code);
+
     // send_ipc_render('terminal-input', code)
     // console.log(`执行结果:\n${result}`);
     // notify(`执行 ${language} 结果:\n${result}`);

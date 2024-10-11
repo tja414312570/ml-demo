@@ -13,6 +13,7 @@
                 <v-list-item-action class="action-buttons">
                     <!-- 显示插件类型 -->
                     <v-chip class="plugin-type" small>{{ plugin.manifest.type }}</v-chip>
+                    <v-chip class="plugin-type" small>{{ plugin.status }}</v-chip>
                     <div style="flex:1" class="action-group">
                         <!-- 查看详情按钮 -->
                         <v-tooltip bottom>
@@ -28,11 +29,11 @@
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
                                 <v-btn density="compact"
-                                    :icon="plugin.enabled ? 'mdi-toggle-switch' : 'mdi-toggle-switch-off'" small
+                                    :icon="plugin.status ? 'mdi-toggle-switch' : 'mdi-toggle-switch-off'" small
                                     v-bind="props" @click="togglePlugin(plugin)">
                                 </v-btn>
                             </template>
-                            <span>{{ plugin.enabled ? '禁用' : '启用' }}</span>
+                            <span>{{ plugin.status ? '禁用' : '启用' }}</span>
                         </v-tooltip>
 
                         <!-- 卸载按钮 -->
@@ -112,7 +113,7 @@ const loading = ref(true);
 interface PluginInfo {
     id: string;
     manifest: PluginManifest;
-    enabled: boolean;
+    status: string;
 }
 
 const dialog = ref(false);
