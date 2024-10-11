@@ -70,15 +70,21 @@
                         <v-list-item>
                             <v-list-item-content>类型: {{ selectedPlugin?.manifest.type }}</v-list-item-content>
                         </v-list-item>
-                        <v-list-item>
+                        <v-list-item v-if="selectedPlugin?.manifest.supportedHooks">
                             <v-list-item-content>支持钩子:
                                 <v-chip v-for="hook in selectedPlugin?.manifest.supportedHooks" :key="hook">{{ hook
                                     }}</v-chip>
                             </v-list-item-content>
                         </v-list-item>
-                        <v-list-item>
+                        <v-list-item v-if="selectedPlugin?.manifest.match">
                             <v-list-item-content>适用域名:
                                 <v-chip v-for="domain in selectedPlugin?.manifest.match" :key="domain">{{ domain
+                                    }}</v-chip>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item v-if="selectedPlugin?.manifest.instruct">
+                            <v-list-item-content>适用指令:
+                                <v-chip v-for="domain in selectedPlugin?.manifest.instruct" :key="domain">{{ domain
                                     }}</v-chip>
                             </v-list-item-content>
                         </v-list-item>
@@ -95,25 +101,13 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, vShow } from 'vue';
+import { PluginManifest } from '@main/plugin/type/plugin';
 
 
 import { getIpcApi } from '@renderer/ts/ipc-api';
 
 const pluginViewApi: any = getIpcApi('plugin-view-api');
 const loading = ref(true);
-
-interface PluginManifest {
-    name: string;
-    version: string;
-    description: string;
-    main: string;
-    pluginType: string;
-    supportedHooks: string[];
-    author: string;
-    license?: string;
-    type: string;
-    match?: string[];
-}
 
 interface PluginInfo {
     id: string;

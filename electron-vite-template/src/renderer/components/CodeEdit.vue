@@ -22,7 +22,7 @@ const MONACO_EDITOR_OPTIONS = {
 }
 const language = ref('shell')
 const orange_language = ref(language.value)
-const code = ref(`ls -l`)
+const code = ref(`等待输入指令`)
 window.codeViewApi.onCode(code_content => {
   console.log('指令信息:', code_content)
   code_content = code_content[0]

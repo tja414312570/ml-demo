@@ -154,6 +154,7 @@ class PluginManager {
             proxy: null,
             type: manifest.type as any,
             match: manifest.match,
+            instruct: manifest.instruct,
             status: PluginStatus.ready,
             getModule() {
                 pluginInfo.proxy;

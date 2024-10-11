@@ -12,6 +12,7 @@ export interface PluginManifest {
     license?: string;
     type: string;             // 自定义插件的类型（如 bridge）
     match?: string[];          // 匹配规则（如 URL 匹配）
+    instruct?: string[];      //支持的指令
 }
 
 // 定义加载的插件结构
@@ -26,6 +27,7 @@ export interface PluginInfo {
     module: Pluginlifecycle & any;                // 插件导出的钩子函数
     type: PluginType;             // 插件类型（根据 manifest 中的 type 字段）
     match?: string[];          // 匹配规则
+    instruct?: string[];       //支持的指令
     status: PluginStatus;
 }
 
