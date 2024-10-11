@@ -1,6 +1,7 @@
 import minimist from 'minimist';
 import { execSync } from 'child_process';
 import { sync as globSync } from 'glob';  // 直接导入 sync 函数
+import path from 'path';
 
 // 获取命令行参数
 const args = minimist(process.argv.slice(2));
@@ -8,8 +9,9 @@ const testFile = args._[0];  // 获取第一个非命令选项参数，假设它
 
 // 定义一个运行测试的函数
 const runTest = (file: string) => {
-    console.log(`Running tests in file: ${file}`);
-    execSync(`tsx ${file}`, { stdio: 'inherit' });
+    const ts_file = path.join('./test/', file)
+    console.log(`Running tests in file: ${ts_file}`);
+    execSync(`tsx ${ts_file}`, { stdio: 'inherit' });
 };
 
 // 同步执行测试文件
