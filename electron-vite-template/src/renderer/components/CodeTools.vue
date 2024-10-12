@@ -25,11 +25,19 @@
             <span>调试模式执行代码</span>
         </v-tooltip>
         <div>{{ language }}</div>
+        <div> <v-select :items="executors" v-model="selected" density="compact" label="Compact" single-line></v-select>
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
+
+const executors = ref<string[]>(['ssh 执行器'])
+
+const selected = ref(executors.value[0])
+
+
 
 const props = defineProps<{
     code: string,
@@ -99,6 +107,31 @@ const debugExecuteCode = () => {
     /* 毛玻璃效果 */
     /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
     /* 阴影效果 */
+}
+
+:deep(.v-field__input) {
+    padding: 2px 0px 2px 2px;
+    min-height: 0;
+}
+
+:deep(.v-list-item--density-default.v-list-item--one-line) {
+    min-height: auto;
+}
+
+:deep(.v-list-item--density-default) {
+    min-height: auto;
+}
+
+:deep(.v-field--appended) {
+    padding-inline-end: 0;
+}
+
+:deep(.v-text-field .v-input__details) {
+    display: none;
+}
+
+:deep(.v-select__menu-icon) {
+    margin-inline-start: 0;
 }
 
 .content {

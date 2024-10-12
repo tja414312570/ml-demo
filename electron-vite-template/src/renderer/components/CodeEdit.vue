@@ -2,7 +2,7 @@
   <div style="position: relative;">
     <CodeTools :code="code" :language="orange_language" />
   </div>
-  <div style="top: 40px;bottom:0;left:0;right:0;position: absolute;">
+  <div>
     <div ref="terminalWrapper" style="position: relative;width: 100%;height: 100%;">
       <vue-monaco-editor v-model:value="code" :language="language" theme="vs-dark" :options="MONACO_EDITOR_OPTIONS"
         @mount="handleMount" />
