@@ -45,7 +45,8 @@ const copy = (pluginList: undefined | null | PluginInfo | Set<PluginInfo>) => {
 };
 
 ipcMain.handle('get-plugin-list', (event, args) => {
-    const cloneObj = copy(pluginManager.getAllPlugins());
+    console.log('调用参数', args)
+    const cloneObj = copy(pluginManager.filterPlugins(arg));
     console.log('获取插件列表:', cloneObj)
     return cloneObj;
 })

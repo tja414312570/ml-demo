@@ -35,6 +35,27 @@ class PluginManager {
     public getAllPlugins(): Set<PluginInfo> {
         return this.pluginSet;
     }
+
+    public filtePlugins(condition: PluginInfo): Set<PluginInfo> {
+        let allPlugins = Array.from(this.getAllPlugins());
+        if (condition) {
+            for (let key in condition) {
+                if (condition.hasOwnProperty(key)) {
+                    const conditionValue = condition[key];
+                    if (conditionValue) {
+                        allPlugins = allPlugins.filter((plugin) => {
+                            if (typeof conditionValue === 'function') {
+                                return conditionValue(plugin[key]);
+                            } else {
+                                return conditionValue === plugin[key];
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        return new Set(allPlugins);
+    }
     public getPluginFromId(id: string): PluginInfo {
         return this.idMapping[id];
     }

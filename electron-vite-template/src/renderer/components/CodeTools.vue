@@ -51,7 +51,7 @@ interface PluginInfo {
 }
 
 onMounted(() => {
-    pluginViewApi.invoke('get-plugin-list').then(pluginList => {
+    pluginViewApi.invoke('get-plugin-list', { type: 'executor' }).then(pluginList => {
         console.log("获取到插件列表", pluginList)
         executors.value = pluginList
         selected.value = executors.value[0]
