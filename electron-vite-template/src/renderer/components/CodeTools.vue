@@ -25,19 +25,41 @@
             <span>调试模式执行代码</span>
         </v-tooltip>
         <div>{{ language }}</div>
-        <div> <v-select :items="executors" v-model="selected" density="compact" label="Compact" single-line></v-select>
+        <div> <v-select :items="executors" item-title="name" item-value="title" v-model="selected" density="compact"
+                label="Compact" single-line></v-select>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { PluginManifest } from '@main/plugin/type/plugin';
+import { getIpcApi } from '@renderer/ts/ipc-api';
+import { onMounted, ref, watch } from 'vue';
 
-const executors = ref<string[]>(['ssh 执行器'])
+const executors = ref<string[]>([''])
 
-const selected = ref(executors.value[0])
+const selected = ref('')
 
+const pluginViewApi: any = getIpcApi('plugin-view-api');
+const loading = ref(true);
 
+interface PluginInfo {
+    id: string;
+    name: string;
+    manifest: PluginManifest;
+    status: string;
+}
+
+onMounted(() => {
+    pluginViewApi.invoke('get-plugin-list').then(pluginList => {
+        console.log("获取到插件列表", pluginList)
+        executors.value = pluginList
+        selected.value = executors.value[0]
+        loading.value = false
+    }).catch(err => {
+        console.error("获取到插件失败", err)
+    })
+})
 
 const props = defineProps<{
     code: string,
