@@ -54,14 +54,14 @@ const onEditorMounted = (editorInstance: monaco.editor.IStandaloneCodeEditor) =>
     console.error("Failed to mount Monaco editor instance.");
   }
 };
-// const change = (editorInstance: monaco.editor.IStandaloneCodeEditor) => {
-//   editor.value = editorInstance;  // 确保正确地将 editorInstance 赋值给 editor.value
-//   if (editor.value) {
-//     executeLine(currentLine.value);
-//   } else {
-//     console.error("Failed to mount Monaco editor instance.");
-//   }
-// };
+const change = (editorInstance: monaco.editor.IStandaloneCodeEditor) => {
+  editor.value = editorInstance;  // 确保正确地将 editorInstance 赋值给 editor.value
+  if (editor.value) {
+    // executeLine(currentLine.value);
+  } else {
+    console.error("Failed to mount Monaco editor instance.");
+  }
+};
 
 // setTimeout(() => {
 //   executeLine(currentLine.value);
