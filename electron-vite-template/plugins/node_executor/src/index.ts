@@ -1,66 +1,75 @@
-import {Bridge} from '../../../src/main/plugin/type/bridge'
-import {Pluginlifecycle} from '../../../src/main/plugin/type/plugin-lifecycle'
+import { InstructContent, InstructExecutor, InstructResult } from '../../../src/main/plugin/type/bridge';
+import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle';
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
-import { IContext } from 'http-mitm-proxy';
-import { decompressedBody } from './decode';
-import { processResponse } from './dispatcher';
-import { resolve } from 'path';
+import { createContext, runInContext } from 'vm';
+import { AbstractPlugin } from './abstract-plugin';
+import {stringify} from 'circular-json';
+import { rejects } from 'assert';
 
-class ChatGptBridge implements Bridge,Pluginlifecycle{
-  pluginContext:PluginExtensionContext | undefined;
-  onRequest(ctx: IContext):  Promise<string|void> {
-    // console.log("请求", ctx.proxyToServerRequestOptions.host)
-    return new Promise<string|void>((resolve,rejects)=>{
-      const requestData = ctx.clientToProxyRequest;
-      let body: Uint8Array[] = [];
-      requestData.on('data', (chunk) => {
-        body.push(chunk);
-      }).on('end', () => {
-        const requestBody = Buffer.concat(body).toString();
-        // const logData = `请求拦截: ${requestData.url}\nRequest Body: ${body}\n`;
-        // console.log(logData);
-        resolve(requestBody);
-      });
-      
-    })
-  }
-  onResponse(ctx: IContext):  Promise<string|void> {
-    return new Promise<string|void>(async (resolve)=>{
-      const response = ctx.serverToProxyResponse;
-  
-      // 获取响应的 Content-Type
-      const contentType = response?.headers['content-type'] || '';
-  
-      // 检查是否是静态资源，如 HTML、CSS、图片等
-      const isStaticResource = (
-        contentType.includes('html') ||      // HTML 页面
-        contentType.includes('css') ||       // CSS 样式表
-        contentType.includes('image') ||         // 图片（如 png, jpg, gif 等）
-        contentType.includes('javascript') ||  // JS 文件
-        contentType.includes('font')             // 字体文件
-      );
-  
-      if (isStaticResource) {
-       resolve();
-       return;
+class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructExecutor {
+  execute(instruct: InstructContent): Promise<InstructResult> {
+    const { code, language ,id} = instruct;
+    let execute_result = '';
+    // 用于捕获标准输出和错误输出
+    let stdout = '';
+
+    // 创建上下文，重写 console 和 process 的输出方法
+    const vmContext = createContext({
+      console: {
+        log: (...args: any[]) => {
+          stdout += 'log:'+args.join(' ') + '\n';
+        },
+        error: (...args: any[]) => {
+          stdout +=  'err:'+args.join(' ') + '\n';
+        }
+      },
+      // process: {
+      //   stdout: {
+      //     write: (data: string) => {
+      //       stdout += data;
+      //     }
+      //   },
+      //   stderr: {
+      //     write: (data: string) => {
+      //       stdout += 'stderr:'+data;
+      //     }
+      //   }
+      // },
+      // 全局方法，让执行的代码可以通过 resolve 或 reject 来返回结果
+      resolve: (result: any) => {
+        execute_result = result;
+      },
+      reject: (error: any) => {
+       rejects(error)
       }
-      // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
-      // console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
-      // let logData = `拦截处理:${requestOptions?.method}:${requestOptions?.port === 443 ? 'https' : 'http'}://${requestOptions?.host}${requestOptions?.path}\n`;
-      const decodeResult = await decompressedBody(ctx);
-      // logData += `响应数据: ${decodeResult}\n`;
-      // console.log(logData);
-      const sseData = processResponse(response?.headers, decodeResult);
-      resolve(sseData)
-    })
+    });
+
+    return new Promise((resolve, reject) => {
+      try {
+        // 执行代码
+        runInContext(`(async () => { ${code} })()`, vmContext);
+        // 将输出结果序列化并返回
+        let resultString = stringify(execute_result);
+        
+        pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`控制台：\r\n${stdout}\r\n结果:\r\n${resultString}`,line:code.split(/\r?\n/).length})
+        resolve({
+          id:instruct.id,
+          ret:resultString,
+          std:stdout
+        });
+      } catch (error:any) {
+        reject(`执行过程中发生错误: ${error.message}\n控制台输出:\n${stdout}`);
+      }
+    });
   }
+
   onMounted(ctx: PluginExtensionContext): void {
-    this.pluginContext = ctx;
-      global.pluginContext = ctx;
+    // 插件挂载时的处理逻辑
   }
+
   onUnmounted(ctx: PluginExtensionContext): void {
+    // 插件卸载时的处理逻辑
   }
- 
-  
 }
-export default new ChatGptBridge();
+
+export default new NodeExecutor();

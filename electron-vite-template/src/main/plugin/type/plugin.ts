@@ -57,6 +57,7 @@ export interface PluginExtensionContext {
     notifyManager: { notify: (message: string) => void, notifyError: (message: string) => void }
     ipcMain: IIpcMain;
     pty: IPty
+    sendIpcRender: (event_: string, message: any) => void
 }
 
 /**

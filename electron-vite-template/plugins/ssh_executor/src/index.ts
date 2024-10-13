@@ -1,4 +1,4 @@
-import {InstructContent, InstructExecutor} from '../../../src/main/plugin/type/bridge'
+import {InstructContent, InstructExecutor, InstructResult} from '../../../src/main/plugin/type/bridge'
 import {Pluginlifecycle} from '../../../src/main/plugin/type/plugin-lifecycle'
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { v4 as uuidv4 } from 'uuid';
@@ -13,7 +13,8 @@ const removeInvisibleChars = (str:string) => {
 };
 
 class SshExecutor implements InstructExecutor,Pluginlifecycle{
-  execute(instruct: InstructContent): Promise<string | void> {
+  execute(instruct: InstructContent): Promise<InstructResult> {
+    const {id,code} = instruct;
     return new Promise((resolve,reject)=>{
       let executeing = true;
       let results:string[] = []
@@ -29,7 +30,13 @@ class SshExecutor implements InstructExecutor,Pluginlifecycle{
             if ( removeInvisibleChars(line) === end_tag) {
               // executeing = false;
               console.log("代码执行完毕", results.join())
-              resolve(results.join())
+              pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`控制台：\r\n${results.join()}`,line:code.split(/\r?\n/).length})
+              resolve({
+                id:instruct.id,
+                ret:results.join(),
+                // std:results.join()
+              });
+              // resolve(results.join())
               disable.dispose()
             }
           }

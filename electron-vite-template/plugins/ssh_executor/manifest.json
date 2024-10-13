@@ -1,7 +1,7 @@
 {
-    "name": "terminal执行器",
+    "name": "终端(内置)",
     "version": "1.0.0",
-    "description": "此脚本作为默认终端执行器等",
+    "description": "此脚本作为内置终端执行器等",
     "pluginType": "默认插件",
     "author": "默认开发者",
     "icon":"./dist/assets/logo.svg",

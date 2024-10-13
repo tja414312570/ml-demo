@@ -45,7 +45,7 @@ class IpcApi {
 }
 
 // getIpcApi 函数，用于创建带有代理的 IpcApi 对象
-export function getIpcApi(channel: string): IpcApi {
+export function getIpcApi<T>(channel: string): IpcApi & T {
     const ipcApiInstance = new IpcApi(channel);
     const { _getIpcApi__, _getId__ } = ipcApiInstance;
 
@@ -63,7 +63,7 @@ export function getIpcApi(channel: string): IpcApi {
                         const result = _getIpcApi__()[prop](...args);  // 可以根据需求返回其他默认值
                         return result;
                     } catch (err) {
-                        const message = `ipc通信异常:${String(err)}`
+                        const message = `ipc通信异常:${String(err)},目标:${channel}.${String(prop)}`
                         window['core-api'].send('error-notify', message)
                         showCustomAlert(message)
                         throw new Error(message, { cause: err })
@@ -73,7 +73,7 @@ export function getIpcApi(channel: string): IpcApi {
                 };
             }
         }
-    });
+    }) as IpcApi & T;
 }
 function isListener(args: any[]) {
     return args.some(arg => typeof arg === 'function');;

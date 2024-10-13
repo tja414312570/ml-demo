@@ -25,46 +25,45 @@
             <span>调试模式执行代码</span>
         </v-tooltip>
         <div>{{ language }}</div>
-        <div> <v-select :items="executors" item-title="name" item-value="title" v-model="selected" density="compact"
+        <div> <v-select :items="executors" item-title="name" v-model="selected" item-value="id" density="compact"
                 label="Compact" single-line></v-select>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { PluginManifest } from '@main/plugin/type/plugin';
+import { InstructContent } from '@main/ipc/code-manager';
+import { PluginInfo } from '@main/plugin/type/plugin';
+import { IpcEventHandler } from '@renderer/ts/default-ipc';
 import { getIpcApi } from '@renderer/ts/ipc-api';
 import { onMounted, ref, watch } from 'vue';
 
-const executors = ref<string[]>([''])
+const executors = ref<PluginInfo[]>([])
 
-const selected = ref('')
+const selected = ref<string>(null)
 
 const pluginViewApi: any = getIpcApi('plugin-view-api');
+const codeApi = getIpcApi<IpcEventHandler>('code-view-api');
 const loading = ref(true);
 
-interface PluginInfo {
-    id: string;
-    name: string;
-    manifest: PluginManifest;
-    status: string;
-}
-
 onMounted(() => {
-    pluginViewApi.invoke('get-plugin-list', { type: 'executor' }).then(pluginList => {
+    pluginViewApi.invoke('get-plugin-list', { type: 'executor' }).then((pluginList: Array<PluginInfo>) => {
         console.log("获取到插件列表", pluginList)
-        executors.value = pluginList
-        selected.value = executors.value[0]
+        executors.value = pluginList.sort((a, b) => {
+            const aMatchesLanguage = a.instruct?.includes(props.language) ? 1 : 0;
+            const bMatchesLanguage = b.instruct?.includes(props.language) ? 1 : 0;
+            console.log(aMatchesLanguage, bMatchesLanguage)
+            // 优先匹配到 language 的排前面
+            return bMatchesLanguage - aMatchesLanguage;
+        });
+        selected.value = executors.value[1]['id']
         loading.value = false
     }).catch(err => {
         console.error("获取到插件失败", err)
     })
 })
 
-const props = defineProps<{
-    code: string,
-    language: string
-}>();
+const props = defineProps<InstructContent>();
 // 监听对象变化
 watch(
     () => props.code,
@@ -95,7 +94,7 @@ const handleDebugExecute = () => {
 
 // 模拟的代码执行函数
 const executeCode = () => {
-    window.codeViewApi.executeCode({ code: props.code, language: props.language }).then(result => {
+    codeApi.executeCode({ code: props.code, id: props.id, language: props.language, executor: selected.value } as InstructContent).then(result => {
         console.log('代码已执行:', props.code)
         console.log('代码执行结果:', result)
     }).catch(err => {

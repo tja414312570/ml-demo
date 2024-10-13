@@ -56,9 +56,18 @@ export const ipcRenderMapper: IpcRendererExtended = new Proxy({
       return;
     }
     console.log("绑定监听器：", channel)
-    bindListener(ipcRenderMapper._id_, channel, listener)
+    const wrappedListener = (event: IpcRendererEvent, ...args: any[]) => {
+      try {
+        listener(event, ...args);
+      } catch (error) {
+        console.error(`监听器 '${channel}' 执行出错:`, error);
+        alert(`监听器 '${channel}' 执行出错:${String(error)}`)
+        // 你可以在这里添加自定义的错误处理，例如发送通知或日志记录
+      }
+    };
+    bindListener(ipcRenderMapper._id_, channel, wrappedListener)
     ipcRenderer.send('ipc-core.bind-channel-listener', { webContentId: ipcRenderMapper._web_content_id_, channel })
-    return ipcRenderer.on(channel, listener);
+    return ipcRenderer.on(channel, wrappedListener);
   },
   offAll: () => {
     const _id_ = ipcRenderMapper._id_;
@@ -105,6 +114,7 @@ const api_wrapoer = {
   _setId_: ipcRenderMapper._setId_,
   off: ipcRenderMapper.off,
   offAll: ipcRenderMapper.offAll,
+  on: ipcRenderMapper.on
 }
 export const exposeInMainWorld = (channel: string, api: { [key: string]: any }) => {
   return new Promise<void>((resolve, rejects) => {

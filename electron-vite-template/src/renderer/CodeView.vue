@@ -6,14 +6,14 @@
           panel.name 来判断当前是那个面板，渲染对应内容 
         -->
       <keep-alive>
-        <component :is="getPannel(panel.name)" :panel="panel" />
+        <component :is="getPannel(panel.name)" :panel="panel" style="height: 100%;" />
       </keep-alive>
 
       <!-- <span>Panel {{ debug(panel).name }}, content xxx</span> -->
     </template>
     <!-- https://github.com/imengyu/vue-code-layout/blob/master/examples/views/BasicUseage.vue -->
     <template #centerArea>
-      <MainWebView />
+      <!-- <MainWebView /> -->
     </template>
     <template #statusBar>
       <StatusBar />
@@ -68,13 +68,13 @@ const config = reactive<CodeLayoutConfig>({
   titleBar: true,
   titleBarShowCustomizeLayout: true,
   activityBar: true,
-  primarySideBar: true,
+  primarySideBar: false,
   bottomPanel: true,
   statusBar: true,
   menuBar: true,
   bottomPanelMaximize: false,
   secondarySideBar: true,
-  secondarySideBarWidth: 20,
+  secondarySideBarWidth: 50,
   secondarySideBarMinWidth: 170,
   secondarySideBarAsActivityBar: true,
   secondaryActivityBarPosition: 'side'

@@ -4,11 +4,17 @@ export interface Bridge {
     onResponse(ctx: IContext): Promise<string | void>
 }
 
+export type InstructResult = {
+    id:string,
+    std?:string,
+    ret?:string,
+}
 export interface InstructExecutor {
-    execute(instruct: InstructContent): Promise<string | void>
+    execute(instruct: InstructContent): Promise<InstructResult | void>
 }
 
 export type InstructContent = {
+    id:string,
     code: string,
     language: string
 }

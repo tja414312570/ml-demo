@@ -4,6 +4,7 @@ import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
 import { InstructContent } from "@main/ipc/code-manager";
 import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
 import './index-plugin-view'
+import './index-instruct-view'
 // const wrapper = (api: any) => {
 //   return new Proxy(api, {
 //     get(target, prop) {
@@ -48,16 +49,6 @@ exposeInMainWorld('ipcRenderer', {
   //  off: ipcRenderMapper.off
 });
 
-
-contextBridge.exposeInMainWorld('codeViewApi', {
-  onCode: (callback: Function) => ipcRenderer.on('codeViewApi.code', (event, notifyData) => {
-    callback(notifyData);
-  }),
-  executeCode: (code: InstructContent) => ipcRenderer.invoke("codeViewApi.execute", code),
-  onCodeExecuted: (callback: Function) => ipcRenderer.on('codeViewApi.code.executed', (event, notifyData) => {
-    callback(notifyData);
-  }),
-});
 
 contextBridge.exposeInMainWorld('notificationAPI', {
   onReady: () => ipcRenderer.send('notificationAPI-ready'),
