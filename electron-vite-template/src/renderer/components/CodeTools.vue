@@ -56,7 +56,7 @@ onMounted(() => {
             // 优先匹配到 language 的排前面
             return bMatchesLanguage - aMatchesLanguage;
         });
-        selected.value = executors.value[1]['id']
+        selected.value = executors.value[0]['id']
         loading.value = false
     }).catch(err => {
         console.error("获取到插件失败", err)
@@ -69,6 +69,14 @@ watch(
     () => props.code,
     (newValue) => {
         console.log('user 对象发生变化:', newValue);
+        executors.value = executors.value.sort((a, b) => {
+            const aMatchesLanguage = a.instruct?.includes(props.language) ? 1 : 0;
+            const bMatchesLanguage = b.instruct?.includes(props.language) ? 1 : 0;
+            console.log(aMatchesLanguage, bMatchesLanguage)
+            // 优先匹配到 language 的排前面
+            return bMatchesLanguage - aMatchesLanguage;
+        });
+        selected.value = executors.value[0]['id']
     },
     { deep: true } // 深度监听对象
 );

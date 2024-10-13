@@ -19,12 +19,12 @@ import CodeDiff from './CodeDiff.vue';
 import { getIpcApi } from '@renderer/ts/ipc-api';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
 
-const code = ref<string>(`// Initial code here
-function test() {
-  console.log('Hello World');
-  resolve('hello resolve')
-}
-test()
+const code = ref<string>(`# 获取操作系统和 Python 版本信息
+echo "操作系统信息:"
+uname -a
+echo ""
+echo "Python 版本:"
+python --version
 `);
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 const decorations = ref<string[]>([]);
@@ -126,7 +126,7 @@ function insertVueInlineDiff(editor, lineNumber, diffContent) {
   });
 }
 
-codeApi.on('codeViewApi.code', (code_content: InstructContent) => {
+codeApi.on('codeViewApi.code', (event: any, code_content: InstructContent) => {
   console.log('指令信息:', code_content)
   code_content = code_content[0]
   code.value = code_content.code;
