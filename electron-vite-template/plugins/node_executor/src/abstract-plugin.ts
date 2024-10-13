@@ -1,9 +1,8 @@
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
+import { Pluginlifecycle } from "../../../src/main/plugin/type/plugin-lifecycle";
 
-let ctx:PluginExtensionContext = {} as PluginExtensionContext;
 export class AbstractPlugin{
     _init__(ctx:PluginExtensionContext){
-        ctx = ctx;
+        global.pluginContext = ctx;
     }
 }
-export const notify = ()=>ctx.notifyManager.notify;
