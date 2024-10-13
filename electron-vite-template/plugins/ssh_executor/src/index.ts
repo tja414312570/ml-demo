@@ -27,7 +27,8 @@ class SshExecutor implements InstructExecutor,Pluginlifecycle{
           const lines = data.split(/\r?\n/); // 按换行符分割
           for (const line of lines) {
             // console.log(`读取行:"${JSON.stringify(line)}"${line.length},"${JSON.stringify(end_tag)}"${end_tag.length}`, executeing,line.trim() === end_tag); 
-            if ( removeInvisibleChars(line) === end_tag) {
+            const lineTrim =removeInvisibleChars(line);
+            if (lineTrim.length>1 && lineTrim.substring(1) === end_tag) {
               // executeing = false;
               console.log("代码执行完毕", results.join())
               pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`控制台：\r\n${results.join()}`,line:code.split(/\r?\n/).length})
@@ -42,7 +43,10 @@ class SshExecutor implements InstructExecutor,Pluginlifecycle{
           }
         }
       });
-      const cmd = instruct.code + ' ; echo ' + end_tag + '\r\n';
+      const code_splits = instruct.code
+  .split(/\r?\n/)
+  .filter(line => line.trim() && !/^\s*(#|REM|::)/i.test(line));
+      const cmd = code_splits.join(' && ') + ' && echo s' + end_tag + ' || echo f'+end_tag+'\r\n';
       console.log(`发送指令:${cmd}`);
       pluginContext.pty.write(cmd)
     })

@@ -116,13 +116,29 @@ function insertVueInlineDiff(editor, lineNumber, diffContent) {
 
     // 定义 ViewZone
     const viewZone = {
-      afterLineNumber: lineNumber,
+      afterLineNumber: 2,
       heightInLines: lines, // 根据组件内容调整高度
       domNode: domNode,
     };
 
     // 添加 ViewZone
     viewZoneId = accessor.addZone(viewZone);
+    // requestAnimationFrame(() => {
+    //   const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
+    //   const contentHeight = domNode.clientHeight;
+    //   const lines = Math.ceil(contentHeight / lineHeight);
+
+    //   editor.changeViewZones(updateAccessor => {
+    //     updateAccessor.removeZone(viewZoneId);
+    //     updateAccessor.addZone({
+    //       afterLineNumber: 2,
+    //       heightInLines: lines,
+    //       domNode: domNode
+    //     });
+    //   });
+
+    //   console.log(`插入内容占用行数: ${lines}`);
+    // });
   });
 }
 

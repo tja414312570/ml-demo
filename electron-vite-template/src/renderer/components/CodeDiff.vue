@@ -1,6 +1,6 @@
 <template>
     <div class="diff-content">
-        <pre>{{ content }}</pre>
+        <pre style="white-space: break-spaces;">{{ content }}</pre>
     </div>
 </template>
 
