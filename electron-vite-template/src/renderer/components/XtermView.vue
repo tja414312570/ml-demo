@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
     terminal.dispose();
     window.removeEventListener('resize', fitAddon.fit);
   }
-  terminalApi.off()
+  terminalApi.offAll()
   if (resizeObserver) {
     resizeObserver.disconnect();
   }

@@ -15,6 +15,7 @@ export const wrapperInstruct = (instruction: string, content: string): InstructC
     return { language: instruction, code: content, id: uuidV4() }
 }
 export const previewCode = (code: Array<InstructContent>) => {
+    console.error("执行错误:", new Error())
     send_ipc_render('codeViewApi.code', code)
 }
 

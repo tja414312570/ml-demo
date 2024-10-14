@@ -13,7 +13,7 @@
     </template>
     <!-- https://github.com/imengyu/vue-code-layout/blob/master/examples/views/BasicUseage.vue -->
     <template #centerArea>
-      <!-- <MainWebView /> -->
+      <MainWebView />
     </template>
     <template #statusBar>
       <StatusBar />
@@ -65,13 +65,13 @@ const config = reactive<CodeLayoutConfig>({
   bottomAlignment: 'center',
   panelHeaderHeight: 24,
   panelMinHeight: 150,
-  titleBar: true,
+  titleBar: false,
   titleBarShowCustomizeLayout: true,
   activityBar: true,
   primarySideBar: false,
   bottomPanel: true,
   statusBar: true,
-  menuBar: true,
+  menuBar: false,
   bottomPanelMaximize: false,
   secondarySideBar: true,
   secondarySideBarWidth: 50,

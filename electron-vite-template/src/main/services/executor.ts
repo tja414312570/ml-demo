@@ -28,10 +28,14 @@ import { showErrorDialog } from "@main/utils/dialog";
 //     console.log(`load-module: ${file},${module.support}`);
 // }).catch(console.error);
 
-ipcMain.on('terminal-execute-completed', (event, input) => {
-    console.log("搜到执行结果", input)
-    executeCodeCompleted(input)
+ipcMain.on('send_execute-result', (event, input) => {
+    console.log("发送消息到webview", input)
+    sendMessage(input)
 });
+// ipcMain.on('terminal-execute-completed', (event, input) => {
+//     console.log("搜到执行结果", input)
+//     executeCodeCompleted(input)
+// });
 export const executeCode = async (code_body: InstructContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language, executor } = code_body;

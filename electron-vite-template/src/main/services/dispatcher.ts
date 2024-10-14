@@ -37,7 +37,12 @@ function extractInstructionListFromMarkdown(responseBody: string): Array<Instruc
 
 async function dispatch(headers: IncomingHttpHeaders, response: string) {
     const instructionList = extractInstructionListFromMarkdown(response)
-    previewCode(instructionList)
+    if (instructionList.length > 0) {
+        previewCode(instructionList)
+    } else {
+        notify("没有代码块")
+    }
+
 }
 export {
     dispatch

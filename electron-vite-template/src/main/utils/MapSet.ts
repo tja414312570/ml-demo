@@ -1,23 +1,37 @@
 export class MapSet<V> {
-    private mapping: { [key: string | number | symbol]: Set<V> } = {}
+    private mapping: Map<string | number | symbol, Set<V>> = new Map();
+
     constructor() { }
+
+    // 添加值到指定 key 的 Set 中
     public add(key: string | number | symbol, value: V) {
-        const values = this.mapping[key] || new Set<V>();
+        let values = this.mapping.get(key);
+        if (!values) {
+            values = new Set<V>();
+            this.mapping.set(key, values);
+        }
         values.add(value);
-        this.mapping[key] = values;
     }
-    public get(key: string | number | symbol): Set<V> {
-        return this.mapping[key];
+
+    // 获取指定 key 的 Set
+    public get(key: string | number | symbol): Set<V> | undefined {
+        return this.mapping.get(key);
     }
+
+    // 移除指定 key 中的某个值
     public remove(key: string | number | symbol, value: V) {
-        if (this.mapping[key]) {
-            this.mapping[key].delete(value);
-            if (this.mapping[key].size === 0) {
-                delete this.mapping[key];
+        const values = this.mapping.get(key);
+        if (values) {
+            values.delete(value);
+            // 如果 Set 为空，则删除这个 key
+            if (values.size === 0) {
+                this.mapping.delete(key);
             }
         }
     }
+
+    // 完全移除某个 key 和其对应的 Set
     public removeKey(key: string | number | symbol) {
-        delete this.mapping[key];
+        this.mapping.delete(key);
     }
 }

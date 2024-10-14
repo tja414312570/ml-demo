@@ -80,6 +80,7 @@ export const ipcRenderMapper: IpcRendererExtended = new Proxy({
     if (invokers[_id_]) {
       for (const channel in invokers[_id_]) {
         const listener = invokers[_id_][channel];
+        console.log("注销监听:", _id_, listener)
         ipcRenderer.off(channel, listener);
         removeListener(_id_, channel)
         ipcRenderer.send('ipc-core.remove-channel-listener', { webContentId: ipcRenderMapper._web_content_id_, channel })
@@ -91,6 +92,11 @@ export const ipcRenderMapper: IpcRendererExtended = new Proxy({
     const _id_ = ipcRenderMapper._id_;
     if (!_id_) {
       alert("注销监听器失败，请使用Ipc-Api调用，并传递参数")
+      console.error(new Error("注销监听器失败，请使用代理，并传递参数"))
+      return;
+    }
+    if (channel) {
+      alert("注销监听器失败，请传入要解绑的渠道")
       console.error(new Error("注销监听器失败，请使用代理，并传递参数"))
       return;
     }
@@ -114,7 +120,9 @@ const api_wrapoer = {
   _setId_: ipcRenderMapper._setId_,
   off: ipcRenderMapper.off,
   offAll: ipcRenderMapper.offAll,
-  on: ipcRenderMapper.on
+  on: ipcRenderMapper.on,
+  send: ipcRenderer.send,
+  invoke: ipcRenderer.invoke
 }
 export const exposeInMainWorld = (channel: string, api: { [key: string]: any }) => {
   return new Promise<void>((resolve, rejects) => {

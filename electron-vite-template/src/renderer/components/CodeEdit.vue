@@ -18,7 +18,7 @@ import { InstructContent } from '@main/ipc/code-manager';
 import CodeDiff from './CodeDiff.vue';
 import { getIpcApi } from '@renderer/ts/ipc-api';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
-import app from '@renderer/main';
+
 
 const code = ref<string>(`# 获取操作系统和 Python 版本信息
 echo "操作系统信息:"
@@ -101,7 +101,7 @@ function removeInlineDiff(editor) {
 
   }
 }
-
+// let app; (async () => app = (await import('@renderer/main')).default)();
 // 插入 Vue 组件作为 ViewZone 的内容
 function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber, diffContent) {
   const linesOfDiff = diffContent.split('\n');
@@ -112,7 +112,6 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
     const splitLine = line.length / font_num_of_line;
     lines += splitLine - 1;
   }
-
   editor.changeViewZones((accessor) => {
     // 创建 DOM 节点作为 ViewZone 的容器
     const domNode = document.createElement('div');
@@ -129,10 +128,11 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
         render(null, domNode);
         editor.changeViewZones((accessor) => { accessor.removeZone(viewZoneId) })
       }, send: () => {
-        alert("发送:" + viewZoneId)
+        codeApi.send('send_execute-result', diffContent)
       }
     });
-    vnode.appContext = app._context;
+
+    // vnode.appContext = app._context;
     render(vnode, domNode);
     viewZones.push(viewZoneId)
     const ovsolve = () => {
