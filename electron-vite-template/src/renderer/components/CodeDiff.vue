@@ -1,6 +1,14 @@
 <template>
     <div class="diff-content">
         <pre style="white-space: break-spaces;">{{ content }}</pre>
+        <div>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ props }">
+                    <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-play-circle</v-icon>
+                </template>
+                <span>执行代码</span>
+            </v-tooltip>
+        </div>
     </div>
 </template>
 
@@ -9,6 +17,10 @@ import { defineProps } from 'vue';
 
 interface Props {
     content: string;
+}
+
+const handleExecute = () => {
+    console.log("删除")
 }
 
 const props = defineProps<Props>();

@@ -5,6 +5,7 @@ import { createContext, runInContext } from 'vm';
 import { AbstractPlugin } from './abstract-plugin';
 import {stringify} from 'circular-json';
 import { rejects } from 'assert';
+import util from 'util'
 import fs from 'fs'
 
 class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructExecutor {
@@ -53,7 +54,14 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
           std:stdout
         });
       } catch (error:any) {
-        reject(`执行过程中发生错误: ${error.message}\n控制台输出:\n${stdout}`);
+        const errorDetails = util.inspect(error, { depth: null, colors: true });
+        const out = (stdout.trim().length>1?'控制台：\r\n'+stdout+'\r\n':'')+'执行异常:'+errorDetails;
+        // reject(`执行过程中发生错误: ${errorDetails}\n控制台输出:\n${stdout}`);
+        pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`${out}\r\n`,line:code.split(/\r?\n/).length})
+        resolve({
+          id:instruct.id,
+          std:out
+        });
       }
     });
   }

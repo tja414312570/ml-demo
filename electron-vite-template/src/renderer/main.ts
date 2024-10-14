@@ -16,6 +16,7 @@ import * as directives from 'vuetify/directives'
 import { VIcon } from 'vuetify/components'; // 导入实际的 v-icon 组件
 import { mdiHome } from '@mdi/js';  // 或者你自定义的图标
 import '@mdi/font/css/materialdesignicons.css';
+import CodeDiff from './components/CodeDiff.vue';
 
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 
@@ -32,6 +33,7 @@ const app = createApp(App);
 const store = createPinia();
 app.use(router);
 app.use(store);
+app._context.components.CodeDiff = CodeDiff;
 app.use(VueMonacoEditorPlugin, {
   paths: {
     // The recommended CDN config
@@ -47,3 +49,4 @@ import CodeLayout from 'vue-code-layout'
 app.use(CodeLayout)
 
 app.mount("#app");
+export default app;

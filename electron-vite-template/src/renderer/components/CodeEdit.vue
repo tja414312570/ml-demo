@@ -18,6 +18,7 @@ import { InstructContent } from '@main/ipc/code-manager';
 import CodeDiff from './CodeDiff.vue';
 import { getIpcApi } from '@renderer/ts/ipc-api';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
+import app from '@renderer/main';
 
 const code = ref<string>(`# 获取操作系统和 Python 版本信息
 echo "操作系统信息:"
@@ -55,12 +56,7 @@ const onEditorMounted = (editorInstance: monaco.editor.IStandaloneCodeEditor) =>
   }
 };
 const change = (editorInstance: monaco.editor.IStandaloneCodeEditor) => {
-  editor.value = editorInstance;  // 确保正确地将 editorInstance 赋值给 editor.value
-  if (editor.value) {
-    // executeLine(currentLine.value);
-  } else {
-    console.error("Failed to mount Monaco editor instance.");
-  }
+  console.log("editor change.", editorInstance);
 };
 
 // setTimeout(() => {
@@ -93,15 +89,19 @@ const setExecutionMarker = (lineNumber: number) => {
     console.error("Editor instance is not available to set decorations.");
   }
 };
-let viewZoneId;
+const viewZones = []
 function removeInlineDiff(editor) {
-  if (viewZoneId !== null) {
-    editor.changeViewZones(accessor => {
-      accessor.removeZone(viewZoneId);
-    });
-    viewZoneId = null; // 清空 ID，确保只能删除已存在的 ViewZone
+  if (viewZones.length !== null) {
+    let viewZoneId;
+    while ((viewZoneId = viewZones.pop())) {
+      editor.changeViewZones(accessor => {
+        accessor.removeZone(viewZoneId);
+      });
+    }
+
   }
 }
+
 // 插入 Vue 组件作为 ViewZone 的内容
 function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber, diffContent) {
   const linesOfDiff = diffContent.split('\n');
@@ -120,13 +120,15 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
 
     // 创建虚拟 DOM，并渲染到 ViewZone 中
     const vnode = createVNode(CodeDiff, { content: diffContent });
+    vnode.appContext = app._context;
     render(vnode, domNode);
     const viewZone: monaco.editor.IViewZone = {
       afterLineNumber: lineNumber,
       domNode: domNode,
       heightInLines: 0,
     };
-    viewZoneId = accessor.addZone(viewZone);
+    const viewZoneId = accessor.addZone(viewZone);
+    viewZones.push(viewZoneId)
     const ovsolve = () => {
       requestAnimationFrame(() => {
         // 获取渲染后 DOM 的实际高度
@@ -155,6 +157,7 @@ codeApi.on('codeViewApi.code', (event: any, code_content: InstructContent) => {
     code_content.language = 'shell'
   }
   language.value = code_content.language;
+  removeInlineDiff(editor.value)
 })
 
 codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number }) => {
