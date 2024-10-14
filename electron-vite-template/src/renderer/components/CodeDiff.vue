@@ -4,9 +4,9 @@
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ props }">
-                    <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-play-circle</v-icon>
+                    <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-send-outline</v-icon>
                 </template>
-                <span>执行代码</span>
+                <span>发送结果</span>
             </v-tooltip>
         </div>
     </div>

@@ -4,7 +4,7 @@
             <!-- 自动执行图标（Auto Run / Disable Auto Run）带提示 -->
             <template v-slot:activator="{ props }">
                 <v-icon v-bind="props" small @click="toggleAutoExecute" :color="isAutoRunEnabled ? 'green' : 'grey'">
-                    {{ isAutoRunEnabled ? 'mdi-autorenew' : 'mdi-close-circle-outline' }}
+                    {{ isAutoRunEnabled ? 'mdi-refresh-auto' : 'mdi-pause' }}
                 </v-icon>
             </template>
             <span>{{ isAutoRunEnabled ? '自动执行已启用' : '自动执行已禁用' }}</span>
@@ -28,6 +28,14 @@
         <div> <v-select :items="executors" item-title="name" v-model="selected" item-value="id" density="compact"
                 label="Compact" single-line></v-select>
         </div>
+        <v-tooltip bottom>
+            <template v-slot:activator="{ props }">
+                <v-icon small v-bind="props" @click="toggleAutoSend" :color="isAutoSend ? 'green' : 'grey'">{{
+                    isAutoSend ?
+                        'mdi-send-check-outline' : 'mdi-send-lock-outline' }}</v-icon>
+            </template>
+            <span>{{ isAutoRunEnabled ? '自动发送执行结果' : '手动发送执行结果' }}</span>
+        </v-tooltip>
     </div>
 </template>
 
@@ -41,6 +49,7 @@ import { onMounted, ref, watch } from 'vue';
 const executors = ref<PluginInfo[]>([])
 
 const selected = ref<string>(null)
+const isAutoSend = ref(true)
 
 const pluginViewApi: any = getIpcApi('plugin-view-api');
 const codeApi = getIpcApi<IpcEventHandler>('code-view-api');
@@ -89,7 +98,9 @@ const toggleAutoExecute = () => {
         executeCode(); // 自动执行
     }
 };
-
+const toggleAutoSend = () => {
+    isAutoSend.value = !isAutoSend.value;
+};
 // 执行代码的逻辑
 const handleExecute = () => {
     executeCode();
