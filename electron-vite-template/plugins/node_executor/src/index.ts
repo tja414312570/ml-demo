@@ -5,6 +5,7 @@ import { createContext, runInContext } from 'vm';
 import { AbstractPlugin } from './abstract-plugin';
 import {stringify} from 'circular-json';
 import { rejects } from 'assert';
+import fs from 'fs'
 
 class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructExecutor {
   execute(instruct: InstructContent): Promise<InstructResult> {
@@ -23,25 +24,19 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
           stdout +=  'err:'+args.join(' ') + '\n';
         }
       },
-      // process: {
-      //   stdout: {
-      //     write: (data: string) => {
-      //       stdout += data;
-      //     }
-      //   },
-      //   stderr: {
-      //     write: (data: string) => {
-      //       stdout += 'stderr:'+data;
-      //     }
-      //   }
-      // },
-      // 全局方法，让执行的代码可以通过 resolve 或 reject 来返回结果
       resolve: (result: any) => {
         execute_result = result;
       },
       reject: (error: any) => {
        rejects(error)
-      }
+      }, require,
+      process,
+      Buffer,
+      fs,
+      setTimeout,
+      setInterval,
+      clearTimeout,
+      clearInterval,
     });
 
     return new Promise((resolve, reject) => {
