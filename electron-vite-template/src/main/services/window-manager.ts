@@ -9,6 +9,7 @@ import { executeCode } from "./executor";
 import { bindListenerChannel, getWebContentIds, removeListenerChannel } from "./web-content-listener";
 import pluginContext from "@main/plugin/plugin-context";
 import { wrapper } from "@main/plugin/Iproxy";
+import { IPty } from "@main/plugin/type/plugin";
 
 
 class MainInit {
@@ -87,7 +88,8 @@ class MainInit {
       cwd: process.env.HOME,
       env: process.env,
     });
-    pluginContext.pty = wrapper<any>(ptyProcess)
+    pluginContext.pty = wrapper<IPty>(ptyProcess);
+    (pluginContext.pty as any).type = shell;
     // 监听来自 xterm.js 的输入
     ipcMain.on('terminal-input', (event, input) => {
       ptyProcess.write(input);

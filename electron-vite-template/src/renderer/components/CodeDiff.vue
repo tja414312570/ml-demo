@@ -26,4 +26,8 @@ const props = defineProps<Props>();
     position: relative;
     /* 相对定位以启用 z-index */
 }
+
+pre {
+    user-select: text;
+}
 </style>

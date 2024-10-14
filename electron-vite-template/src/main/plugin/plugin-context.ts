@@ -1,9 +1,8 @@
 import EventEmitter from "events";
-import { IIpcMain, PluginExtensionContext } from "./type/plugin";
+import { IIpcMain, IPty, PluginExtensionContext } from "./type/plugin";
 import { Pluginlifecycle } from "./type/plugin-lifecycle";
 import { notify, notifyError } from "@main/ipc/notify-manager";
 import { app, ipcMain } from "electron";
-import { IPty } from "node-pty";
 import { wrapper } from "./Iproxy";
 import { send_ipc_render } from "@main/ipc/send_ipc";
 
@@ -13,6 +12,7 @@ class ExtensionContext extends EventEmitter implements PluginExtensionContext {
     ipcMain = wrapper<IIpcMain>(ipcMain);
     notifyManager = { notify, notifyError };
     public app = app;
+    pluginContext: import("d:/git/ml-demo/electron-vite-template/src/main/plugin/type/plugin").IPty;
     register(plugin: Pluginlifecycle & any): void {
         console.log(`注册组件${JSON.stringify(plugin)}`)
     }

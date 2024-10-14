@@ -14,6 +14,7 @@ import { Terminal } from 'xterm';
 import { debounce } from 'lodash';
 import { FitAddon } from 'xterm-addon-fit';
 import { getIpcApi } from '../ts/ipc-api'
+import { WebLinksAddon } from 'xterm-addon-web-links';
 const fitAddon = new FitAddon();
 const terminalRef = ref(null);
 const terminalWrapper = ref(null);
@@ -36,7 +37,7 @@ onMounted(async () => {
       background: '#1e1e1e',  // 背景色
       foreground: '#dcdcdc',  // 前景色
       cursor: '#ffffff',      // 光标颜色
-      selectionForeground: '#c0c0c0',   // 选中颜色
+      selectionBackground: '#c0c0c0',   // 选中颜色
       black: '#000000',
       red: '#ff5555',
       green: '#50fa7b',
@@ -61,8 +62,11 @@ onMounted(async () => {
     allowProposedApi: true,
     rightClickSelectsWord: true,
     lineHeight: 1,
+    allowTransparency: true,
   });
 
+  // const webLinksAddon = new WebLinksAddon();
+  // terminal.loadAddon(webLinksAddon);
   terminal.options.cursorStyle = 'block';
   terminal.options.cursorBlink = true;
   terminal.options.fontSize = 12;
@@ -100,24 +104,15 @@ onMounted(async () => {
 
   terminal.prompt();
   terminal.focus();
-  // 防抖函数，每 100 毫秒触发一次
-  const debouncedResize = debounce((cols, rows) => {
-    console.log("resize:", cols, rows)
-    if (cols > 0 && rows > 0) {
-      terminalApi.send('terminal-resize', cols, rows);
-    }
-  }, 100);
   terminal.onResize((size) => {
     const { cols, rows } = size;
     // 检查 cols 和 rows 是否为正数
     // debouncedResize(cols, rows);
-    console.log("resize:", cols, rows)
     if (cols > 0 && rows > 0) {
       terminalApi.send('terminal-resize', cols, rows);
     }
   });
   window.addEventListener('resize', () => fitAddon.fit());
-
 });
 
 onBeforeUnmount(() => {
@@ -230,6 +225,11 @@ onBeforeUnmount(() => {
 :deep(.xterm.focus),
 :deep(.xterm:focus) {
   outline: none;
+}
+
+:deep(.xterm) {
+  user-select: text;
+  /* 启用文本选择 */
 }
 
 :deep(.xterm .xterm-helpers) {

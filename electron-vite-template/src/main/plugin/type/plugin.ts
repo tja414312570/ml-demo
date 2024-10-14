@@ -64,6 +64,7 @@ export interface PluginExtensionContext {
    * An interface representing a pseudoterminal, on Windows this is emulated via the winpty library.
    */
 export interface IPty {
+    readonly type: string;
     /**
      * The process ID of the outer process.
      */

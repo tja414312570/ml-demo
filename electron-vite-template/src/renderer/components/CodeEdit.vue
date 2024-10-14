@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { createVNode, onMounted, ref, render, shallowRef } from 'vue'
+import { createVNode, nextTick, onMounted, ref, render, shallowRef } from 'vue'
 import CodeTools from './CodeTools.vue';
 import * as monaco from 'monaco-editor';
 import { InstructContent } from '@main/ipc/code-manager';
@@ -103,9 +103,17 @@ function removeInlineDiff(editor) {
   }
 }
 // 插入 Vue 组件作为 ViewZone 的内容
-function insertVueInlineDiff(editor, lineNumber, diffContent) {
-  const lines = diffContent.split('\n').length;
-  editor.changeViewZones(accessor => {
+function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber, diffContent) {
+  const linesOfDiff = diffContent.split('\n');
+  let lines = linesOfDiff.length;
+  const content_width = editor.getLayoutInfo().contentWidth;
+  const font_num_of_line = content_width / 16;
+  for (const line of linesOfDiff) {
+    const splitLine = line.length / font_num_of_line;
+    lines += splitLine - 1;
+  }
+
+  editor.changeViewZones((accessor) => {
     // 创建 DOM 节点作为 ViewZone 的容器
     const domNode = document.createElement('div');
     domNode.className = 'inline-vue-viewzone';
@@ -113,32 +121,27 @@ function insertVueInlineDiff(editor, lineNumber, diffContent) {
     // 创建虚拟 DOM，并渲染到 ViewZone 中
     const vnode = createVNode(CodeDiff, { content: diffContent });
     render(vnode, domNode);
-
-    // 定义 ViewZone
-    const viewZone = {
-      afterLineNumber: 2,
-      heightInLines: lines, // 根据组件内容调整高度
+    const viewZone: monaco.editor.IViewZone = {
+      afterLineNumber: lineNumber,
       domNode: domNode,
+      heightInLines: 0,
     };
-
-    // 添加 ViewZone
     viewZoneId = accessor.addZone(viewZone);
-    // requestAnimationFrame(() => {
-    //   const lineHeight = editor.getOption(monaco.editor.EditorOption.lineHeight);
-    //   const contentHeight = domNode.clientHeight;
-    //   const lines = Math.ceil(contentHeight / lineHeight);
-
-    //   editor.changeViewZones(updateAccessor => {
-    //     updateAccessor.removeZone(viewZoneId);
-    //     updateAccessor.addZone({
-    //       afterLineNumber: 2,
-    //       heightInLines: lines,
-    //       domNode: domNode
-    //     });
-    //   });
-
-    //   console.log(`插入内容占用行数: ${lines}`);
-    // });
+    const ovsolve = () => {
+      requestAnimationFrame(() => {
+        // 获取渲染后 DOM 的实际高度
+        const computedHeight = window.getComputedStyle(domNode.firstElementChild)['height'];
+        if (computedHeight === 'auto') {
+          ovsolve()
+          return;
+        }
+        viewZone.heightInPx = parseInt(computedHeight, 10);
+        editor.changeViewZones((accessor) => {
+          accessor.layoutZone(viewZoneId)
+        })
+      });
+    }
+    ovsolve()
   });
 }
 
