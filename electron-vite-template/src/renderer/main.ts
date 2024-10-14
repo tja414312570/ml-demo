@@ -48,5 +48,6 @@ import 'dockview-core/dist/styles/dockview.css';
 import CodeLayout from 'vue-code-layout'
 app.use(CodeLayout)
 
+window.app = app;
 app.mount("#app");
 export default app;

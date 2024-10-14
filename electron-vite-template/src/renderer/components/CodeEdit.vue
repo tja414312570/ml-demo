@@ -132,7 +132,7 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
       }
     });
 
-    // vnode.appContext = app._context;
+    vnode.appContext = window.app._context;
     render(vnode, domNode);
     viewZones.push(viewZoneId)
     const ovsolve = () => {
