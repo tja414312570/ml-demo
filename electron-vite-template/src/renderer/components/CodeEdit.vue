@@ -117,17 +117,23 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
     // 创建 DOM 节点作为 ViewZone 的容器
     const domNode = document.createElement('div');
     domNode.className = 'inline-vue-viewzone';
-
-    // 创建虚拟 DOM，并渲染到 ViewZone 中
-    const vnode = createVNode(CodeDiff, { content: diffContent });
-    vnode.appContext = app._context;
-    render(vnode, domNode);
     const viewZone: monaco.editor.IViewZone = {
       afterLineNumber: lineNumber,
       domNode: domNode,
       heightInLines: 0,
     };
     const viewZoneId = accessor.addZone(viewZone);
+    // 创建虚拟 DOM，并渲染到 ViewZone 中
+    const vnode = createVNode(CodeDiff, {
+      content: diffContent, del: () => {
+        render(null, domNode);
+        editor.changeViewZones((accessor) => { accessor.removeZone(viewZoneId) })
+      }, send: () => {
+        alert("发送:" + viewZoneId)
+      }
+    });
+    vnode.appContext = app._context;
+    render(vnode, domNode);
     viewZones.push(viewZoneId)
     const ovsolve = () => {
       requestAnimationFrame(() => {

@@ -12,7 +12,7 @@
         <!-- 执行图标带提示 -->
         <v-tooltip bottom>
             <template v-slot:activator="{ props }">
-                <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-play-circle</v-icon>
+                <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-play-outline</v-icon>
             </template>
             <span>执行代码</span>
         </v-tooltip>
@@ -20,7 +20,7 @@
         <!-- 已 Debug 执行图标带提示 -->
         <v-tooltip bottom>
             <template v-slot:activator="{ props }">
-                <v-icon small v-bind="props" @click="handleDebugExecute" color="orange">mdi-bug</v-icon>
+                <v-icon small v-bind="props" @click="handleDebugExecute" color="orange">mdi-bug-play-outline</v-icon>
             </template>
             <span>调试模式执行代码</span>
         </v-tooltip>

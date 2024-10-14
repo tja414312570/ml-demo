@@ -4,9 +4,15 @@
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ props }">
-                    <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-send-outline</v-icon>
+                    <v-icon small v-bind="props" @click="send" color="blue">mdi-send-outline</v-icon>
                 </template>
                 <span>发送结果</span>
+            </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ props }">
+                    <v-icon small v-bind="props" @click="del" color="blue">mdi-close-outline</v-icon>
+                </template>
+                <span>删除</span>
             </v-tooltip>
         </div>
     </div>
@@ -17,6 +23,8 @@ import { defineProps } from 'vue';
 
 interface Props {
     content: string;
+    del: () => void;
+    send: () => void;
 }
 
 const handleExecute = () => {
