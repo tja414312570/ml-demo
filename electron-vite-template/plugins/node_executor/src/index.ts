@@ -1,4 +1,4 @@
-import { InstructContent, InstructExecutor, InstructResult } from '../../../src/main/plugin/type/bridge';
+import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../src/main/plugin/type/bridge';
 import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle';
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { createContext, runInContext } from 'vm';
@@ -20,9 +20,19 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
       console: {
         log: (...args: any[]) => {
           stdout += 'log:'+args.join(' ') + '\n';
+          const temp = []
+          for(let arg of args){
+              temp.push(util.inspect(arg, { depth: null, colors: true }))
+          }
+          pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`log：${temp.join(',')}\r\n`,line:code.split(/\r?\n/).length,type:InstructResultType.executing})
         },
         error: (...args: any[]) => {
           stdout +=  'err:'+args.join(' ') + '\n';
+          const temp = []
+          for(let arg of args){
+              temp.push(util.inspect(arg, { depth: null, colors: true }))
+          }
+          pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`err:${temp.join(',')}\r\n`,line:code.split(/\r?\n/).length,type:InstructResultType.executing})
         }
       },
       resolve: (result: any) => {
@@ -47,11 +57,12 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
         // 将输出结果序列化并返回
         let resultString = stringify(execute_result);
         
-        pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`控制台：\r\n${stdout}\r\n结果:\r\n${resultString}`,line:code.split(/\r?\n/).length})
+        pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`结果:\r\n${resultString}`,line:code.split(/\r?\n/).length,type:InstructResultType.completed})
         resolve({
           id:instruct.id,
           ret:resultString,
-          std:stdout
+          std:stdout,
+          type:InstructResultType.completed
         });
       } catch (error:any) {
         const errorDetails = util.inspect(error, { depth: null, colors: true });
@@ -60,7 +71,8 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
         pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`${out}\r\n`,line:code.split(/\r?\n/).length})
         resolve({
           id:instruct.id,
-          std:out
+          std:out,
+          type:InstructResultType.failed
         });
       }
     });

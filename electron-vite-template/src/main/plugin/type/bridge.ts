@@ -4,10 +4,16 @@ export interface Bridge {
     onResponse(ctx: IContext): Promise<string | void>
 }
 
+export const  enum InstructResultType{
+    executing="executing",
+    completed="completed",
+    failed="failed"
+}
 export type InstructResult = {
     id:string,
     std?:string,
     ret?:string,
+    type:InstructResultType
 }
 export interface InstructExecutor {
     execute(instruct: InstructContent): Promise<InstructResult | void>
