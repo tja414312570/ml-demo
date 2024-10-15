@@ -10,15 +10,16 @@
             <span>{{ isAutoRunEnabled ? '自动执行已启用' : '自动执行已禁用' }}</span>
         </v-tooltip>
         <!-- 执行图标带提示 -->
-        <v-tooltip bottom>
+        <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
                 <v-icon small v-bind="props" @click="executeCode" color="blue">mdi-play-outline</v-icon>
             </template>
             <span>执行代码</span>
         </v-tooltip>
-
+        <v-progress-circular v-show='isExecuting' color="purple" :width="3" indeterminate
+            size="16"></v-progress-circular>
         <!-- 已 Debug 执行图标带提示 -->
-        <v-tooltip bottom>
+        <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
                 <v-icon small v-bind="props" @click="handleDebugExecute" color="orange">mdi-bug-play-outline</v-icon>
             </template>
@@ -28,7 +29,7 @@
         <div> <v-select :items="executors" item-title="name" v-model="selected" item-value="id" density="compact"
                 label="Compact" single-line></v-select>
         </div>
-        <v-tooltip bottom>
+        <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
                 <v-icon small v-bind="props" @click="toggleAutoSend" :color="isAutoSend ? 'green' : 'grey'">{{
                     isAutoSend ?
@@ -51,6 +52,7 @@ const executors = ref<PluginInfo[]>([])
 const selected = ref<string>(null)
 const isAutoSend = ref(true)
 
+const isExecuting = ref(false);
 const pluginViewApi: any = getIpcApi('plugin-view-api');
 const codeApi = getIpcApi<IpcEventHandler>('code-view-api');
 const loading = ref(true);
@@ -107,6 +109,7 @@ const toggleAutoSend = () => {
 codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number }) => {
     const { code, line } = lineDiff;
     console.log("执行完毕", JSON.stringify(lineDiff))
+    isExecuting.value = false;
     try {
         if (isAutoSend.value) {
             codeApi.send('send_execute-result', code)
@@ -125,9 +128,11 @@ const handleDebugExecute = () => {
 
 // 模拟的代码执行函数
 const executeCode = () => {
+    isExecuting.value = true;
     codeApi.executeCode({ code: props.code, id: props.id, language: props.language, executor: selected.value } as InstructContent).then(result => {
         console.log('代码已执行:', props.code)
         console.log('代码执行结果:', result)
+
     }).catch(err => {
         console.log('代码执行错误:', err)
     })
