@@ -12,7 +12,7 @@
         <!-- 执行图标带提示 -->
         <v-tooltip bottom>
             <template v-slot:activator="{ props }">
-                <v-icon small v-bind="props" @click="handleExecute" color="blue">mdi-play-outline</v-icon>
+                <v-icon small v-bind="props" @click="executeCode" color="blue">mdi-play-outline</v-icon>
             </template>
             <span>执行代码</span>
         </v-tooltip>
@@ -34,7 +34,7 @@
                     isAutoSend ?
                         'mdi-send-check-outline' : 'mdi-send-lock-outline' }}</v-icon>
             </template>
-            <span>{{ isAutoRunEnabled ? '自动发送执行结果' : '手动发送执行结果' }}</span>
+            <span>{{ isAutoSend ? '自动发送执行结果' : '手动发送执行结果' }}</span>
         </v-tooltip>
     </div>
 </template>
@@ -86,10 +86,13 @@ watch(
             return bMatchesLanguage - aMatchesLanguage;
         });
         selected.value = executors.value[0]['id']
+        if (isAutoRunEnabled.value) {
+            executeCode()
+        }
     },
     { deep: true } // 深度监听对象
 );
-const isAutoRunEnabled = ref(false);
+const isAutoRunEnabled = ref(true);
 
 // 切换自动执行状态
 const toggleAutoExecute = () => {
@@ -101,10 +104,19 @@ const toggleAutoExecute = () => {
 const toggleAutoSend = () => {
     isAutoSend.value = !isAutoSend.value;
 };
-// 执行代码的逻辑
-const handleExecute = () => {
-    executeCode();
-};
+codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number }) => {
+    const { code, line } = lineDiff;
+    console.log("执行完毕", JSON.stringify(lineDiff))
+    try {
+        if (isAutoSend.value) {
+            codeApi.send('send_execute-result', code)
+        }
+    } catch (error) {
+        console.error(`执行出错:`, error);
+        // 你可以在这里添加自定义的错误处理，例如发送通知或日志记录
+    }
+}
+)
 
 // Debug 执行代码的逻辑
 const handleDebugExecute = () => {

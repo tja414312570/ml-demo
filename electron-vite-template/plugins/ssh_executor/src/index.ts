@@ -25,7 +25,7 @@ const removeInvisibleChars = (str: string) => {
 class SshExecutor implements InstructExecutor, Pluginlifecycle {
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { id, code } = instruct;
-
+    const execId = '12345'
     return new Promise((resolve, reject) => {
       let executeing = true;
       let results: string[] = []
@@ -46,7 +46,7 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
               // executeing = false;
               console.log("代码执行完毕", results.join())
               const result = results.join('\r\n');
-              pluginContext.sendIpcRender('codeViewApi.insertLine', { id, code: `控制台：\r\n${result}`, line: code.split(/\r?\n/).length })
+              
               resolve({
                 id: instruct.id,
                 ret: result,
@@ -57,6 +57,7 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
             } else if (lineTrim.length > 1) {
               const lineTrimProcess = lineTrim.replace(end_cmd, '');
               results.push(lineTrimProcess)
+              pluginContext.sendIpcRender('codeViewApi.insertLine', { id, code: `${lineTrimProcess}\r\n`, execId,line: code.split(/\r?\n/).length })
             }
           }
         }

@@ -46,8 +46,8 @@ app.config.compilerOptions.isCustomElement = tag => tag === 'webview';
 import 'vue-code-layout/lib/vue-code-layout.css'
 import 'dockview-core/dist/styles/dockview.css';
 import CodeLayout from 'vue-code-layout'
+import context from "./context";
 app.use(CodeLayout)
 
-window.app = app;
+context.setApp(app);
 app.mount("#app");
-export default app;

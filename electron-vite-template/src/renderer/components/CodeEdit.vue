@@ -18,14 +18,12 @@ import { InstructContent } from '@main/ipc/code-manager';
 import CodeDiff from './CodeDiff.vue';
 import { getIpcApi } from '@renderer/ts/ipc-api';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
+import context from '@renderer/context';
 
 
-const code = ref<string>(`# 获取操作系统和 Python 版本信息
-echo "操作系统信息:"
-uname -a
-echo ""
-echo "Python 版本:"
-python --version
+const code = ref<string>(`
+echo "Operating System:" && uname -a
+echo "Python Version:" && python3 --version
 `);
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 const decorations = ref<string[]>([]);
@@ -89,21 +87,42 @@ const setExecutionMarker = (lineNumber: number) => {
     console.error("Editor instance is not available to set decorations.");
   }
 };
-const viewZones = []
+const viewZones: Map<string, { viewZoneId: string, prop: any, vnode: any, viewZone: monaco.editor.IViewZone, domNode: HTMLDivElement }> = new Map();
 function removeInlineDiff(editor) {
-  if (viewZones.length !== null) {
-    let viewZoneId;
-    while ((viewZoneId = viewZones.pop())) {
-      editor.changeViewZones(accessor => {
-        accessor.removeZone(viewZoneId);
-      });
-    }
-
+  for (let execId of viewZones.keys()) {
+    let viewZoneId = viewZones.get(execId);
+    console.log(`execId: ${execId}, viewZoneId: ${viewZoneId}`);
+    editor.changeViewZones(accessor => {
+      accessor.removeZone(viewZoneId);
+    });
+    // 删除当前键
+    viewZones.delete(execId);
   }
 }
 // let app; (async () => app = (await import('@renderer/main')).default)();
 // 插入 Vue 组件作为 ViewZone 的内容
-function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber, diffContent) {
+function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber: number, diffContent: string, execId: string) {
+  const viewContext = viewZones.get(execId);
+  if (viewContext) {
+    viewContext.prop.content.value += diffContent;
+    console.log(`prop:${viewContext.prop.content.value}`)
+    const ovsolve = () => {
+      requestAnimationFrame(() => {
+        // 获取渲染后 DOM 的实际高度
+        const computedHeight = window.getComputedStyle(viewContext.domNode.firstElementChild)['height'];
+        if (computedHeight === 'auto') {
+          ovsolve()
+          return;
+        }
+        viewContext.viewZone.heightInPx = parseInt(computedHeight, 10);
+        editor.changeViewZones((accessor) => {
+          accessor.layoutZone(viewContext.viewZoneId)
+        })
+      });
+    }
+    ovsolve()
+    return;
+  }
   const linesOfDiff = diffContent.split('\n');
   let lines = linesOfDiff.length;
   const content_width = editor.getLayoutInfo().contentWidth;
@@ -123,18 +142,20 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
     };
     const viewZoneId = accessor.addZone(viewZone);
     // 创建虚拟 DOM，并渲染到 ViewZone 中
-    const vnode = createVNode(CodeDiff, {
-      content: diffContent, del: () => {
+    const prop = {
+      content: ref(diffContent), del: () => {
         render(null, domNode);
         editor.changeViewZones((accessor) => { accessor.removeZone(viewZoneId) })
+        viewZones.delete(execId);
       }, send: () => {
         codeApi.send('send_execute-result', diffContent)
       }
-    });
+    };
+    const vnode = createVNode(CodeDiff, prop);
 
-    vnode.appContext = window.app._context;
+    vnode.appContext = context.getApp()._context;
     render(vnode, domNode);
-    viewZones.push(viewZoneId)
+    viewZones.set(execId, { viewZoneId, prop, vnode, viewZone, domNode })
     const ovsolve = () => {
       requestAnimationFrame(() => {
         // 获取渲染后 DOM 的实际高度
@@ -153,6 +174,10 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
   });
 }
 
+let t = 0;
+window.test = () => {
+  insertVueInlineDiff(editor.value, 1, 'testtest_' + (t++) + '\r\n', '12345')
+}
 codeApi.on('codeViewApi.code', (event: any, code_content: InstructContent) => {
   console.log('指令信息:', code_content)
   code_content = code_content[0]
@@ -166,12 +191,11 @@ codeApi.on('codeViewApi.code', (event: any, code_content: InstructContent) => {
   removeInlineDiff(editor.value)
 })
 
-codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number }) => {
-  const { code, line } = lineDiff;
+codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number, execId: string }) => {
+  const { code, line, execId } = lineDiff;
   console.log("执行完毕", JSON.stringify(lineDiff))
   try {
-    insertVueInlineDiff(editor.value, line, code);
-    throw new Error('')
+    insertVueInlineDiff(editor.value, line, code, execId);
   } catch (error) {
     console.error(`执行出错:`, error);
     // 你可以在这里添加自定义的错误处理，例如发送通知或日志记录
