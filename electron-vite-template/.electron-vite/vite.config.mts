@@ -21,9 +21,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@main': resolve('src/main'),
       "@renderer": root,
       "@store": join(root, "/store/modules"),
-      'vue': 'vue/dist/vue.esm-bundler.js',  
+      'vue': 'vue/dist/vue.esm-bundler.js',
     },
   },
   base: "./",
