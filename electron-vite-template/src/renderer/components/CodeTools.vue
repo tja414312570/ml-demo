@@ -42,6 +42,7 @@
 
 <script lang="ts" setup>
 import { InstructContent } from '@main/ipc/code-manager';
+import { InstructResultType } from '@main/plugin/type/bridge';
 import { PluginInfo } from '@main/plugin/type/plugin';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
 import { getIpcApi } from '@renderer/ts/ipc-api';
@@ -106,13 +107,19 @@ const toggleAutoExecute = () => {
 const toggleAutoSend = () => {
     isAutoSend.value = !isAutoSend.value;
 };
-codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number }) => {
-    const { code, line } = lineDiff;
+let result = [];
+codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number, type: InstructResultType }) => {
+    const { code, line, type } = lineDiff;
     console.log("执行完毕", JSON.stringify(lineDiff))
-    isExecuting.value = false;
     try {
-        if (isAutoSend.value) {
-            codeApi.send('send_execute-result', code)
+        result.push(code)
+        if (type === InstructResultType.completed || type === InstructResultType.failed) {
+            isExecuting.value = false;
+            if (isAutoSend.value) {
+                codeApi.send('send_execute-result', result.join('\r\n'))
+                result = [];
+            }
+
         }
     } catch (error) {
         console.error(`执行出错:`, error);

@@ -33,7 +33,7 @@
 import { ref, onMounted } from 'vue';
 import { WebviewTag } from 'electron';
 
-const url = ref('https://chat.openai.com/');
+const url = ref('https://share.github.cn.com/');
 const webviews = ref<WebviewTag | null>(null);
 onMounted(() => {
   // 可以在 mounted 后默认打开开发者工具

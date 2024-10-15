@@ -1,6 +1,6 @@
 <template>
     <div class="diff-content">
-        <pre style="white-space: break-spaces;">{{ content }}</pre>
+        <pre style="">{{ content }}</pre>
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ props }">
@@ -49,5 +49,6 @@ const props = defineProps<Props>();
 
 pre {
     user-select: text;
+    white-space: pre-line;
 }
 </style>

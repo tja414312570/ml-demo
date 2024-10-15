@@ -1,29 +1,32 @@
-import { InstructContent, InstructExecutor, InstructResult } from '../../../src/main/plugin/type/bridge'
+import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../src/main/plugin/type/bridge'
 import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { v4 as uuidv4 } from 'uuid';
 import { runPythonCode } from './python';
+import util from 'util'
 
 class PythonExecutor implements InstructExecutor, Pluginlifecycle {
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { id, code } = instruct;
-
+    const execId = uuidv4();
     return new Promise((resolve, reject) => {
-      runPythonCode(code)
+      runPythonCode(id,code,execId)
         .then(result => {
-          pluginContext.sendIpcRender('codeViewApi.insertLine', { id, code: `控制台：\r\n${result}`, line: code.split(/\r?\n/).length })
           console.log('Python 输出:', result);  // 处理 Python 输出
           resolve({
             id,
             std: result,
+            type:InstructResultType.completed,
+            execId
           })
         })
         .catch(error => {
-          console.error('执行 Python 代码时出错:', error);
-          pluginContext.sendIpcRender('codeViewApi.insertLine', { id, code: `错误:\r\n${error}`, line: code.split(/\r?\n/).length })
+          const errorDetails = util.inspect(error, { depth: null, colors: true });
           resolve({
             id,
-            std: error,
+            std: errorDetails,
+            type:InstructResultType.failed,
+            execId
           })
         });
     });

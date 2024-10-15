@@ -7,6 +7,7 @@ import {stringify} from 'circular-json';
 import { rejects } from 'assert';
 import util from 'util'
 import fs from 'fs'
+import { v4 as uuidv4 } from 'uuid';
 
 class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructExecutor {
   execute(instruct: InstructContent): Promise<InstructResult> {
@@ -14,7 +15,7 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
     let execute_result = '';
     // 用于捕获标准输出和错误输出
     let stdout = '';
-
+    const execId = uuidv4();
     // 创建上下文，重写 console 和 process 的输出方法
     const vmContext = createContext({
       console: {
@@ -62,6 +63,7 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
           id:instruct.id,
           ret:resultString,
           std:stdout,
+          execId,
           type:InstructResultType.completed
         });
       } catch (error:any) {
@@ -72,6 +74,7 @@ class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructEx
         resolve({
           id:instruct.id,
           std:out,
+          execId,
           type:InstructResultType.failed
         });
       }

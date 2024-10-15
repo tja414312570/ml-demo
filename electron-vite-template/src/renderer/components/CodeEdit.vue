@@ -90,7 +90,7 @@ const setExecutionMarker = (lineNumber: number) => {
 const viewZones: Map<string, { viewZoneId: string, prop: any, vnode: any, viewZone: monaco.editor.IViewZone, domNode: HTMLDivElement }> = new Map();
 function removeInlineDiff(editor) {
   for (let execId of viewZones.keys()) {
-    let viewZoneId = viewZones.get(execId);
+    let viewZoneId = viewZones.get(execId).viewZoneId;
     console.log(`execId: ${execId}, viewZoneId: ${viewZoneId}`);
     editor.changeViewZones(accessor => {
       accessor.removeZone(viewZoneId);
@@ -148,7 +148,7 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
         editor.changeViewZones((accessor) => { accessor.removeZone(viewZoneId) })
         viewZones.delete(execId);
       }, send: () => {
-        codeApi.send('send_execute-result', diffContent)
+        codeApi.send('send_execute-result', prop.content.value)
       }
     };
     const vnode = createVNode(CodeDiff, prop);

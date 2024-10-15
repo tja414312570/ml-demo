@@ -139,6 +139,7 @@ const processResponse = async (headers:IncomingHttpHeaders|undefined, body:strin
         // 检查是否为 SSE (text/event-stream)
         if (!contentType.includes('text/event-stream')) {
             resolve()
+            return;
         }
         const sseData = body;
         // 将 SSE 数据根据事件分隔符 \n\n 进行分割

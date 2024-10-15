@@ -14,6 +14,7 @@ export type InstructResult = {
     std?:string,
     ret?:string,
     type:InstructResultType
+    execId:string,
 }
 export interface InstructExecutor {
     execute(instruct: InstructContent): Promise<InstructResult | void>

@@ -1,4 +1,4 @@
-import { InstructContent, InstructExecutor, InstructResult } from '../../../src/main/plugin/type/bridge'
+import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../src/main/plugin/type/bridge'
 import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { v4 as uuidv4 } from 'uuid';
@@ -25,7 +25,7 @@ const removeInvisibleChars = (str: string) => {
 class SshExecutor implements InstructExecutor, Pluginlifecycle {
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { id, code } = instruct;
-    const execId = '12345'
+    const execId = uuidv4()
     return new Promise((resolve, reject) => {
       let executeing = true;
       let results: string[] = []
@@ -40,24 +40,38 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
 
           const lines = data.split(/\r?\n/); // 按换行符分割
           for (const line of lines) {
-            // console.log(`读取行:"${JSON.stringify(line)}"${line.length},"${JSON.stringify(end_tag)}"${end_tag.length}`, executeing,line.trim() === end_tag); 
+            console.log(`读取行:"${line}"${executeing}`); 
             const lineTrim = removeInvisibleChars(line);
             if (lineTrim.length > 1 && lineTrim.substring(1) === end_tag) {
-              // executeing = false;
+              executeing = false;
               console.log("代码执行完毕", results.join())
               const result = results.join('\r\n');
-              
+              pluginContext.sendIpcRender('codeViewApi.insertLine', {
+                id,
+                code: ``,
+                execId,
+                line: code.split(/\r?\n/).length,
+                type: InstructResultType.completed
+              })
               resolve({
                 id: instruct.id,
                 ret: result,
                 // std:results.join()
+                execId,
+                type: InstructResultType.completed
               });
               // resolve(results.join())
               disable.dispose()
             } else if (lineTrim.length > 1) {
               const lineTrimProcess = lineTrim.replace(end_cmd, '');
               results.push(lineTrimProcess)
-              pluginContext.sendIpcRender('codeViewApi.insertLine', { id, code: `${lineTrimProcess}\r\n`, execId,line: code.split(/\r?\n/).length })
+              pluginContext.sendIpcRender('codeViewApi.insertLine', {
+                id,
+                code: `${lineTrimProcess}\r\n`,
+                execId,
+                line: code.split(/\r?\n/).length,
+                type: InstructResultType.executing
+              })
             }
           }
         }
