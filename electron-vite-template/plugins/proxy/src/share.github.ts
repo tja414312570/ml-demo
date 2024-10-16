@@ -1,5 +1,9 @@
 import { applyPatch, Operation } from 'fast-json-patch';
 const fieldMap = [["channel", "c"], ["path", "p"], ["op", "o"], ["value", "v"]];
+import {produce} from "immer"
+
+import util from 'util'
+
 const StreamEncoding = {
     V1:'v1',
     V1_TEST:'v1_test'
@@ -30,11 +34,11 @@ class DeltaProcessor {
             const decodedDelta = this.decodeDelta(delta);
             const channelId = decodedDelta.channel;
             const previousObj = this.prevObjByChannel[channelId];
-            const updatedObj = applyOperation(previousObj, decodedDelta);
+            const updatedObj = mergeDeltas2(previousObj, decodedDelta);
             this.prevObjByChannel[channelId] = updatedObj;
             return updatedObj;
         } catch (error) {
-            logError(`Error applying delta: ${error}`);
+            logError(`Error applying delta: ${error}`,error);
         }
     }
 
@@ -71,6 +75,9 @@ function parsePath(path:string) {
 // 辅助函数：处理路径中的转义字符
 function decodePath(part:string) {
     return part.replace(/~1/g, "/").replace(/~0/g, "~");
+}
+function mergeDeltas2(target: any, delta: any): any {
+    return produce({ __root: target },r=>applyOperation(r, delta)).__root;
 }
 
 // 将增量应用到对象的方法
@@ -165,8 +172,8 @@ function expandArray(value:Delta) {
 }
 
 // 辅助函数：记录错误
-function logError(message:any) {
-    console.error(message);
+function logError(...args:any) {
+    console.error(args);
 }
 
 // 判断是否为对象
@@ -175,7 +182,7 @@ function isObject(obj:any) {
 }
 function triggerEvent(event:any) {
     // 假设这里触发 UI 更新或其他业务逻辑
-    console.log("Event triggered:", event);
+    console.log("Event triggered:", util.inspect(event, { depth: null, colors: true }));
 }
 
 let isProcessing = false;
@@ -185,7 +192,7 @@ let currentEncoding = '';
 let isConsistent = true;
 let deltaProcessor:DeltaProcessor|null = null;
 let  previousObject;
-function handleServerEvent(event:any) {
+export function handleServerEvent(event:any) {
     // 将接收到的数据传递给流追踪器
     console.log('处理:',event.data);
 

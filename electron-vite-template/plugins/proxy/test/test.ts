@@ -1,7 +1,7 @@
 import { createParser, EventSourceParser } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import * as eventstreamCodec from '@smithy/eventstream-codec';
-import { handleServerEvent } from '../src/handlersse'
+import { handleServerEvent } from '../src/share.github'
 import path from 'path';
 import fs from 'fs';
 
