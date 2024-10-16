@@ -1,6 +1,9 @@
-import { createParser,EventSourceParser } from 'eventsource-parser';
+import { createParser, EventSourceParser } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import * as eventstreamCodec from '@smithy/eventstream-codec';
+import { handleServerEvent } from '../src/handlersse'
+import path from 'path';
+import fs from 'fs';
 
 // 用来存储最终拼接的消息数据
 let fullMessage = "";
@@ -129,10 +132,10 @@ data: [DONE]
 // // 打印拼接后的完整消息
 // console.log("完整的消息: ", fullMessage);
 
-// const response = new Response(sseData2)
-// if (!response.body) {
-//   throw new Error('No body')
-// }
+const response = new Response(sseData2)
+if (!response.body) {
+  throw new Error('No body')
+}
 
 // const eventStream = response.body
 //   .pipeThrough(new TextDecoderStream())
@@ -145,8 +148,19 @@ data: [DONE]
 //       console.log('流读取完成');
 //     }
 //   })
- console.log(eventstreamCodec)
+//  console.log(eventstreamCodec)
 
+
+const parser2 = createParser((event) => {
+  // console.log(`获得事件:${JSON.stringify(event)}`)
+  handleServerEvent(event);
+});
+// const events = sseData2.split(/\r?\n/)
+// for(const event of events){
+//   console.log(`处理数据${event}`)
+const content = fs.readFileSync(path.join(__dirname, 'test.txt'), 'utf-8');
+parser2.feed(content)
+// }
 
 
 // const marshaller = new eventstreamCodec.EventStreamMarshaller();

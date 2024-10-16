@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2020",           // 指定 ECMAScript 的目标版本
+    "target": "ES2022",           // 指定 ECMAScript 的目标版本
     "module": "commonjs",          // 指定模块系统
     "strict": true,                // 开启所有严格类型检查选项
     "esModuleInterop": true,       // 兼容 ES6 模块
