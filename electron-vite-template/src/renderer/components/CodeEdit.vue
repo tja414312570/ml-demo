@@ -1,7 +1,7 @@
 <template>
   <div style="display: flex;flex-direction: column;">
     <div style="position: relative;">
-      <CodeTools :code="code" :language="orange_language" :id="instrunctId" />
+      <CodeTools :code="code" :editor="editor" :language="orange_language" :id="instrunctId" />
     </div>
     <div ref="terminalWrapper" style="flex: 1;">
       <vue-monaco-editor v-model:value="code" :language="language" theme="vs-dark" @mount="onEditorMounted"
@@ -35,6 +35,7 @@ const decorationsCollection = ref<monaco.editor.IEditorDecorationsCollection>(nu
 
 const codeApi = getIpcApi<IpcEventHandler>('code-view-api');
 
+// const onLoad = ref(null)
 // 配置编辑器选项
 const editorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
@@ -48,7 +49,9 @@ const onEditorMounted = (editorInstance: monaco.editor.IStandaloneCodeEditor) =>
   editor.value = editorInstance;  // 确保正确地将 editorInstance 赋值给 editor.value
   // window.editor = editorInstance;
   if (editor.value) {
-    // executeLine(currentLine.value);
+    // executeLine(currentLine.value)
+    ;
+    // editorMounted(editor)
   } else {
     console.error("Failed to mount Monaco editor instance.");
   }
@@ -93,6 +96,7 @@ function removeInlineDiff(editor) {
     let viewZoneId = viewZones.get(execId).viewZoneId;
     console.log(`execId: ${execId}, viewZoneId: ${viewZoneId}`);
     editor.changeViewZones(accessor => {
+      render(null, viewZones.get(execId).domNode);
       accessor.removeZone(viewZoneId);
     });
     // 删除当前键

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
 import pluginContext from './plugin-context';
+import { ipcMain } from 'electron';
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
 // 定义常见的特殊属性集合
@@ -144,6 +145,15 @@ class PluginManager {
         delete pluginInfo.module;
         // pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
         console.log(`插件 ${pluginInfo.manifest.name} 已卸载`);
+    }
+    public reload(pluginInfo: PluginInfo) {
+        pluginInfo.module.onUnmounted(pluginContext);
+        pluginInfo.status = PluginStatus.unload;
+        delete require.cache[require.resolve(pluginInfo.main)];
+        pluginInfo.status = PluginStatus.ready;
+        this.load(pluginInfo as any)
+        // pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
+        return pluginInfo;
     }
     private getModule(pluginInfo: PluginInfo & PluginProxy): any {
         if (!pluginInfo.module) {

@@ -1,16 +1,19 @@
-import {Bridge} from '../../../src/main/plugin/type/bridge'
-import {Pluginlifecycle} from '../../../src/main/plugin/type/plugin-lifecycle'
+import { Bridge } from '../../../src/main/plugin/type/bridge'
+import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
 import { processResponse } from './dispatcher';
 import { resolve } from 'path';
+import performance from 'perf_hooks';
 
-class ChatGptBridge implements Bridge,Pluginlifecycle{
-  pluginContext:PluginExtensionContext | undefined;
-  onRequest(ctx: IContext):  Promise<string|void> {
+
+
+class ChatGptBridge implements Bridge, Pluginlifecycle {
+  pluginContext: PluginExtensionContext | undefined;
+  onRequest(ctx: IContext): Promise<string | void> {
     // console.log("请求", ctx.proxyToServerRequestOptions.host)
-    return new Promise<string|void>((resolve,rejects)=>{
+    return new Promise<string | void>((resolve, rejects) => {
       const requestData = ctx.clientToProxyRequest;
       let body: Uint8Array[] = [];
       requestData.on('data', (chunk) => {
@@ -21,16 +24,16 @@ class ChatGptBridge implements Bridge,Pluginlifecycle{
         // console.log(logData);
         resolve(requestBody);
       });
-      
+
     })
   }
-  onResponse(ctx: IContext):  Promise<string|void> {
-    return new Promise<string|void>(async (resolve)=>{
+  onResponse(ctx: IContext): Promise<string | void> {
+    return new Promise<string | void>(async (resolve) => {
       const response = ctx.serverToProxyResponse;
-  
+
       // 获取响应的 Content-Type
       const contentType = response?.headers['content-type'] || '';
-  
+
       // 检查是否是静态资源，如 HTML、CSS、图片等
       const isStaticResource = (
         contentType.includes('html') ||      // HTML 页面
@@ -39,10 +42,14 @@ class ChatGptBridge implements Bridge,Pluginlifecycle{
         contentType.includes('javascript') ||  // JS 文件
         contentType.includes('font')             // 字体文件
       );
-  
+
       if (isStaticResource) {
-       resolve();
-       return;
+        ctx.proxyToClientResponse.setHeader('Cache-Control', 'max-age=21600');
+        // 如果有需要，还可以修改 Expires 头
+        const expiresDate = new Date(Date.now() + 21600 * 1000).toUTCString();
+        ctx.proxyToClientResponse.setHeader('Expires', expiresDate);
+        resolve();
+        return;
       }
       // 非静态资源（例如 JSON 或 API 响应），可能是 fetch 请求
       // console.log("拦截处理:" + requestOptions.host + "" + requestOptions.path + "，上下文类型:" + contentType);
@@ -56,11 +63,12 @@ class ChatGptBridge implements Bridge,Pluginlifecycle{
   }
   onMounted(ctx: PluginExtensionContext): void {
     this.pluginContext = ctx;
-      global.pluginContext = ctx;
+    global.pluginContext = ctx;
+    console.log("proxy代理已挂载")
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }
- 
-  
+
+
 }
 export default new ChatGptBridge();

@@ -18,9 +18,9 @@
                         <!-- 查看详情按钮 -->
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
-                                <v-btn density="compact" icon="mdi-information-outline" small v-bind="props"
-                                    @click="showDetails(plugin)">
-                                </v-btn>
+                                <v-icon v-bind="props" color="yellow" small @click="showDetails(plugin)">
+                                    mdi-information-outline
+                                </v-icon>
                             </template>
                             <span>查看详情</span>
                         </v-tooltip>
@@ -28,20 +28,27 @@
                         <!-- 禁用启用切换 -->
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
-                                <v-btn density="compact"
-                                    :icon="plugin.status ? 'mdi-toggle-switch' : 'mdi-toggle-switch-off'" small
-                                    v-bind="props" @click="togglePlugin(plugin)">
-                                </v-btn>
+                                <v-icon v-bind="props" small @click="togglePlugin(plugin)"
+                                    :color="plugin.enable ? 'green' : 'grey'">
+                                    {{ plugin.enable ? 'mdi-toggle-switch' : 'mdi-toggle-switch-off' }}
+                                </v-icon>
                             </template>
-                            <span>{{ plugin.status ? '禁用' : '启用' }}</span>
+                            <span>{{ plugin.enable ? '禁用' : '启用' }}</span>
                         </v-tooltip>
-
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ props }">
+                                <v-icon v-bind="props" color="red" small @click="reload(plugin)">
+                                    mdi-reload
+                                </v-icon>
+                            </template>
+                            <span>重新加载</span>
+                        </v-tooltip>
                         <!-- 卸载按钮 -->
                         <v-tooltip bottom>
                             <template v-slot:activator="{ props }">
-                                <v-btn density="compact" icon="mdi-delete-outline" small v-bind="props"
-                                    @click="unloadPlugin(plugin)">
-                                </v-btn>
+                                <v-icon v-bind="props" color="gray" small @click="unloadPlugin(plugin)">
+                                    mdi-delete-outline
+                                </v-icon>
                             </template>
                             <span>卸载插件</span>
                         </v-tooltip>
@@ -114,6 +121,7 @@ interface PluginInfo {
     id: string;
     manifest: PluginManifest;
     status: string;
+    enable: boolean
 }
 
 const dialog = ref(false);
@@ -133,10 +141,17 @@ onMounted(() => {
 
 // 方法：切换插件启用/禁用状态
 const togglePlugin = (plugin: PluginInfo) => {
-    plugin.enabled = !plugin.enabled;
-    console.log(`${plugin.manifest.name} 已切换到 ${plugin.enabled ? '启用' : '禁用'}`);
+    plugin.enable = !plugin.enable;
+    console.log(`${plugin.manifest.name} 已切换到 ${plugin.enable ? '启用' : '禁用'}`);
 };
-
+const reload = (plugin: PluginInfo) => {
+    pluginViewApi.invoke('plugin-reload', plugin.id).then(plugin => {
+        alert(`插件加载成功${plugin.manifest.name}`)
+    }).catch(err => {
+        console.error(err)
+        alert("插件加载失败")
+    })
+}
 // 方法：卸载插件
 const unloadPlugin = (plugin: PluginInfo) => {
     console.log(`${plugin.manifest.name} 已卸载`);

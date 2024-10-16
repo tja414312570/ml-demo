@@ -47,6 +47,7 @@ import { PluginInfo } from '@main/plugin/type/plugin';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
 import { getIpcApi } from '@renderer/ts/ipc-api';
 import { onMounted, ref, watch } from 'vue';
+import * as monaco from 'monaco-editor';
 
 const executors = ref<PluginInfo[]>([])
 
@@ -75,7 +76,18 @@ onMounted(() => {
     })
 })
 
-const props = defineProps<InstructContent>();
+const props = defineProps<InstructContent & { editor: monaco.editor.IStandaloneCodeEditor }>();
+watch(
+    () => props.editor,
+    (newValue) => {
+        console.log('user 对象发生变化:', newValue);
+        newValue.onKeyDown(function (event) {
+            isAutoRunEnabled.value = false;
+        });
+    },
+    { deep: true } // 深度监听对象
+);
+
 // 监听对象变化
 watch(
     () => props.code,

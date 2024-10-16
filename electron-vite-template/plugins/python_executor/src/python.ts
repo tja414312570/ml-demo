@@ -40,7 +40,7 @@ export const runPythonCode = async (id: string, code: string, execId: string): P
       if (exit === 0) {
         pluginContext.sendIpcRender('codeViewApi.insertLine', {
           id,
-          code: ``,
+          code: `\r\nPython 进程正常退出，退出码: ${exit}`,
           line: code.split(/\r?\n/).length,
           type: InstructResultType.completed,
           execId

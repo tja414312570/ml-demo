@@ -11,11 +11,13 @@
       <v-btn icon @click="reloadPage">
         <v-icon>mdi-refresh</v-icon> <!-- 刷新按钮 -->
       </v-btn>
-      <v-text-field v-model="url" @keydown.enter="loadPage" dense density="compact" hide-details variant="outlined"
-        class="url-bar" />
-      <v-btn icon @click="loadPage">
+      <v-text-field v-model="tempUrl" dense density="compact" hide-details variant="outlined" class="url-bar"
+        @keydown.enter="loadPage" @focus="isFocused = true" @blur="isFocused = false" />
+      <v-btn icon @click="loadPage" v-if="!loading">
         <v-icon>mdi-arrow-right-bold-circle</v-icon> <!-- 地址栏加载按钮 -->
       </v-btn>
+      <v-progress-circular v-if="loading" color="amber" indeterminate size="24"
+        class="loading-indicator"></v-progress-circular>
       <button @click="webviews.openDevTools()">打开开发者工具</button>
     </div>
 
@@ -23,8 +25,7 @@
     <div class="webview-container">
       <webview ref="webviews" :src="url" partition="persist:your-partition"
         useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36"
-        class="webview" @did-finish-load="onLoad">
-      </webview>
+        class="webview" @did-start-loading="onStartLoading" @did-finish-load="onLoad"></webview>
     </div>
   </div>
 </template>
@@ -34,25 +35,47 @@ import { ref, onMounted } from 'vue';
 import { WebviewTag } from 'electron';
 
 const url = ref('https://share.github.cn.com/');
+const tempUrl = ref(url.value);
 const webviews = ref<WebviewTag | null>(null);
-onMounted(() => {
-  // 可以在 mounted 后默认打开开发者工具
-  console.log("打开控制台", webviews.value)
+const isFocused = ref(false);
+const canGoBack = ref(false);
+const canGoForward = ref(false);
+const loading = ref(false); // 加载状态
 
-  const myWebview = webviews.value;
+// 加载页面时设置 loading 状态
+function onStartLoading() {
+  loading.value = true;
+}
 
+// 页面加载完成时更新按钮状态，并停止 loading 状态
+function onLoad() {
+  loading.value = false;
   if (webviews.value) {
-    webviews.value.addEventListener('dom-ready', () => {
-      webviews.value.openDevTools();
+    canGoBack.value = webviews.value.canGoBack();
+    canGoForward.value = webviews.value.canGoForward();
+  }
+}
+
+onMounted(() => {
+  const myWebview = webviews.value;
+  if (myWebview) {
+    myWebview.addEventListener('did-navigate', (event) => {
+      if (!isFocused.value) {
+        tempUrl.value = event.url;
+      }
+    });
+    myWebview.addEventListener('did-navigate-in-page', (event) => {
+      if (!isFocused.value) {
+        tempUrl.value = event.url;
+      }
     });
   }
 });
-const canGoBack = ref(false);
-const canGoForward = ref(false);
 
 // 加载新页面
 function loadPage() {
   if (webviews.value) {
+    url.value = tempUrl.value;
     webviews.value.src = url.value;
   }
 }
@@ -77,26 +100,6 @@ function reloadPage() {
     webviews.value.reload();
   }
 }
-
-// 页面加载完成时更新按钮状态
-function onLoad() {
-  if (webviews.value) {
-    canGoBack.value = webviews.value.canGoBack();
-    canGoForward.value = webviews.value.canGoForward();
-  }
-}
-
-onMounted(() => {
-  if (webviews.value) {
-    webviews.value.addEventListener('did-navigate', (event) => {
-      url.value = event.url;
-    });
-
-    webviews.value.addEventListener('did-navigate-in-page', (event) => {
-      url.value = event.url;
-    });
-  }
-});
 </script>
 
 <style scoped>
@@ -134,5 +137,10 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   border: none;
+  background: #fff;
+}
+
+.loading-indicator {
+  margin-left: 8px;
 }
 </style>

@@ -52,19 +52,19 @@ class MainInit {
     });
     global.mainWindow = this.mainWindow;
     console.log("初始化", global.mainWindow);
-    const currentSession = session.defaultSession;
-    currentSession.clearCache()
-      .then(() => {
-        console.log('缓存已清除');
-      })
-      .catch((err) => {
-        console.error('清除缓存时出错:', err);
-      });
+    // const currentSession = session.defaultSession;
+    // currentSession.clearCache()
+    //   .then(() => {
+    //     console.log('缓存已清除');
+    //   })
+    //   .catch((err) => {
+    //     console.error('清除缓存时出错:', err);
+    //   });
 
-    // 清除存储的SSL证书错误状态
-    currentSession.clearAuthCache().then(() => {
-      console.log('Auth cache cleared successfully.');
-    });
+    // // 清除存储的SSL证书错误状态
+    // currentSession.clearAuthCache().then(() => {
+    //   console.log('Auth cache cleared successfully.');
+    // });
 
     ipcMain.handle('ipc-core.get-current-webcontents-id', (event, input) => {
       return event.sender.id;
@@ -131,12 +131,12 @@ class MainInit {
     })
 
     const ses = session.fromPartition('persist:your-partition');
-    // 清理所有存储数据，包括缓存、Cookies、LocalStorage 等
-    ses.clearStorageData({
-      storages: ["filesystem", "indexdb", "localstorage", "shadercache", "websql", "serviceworkers", "cachestorage"]
-    }).then(() => {
-      console.log('所有存储数据已清理');
-    });
+    // // 清理所有存储数据，包括缓存、Cookies、LocalStorage 等
+    // ses.clearStorageData({
+    //   storages: ["filesystem", "indexdb", "localstorage", "shadercache", "websql", "serviceworkers", "cachestorage"]
+    // }).then(() => {
+    //   console.log('所有存储数据已清理');
+    // });
     // ses.cookies.set({
     //   url: 'https://chatgpt.com',
     //   name: 'cf_clearance',

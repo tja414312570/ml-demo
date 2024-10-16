@@ -2,1333 +2,724 @@ event: delta_encoding
 data: "v1"
 
 event: delta
-data: {"p": "", "o": "add", "v": {"message": {"id": "ce855707-1e50-44a3-a969-ef6dd7fbd3f5", "author": {"role": "system", "name": null, "metadata": {}}, "create_time": null, "update_time": null, "content": {"content_type": "text", "parts": [""]}, "status": "finished_successfully", "end_turn": true, "weight": 0.0, "metadata": {"rebase_system_message": true, "message_type": "variant", "model_slug": "gpt-4o-canmore", "requested_model_slug": "gpt-4o-canmore", "default_model_slug": "gpt-4o", "parent_id": "aaa219e2-d7e7-4d6d-907a-995ee6c7d7be", "model_switcher_deny": [{"slug": "o1-preview", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-preview", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}], "is_visually_hidden_from_conversation": true}, "recipient": "all", "channel": null}, "conversation_id": "670f2a64-5f30-8005-b7bd-f2e05d76260d", "error": null}, "c": 0}
+data: {"p": "", "o": "add", "v": {"message": {"id": "2fbb6a89-5387-4146-9471-10f792d0e284", "author": {"role": "assistant", "name": null, "metadata": {}}, "create_time": 1729089493.91924, "update_time": null, "content": {"content_type": "text", "parts": [""]}, "status": "in_progress", "end_turn": null, "weight": 1.0, "metadata": {"citations": [], "content_references": [], "gizmo_id": null, "message_type": "next", "model_slug": "gpt-4o", "default_model_slug": "gpt-4o", "parent_id": "aaa2fd24-fda4-4885-9442-8134d5ff2396", "model_switcher_deny": []}, "recipient": "all", "channel": null}, "conversation_id": "670fce41-4328-800b-8b72-f52b274345f0", "error": null}, "c": 0}    
 
 event: delta
-data: {"v": {"message": {"id": "8d4077af-e81b-4c43-8e1a-00af5f6095f0", "author": {"role": "tool", "name": "myfiles_browser", "metadata": {}}, "create_time": null, "update_time": null, "content": {"content_type": "tether_browsing_display", "result": "", "summary": "", "assets": null, "tether_id": null}, "status": "finished_successfully", "end_turn": null, "weight": 0.0, "metadata": {"command": "spinner", "status": "running", "message_type": "variant", "model_slug": "gpt-4o-canmore", "requested_model_slug": "gpt-4o-canmore", "default_model_slug": "gpt-4o", "parent_id": "ce855707-1e50-44a3-a969-ef6dd7fbd3f5", "model_switcher_deny": [{"slug": "o1-preview", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-preview", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}]}, "recipient": "all", "channel": null}, "conversation_id": "670f2a64-5f30-8005-b7bd-f2e05d76260d", "error": null}, "c": 1}
+data: {"p": "/message/content/parts/0", "o": "append", "v": "\u597d\u7684"}   
 
 event: delta
-data: {"v": {"message": {"id": "e80b6c9a-f6ed-4bb7-a39b-13f911a19741", "author": {"role": "tool", "name": "myfiles_browser", "metadata": {}}, "create_time": null, "update_time": null, "content": {"content_type": "tether_quote", "url": "file-id3JtQ4dynhb0pbakzjIqBKr", "domain": "kovfiydeinrm6blw.js", "text": "const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=[\"assets/dipqw8l6dnulbtd4.js\",\"assets/egi9yqe8h527q0wn.js\",\"assets/e6itquh41uv61tg7.js\",\"assets/root-mqr9jcw8.css\",\"assets/d1idnzvl0pqu9wz9.js\",\"assets/hv5dp5z9yhve225l.js\",\"assets/gxsjxn5wybo6v3lv.js\",\"assets/k12wnubr5utsk7km.js\",\"assets/cpy4h98tkspyqegu.js\",\"assets/mqdz0jzpbpscyuh1.js\",\"assets/esnat1gvfhavkz4p.js\",\"assets/bue7ssrf5lr74ywi.js\",\"assets/i04pcwd992jm5mp6.js\",\"assets/fudx0zpt1yfrknlw.js\",\"assets/fv2lx90pr3xg3map.js\",\"assets/kqwdyvkaaavvn8k3.js\",\"assets/cshczh318z9duy1w.js\",\"assets/o8ef0qyen304hbei.js\",\"assets/hjyufao59r59iwke.js\",\"assets/jtbo7p7at80ahp56.js\",\"assets/sso-o0ordy3is7cqyfhc.js\",\"assets/fsldftql3hgxsggg.js\",\"assets/mk14lgsmrpmo2zsf.js\",\"assets/efbz2xeupq2vm8nx.js\",\"assets/mulk6actptn6vk4t.js\",\"assets/er0ahr1yq57dmlc2.js\",\"assets/z0c6vm4df23yv2bb.js\",\"assets/fkawcdcy1eq7glw1.js\",\"assets/ed4yr7r1n1jkra8g.js\",\"assets/jjgbixfnrr7f0qh3.js\",\"assets/mgq1wtzg44y87iu2.js\",\"assets/lew6vqidx3rgvrcj.js\",\"assets/flyr16ctvc00vp1u.js\",\"assets/j4qppop119es06ph.js\",\"assets/d3w35uzpylqjfq4t.js\",\"assets/no5diehbeq5uzkos.js\",\"assets/ffgb6cqlnn5rmgr5.js\",\"assets/k47fatma6a4s1ju0.js\",\"assets/ly000ew6ys3ezbz9.js\",\"assets/l02mfs267sy7zqwa.js\",\"assets/kdau7fbyqjqphc5h.js\",\"assets/cbfhk7wf0lp6ezdz.js\",\"assets/e9lafxuzyeh4418f.js\",\"assets/rs45oebfwlfkc0d4.js\",\"assets/hmqx94uou5mdgys6.js\",\"assets/bzjoh1jo39slpjo5.js\",\"assets/k06br910ge3nee84.js\",\"assets/nhwwej1nq0zrd7sc.js\",\"assets/itoaii0x6pbp2y4g.js\",\"assets/jmmt8kt50szmpk6v.js\",\"assets/g8dk0p9fqqplk9i1.js\",\"assets/i91n50yt16oqkyc4.js\",\"assets/o454bpu1c0xgns3r.js\",\"assets/diemq8s9dr5y0vfm.js\",\"assets/elp95vs8lkf3yodn.js\",\"assets/egua8rkjrlzqa57o.js\",\"assets/kjok3qqpzyd4jz2x.js\",\"assets/j6ontdtp704853qp.js\",\"assets/louqp0wzqldquiqi.js\",\"assets/ob86mfmf3mgwxue8.js\",\"assets/kgbcmaztr0mh2fpl.js\",\"assets/lyajfocluai5tj3m.js\",\"assets/lv0rtycw52wt1lk8.js\",\"assets/j7203wvxxu1lsat2.js\",\"assets/kn5b5ysm9iqn7ekh.js\",\"assets/jl28rdpcclvtsph2.js\",\"assets/le3p8r41qbeaqkun.js\",\"assets/fq54pyiqhdt6emap.js\",\"assets/iej0cupg2dqkmejt.js\",\"assets/bngzwf3qmkqndg8v.js\",\"assets/jk8w36bsokizpx57.js\",\"assets/ieqslg527rfb980v.js\",\"assets/g33i75sjew1w3z8j.js\",\"assets/hb6lghr92jcoc968.js\",\"assets/dt5muwk0s9zorngf.js\",\"assets/kefzn796srd2xhnv.js\",\"assets/k63hcl256h5irly1.js\",\"assets/carousel-bss5aguy.css\",\"assets/iwxx3c896o976984.js\",\"assets/nm04jgpfyxi6pn12.js\",\"assets/kvquktih1j5d6cpy.js\",\"assets/pecr9i4k15m8a625.js\"])))=>i.map(i=>d[i]);\nimport{c as qe,i as na,p as bn,R as se,P as G,a as ee,D as ie,M as Ae,b as on,v as Or,g as ue,k as qk,d as Ri,u as Kt,e as Jt,r as m,f as Q,h as at,j as re,l as d,m as U,$ as Ir,n as Yk,o as ss,q as lR,s as E0,t as $n,w as vt,_ as fe,x as Ie,y as Xk,z as Ni,A as Qk,B as cR,C as uR,E as gm,F as dR,G as fR,H as hR,I as pR,J as mR,L as Bt,K as ur,N as dn,O as Qt,Q as Rr,S as Zk,T as Bd,U as Kk,V as Jk,W as K,X as je,Y as Ue,Z as Ke,a0 as M,a1 as de,a2 as $e,a3 as W,a4 as e_,a5 as gR,a6 as t_,a7 as n_,a8 as r_,a9 as o_,aa as vR,ab as Di,ac as a_,ad as Ut,ae as yR,af as ra,ag as Ud,ah as bR,ai as xR,aj as s_,ak as wR,al as $R,am as SR,an as Vd,ao as CR,ap as we,aq as Li,ar as ji,as as kR,at as _R,au as Wd,av as ER,aw as i_,ax as gt,ay as TR,az as PR,aA as Sn,aB as MR,aC as fu,aD as co,aE as Nr,aF as AR,aG as Hd,aH as xr,aI as Pa,aJ as l_,aK as Nn,aL as c_,aM as OR,aN as Cn,aO as Ma,aP as Lo,aQ as Vo,aR as u_,aS as zd,aT as d_,aU as Gd,aV as qd,aW as Yd,aX as Xd,aY as ne,aZ as A,a_ as yt,a$ as is,b0 as f_,b1 as IR,b2 as h_,b3 as RR,b4 as p_,b5 as NR,b6 as T0,b7 as hi,b8 as m_,b9 as DR,ba as LR,bb as jR,bc as FR,bd as Ee,be as P0,bf as g_,bg as oa,bh as O1,bi as Fi,bj as BR,bk as UR,bl as Qd,bm as I1,bn as M0,bo as VR,bp as WR,bq as HR,br as zR,bs as GR,bt as qR,bu as YR,bv as XR,bw as QR,bx as Zd,by as R1,bz as pe,bA as mh,bB as N1,bC as ls,bD as A0,bE as wr,bF as lc,bG as ZR,bH as Qn,bI as jt,bJ as Js,bK as Bi,bL as $r,bM as KR,bN as JR,bO as e4,bP as Ui,bQ as t4,bR as hu,bS as Ya,bT as v_,bU as n4,bV as y_,bW as dr,bX as r4,bY as O0,bZ as o4,b_ as a4,b$ as I0,c0 as s4,c1 as i4,c2 as b_,c3 as l4,c4,c5 as x_,c6 as u4,c7 as w_,c8 as d4,c9 as f4,ca as h4,cb as p4,cc as $_,cd as m4,ce as g4,cf as cc,cg as S_,ch as C_,ci as k_,cj as __,ck as v4,cl as E_,cm as D1,cn as Yo,co as y4,cp as b4,cq as x4,cr as cs,cs as us,ct as L1,cu as j1,cv as De,cw as w4,cx as T_,cy as $4,cz as S4,cA as R0,cB as C4,cC as F1,cD as Fa,cE as k4,cF as Is,cG as _4,cH as vm,cI as E4,cJ as T4,cK as P4,cL as M4,cM as A4,cN as O4,cO as I4,cP as R4,cQ as N4,cR as D4,cS as L4,cT as j4,cU as F4,cV as B4,cW as U4,cX as V4,cY as W4,cZ as H4,c_ as z4,c$ as G4,d0 as Vn,d1 as q4,d2 as Xa,d3 as Co}from\"./egi9yqe8h527q0wn.js\";import{S as ds,a as fs,b as P_,c as Y4,d as X4,e as Q4,f as Z4,g as M_,h as A_,i as O_,j as I_,k as Kd,l as R_,m as N_,n as N0,o as K4,p as D_,q as J4,r as e9,s as B1,t as ym,u as t9,v as n9,w as r9,x as o9,y as a9,z as s9,A as i9,B as L_,C as Jd,D as l9,E as c9,F as D0,G as ef,H as u9,I as d9,J as f9,K as h9,L as p9,M as j_,N as F_,O as B_,P as m9,Q as g9,R as v9,T as y9,U as b9,V as x9,W as w9,X as $9,Y as U_,Z as S9,_ as C9,$ as k9,a0 as _9,a1 as E9}from\"./e6itquh41uv61tg7.js\";function T9(e){return e!=null}const L0=(e,t)=>e.includes(t),P9=(e,t,n=[])=>{if(e==null)return n;const r=Array.isArray(e)?e:[e];return t?r.map(t):r},V_=(e,t=[])=>n=>P9(n,e,t),M9=(e,t=void 0)=>typeof e!=\"object\"||e==null||Array.isArray(e)?t:e,A9=(e,t)=>{const n=M9(e),r={};for(const o in t)r[o]=t[o](n?.[o]);return r},pi=e=>t=>A9(t,e),Wo=(e,t=\"\")=>typeof e==\"object\"||e==null?t:String(e),O9=(e,t=0)=>{if(typeof e==\"object\"||e==null)return t;const n=Number(e);return isNaN(n)?t:n},I9=(e,t=!1)=>{if(typeof e==\"boolean\")return e;if(typeof e==\"number\"){if(e===0)return!1;if(e===1)return!0}if(typeof e==\"string\"){const n=e.toLowerCase();if(n===\"false\")return!1;if(n===\"true\")return!0}return t},j0=(e,t,n=t[0])=>L0(t,e)?e:n,R9=(e,t=e[0])=>n=>j0(n,e,t),ro=e=>t=>t===void 0?void 0:e(t);var tf=(e=>(e[e.Textdoc=0]=\"Textdoc\",e[e.ADAVisualization=1]=\"ADAVisualization\",e))(tf||{});const _r=qe(()=>({focusedObject:null,fromMessageId:null})),XZe=(e,t)=>{const n=_r.getState();t!==n.fromMessageId&&_r.setState({focusedObject:e,fromMessageId:t})},F0=e=>{_r.setState({focusedObject:e,fromMessageId:null})},QZe=e=>{const t=_r.getState(),{focusedObject:n}=t;(!n||n.type!==0||n.textdocId!==e)&&W_(e)},W_=e=>{F0({type:0,textdocId:e})},N9=(e,t,n)=>{F0({type:0,textdocId:e,history:t,showChangesAtVersion:n})},ZZe=(e,t,n)=>{F0({type:0,textdocId:e,showChangesAtVersion:t,history:n??void 0})},KZe=()=>{_r.setState({focusedObject:null})},JZe=()=>{_r.setState({focusedObject:null,fromMessageId:null})},mi=-1;var H_=(e=>(e.DOCUMENT=\"document\",e.CODE_BASH=\"code/bash\",e.CODE_ZSH=\"code/zsh\",e.CODE_JAVASCRIPT=\"code/javascript\",e.CODE_TYPESCRIPT=\"code/typescript\",e.CODE_HTML=\"code/html\",e.CODE_CSS=\"code/css\",e.CODE_PYTHON=\"code/python\",e.CODE_JSON=\"code/json\",e.CODE_SQL=\"code/sql\",e.CODE_GO=\"code/go\",e.CODE_YAML=\"code/yaml\",e.CODE_JAVA=\"code/java\",e.CODE_RUST=\"code/rust\",e.CODE_CPP=\"code/cpp\",e.CODE_SWIFT=\"code/swift\",e.CODE_PHP=\"code/php\",e.CODE_XML=\"code/xml\",e.CODE_RUBY=\"code/ruby\",e.CODE_HASKELL=\"code/haskell\",e.CODE_KOTLIN=\"code/kotlin\",e.CODE_CSHARP=\"code/csharp\",e.CODE_C=\"code/c\",e.CODE_OBJECTIVEC=\"code/objectivec\",e.CODE_R=\"code/r\",e.CODE_LUA=\"code/lua\",e.CODE_DART=\"code/dart\",e.CODE_SCALA=\"code/scala\",e.CODE_PERL=\"code/perl\",e.CODE_COMMONLISP=\"code/commonlisp\",e.CODE_CLOJURE=\"code/clojure\",e.CODE_OCAML=\"code/ocaml\",e.CODE_OTHER=\"code/other\",e.LOADING=\"loading\",e))(H_||{});function bm(e){return e.startsWith(\"code/\")}function D9(e){const t=j0(e,Object.values(H_),null);if(t)return t;if(e===\"webview\")return\"code/html\";if(e.startsWith(\"code\"))switch(e){case\"code/js\":return\"code/javascript\";default:return\"code/other\"}return\"document\"}var et=(e=>(e.CREATE=\"create\",e.REWRITE=\"rewrite\",e.EDIT=\"edit\",e.ADD_COMMENT=\"add_comment\",e.REMOVE_COMMENT=\"remove_comment\",e))(et||{}),z_=(e=>(e.ACCEPT=\"accept\",e.DISMISS=\"dismiss\",e))(z_||{}),xm=(e=>(e.ACCEPT_INITIATED=\"accept_initiated\",e.DISMISSED=\"dismissed\",e.PENDING=\"pending\",e))(xm||{}),L9=(e=>(e.ADDED=\"added\",e.REMOVED=\"removed\",e))(L9||{}),j9=(e=>(e.Streaming=\"streaming\",e.Restoring=\"restoring\",e.OldVersion=\"oldVersion\",e.ShowingChanges=\"showingChanges\",e.QueryParam=\"queryParam\",e))(j9||{}),F9=(e=>(e.ACCEPT_COMMENT=\"accept_comment\",e.ASK_CHATGPT=\"ask_chatgpt\",e.ACCELERATOR=\"accelerator\",e.FULL_SCREEN_SUBMIT=\"full_screen_submit\",e))(F9||{});function B9(){return{resolveTempTextdocId:{},resolveTempCommentId:{},latestTextdocId:null}}const hs=qe(na(B9));function eKe(){return hs(({resolveTempTextdocId:e})=>e)}function tKe(){return hs(({latestTextdocId:e})=>e)}function G_(e,t){return bn(e??hs.getState(),t)}function q_(e){hs.setState(e)}const nKe=e=>{if(!e)return;let t=null;for(const n of e)t=G_(t,r=>{if(n.kind===et.CREATE){const{tempTextdocId:o,textdocId:a}=n;o&&o!==a&&(r.resolveTempTextdocId[o]=a)}else if(n.kind===et.ADD_COMMENT){const{tempId:o,id:a}=n;a&&o&&a!==o&&(r.resolveTempCommentId[a]=o)}r.latestTextdocId=n.textdocId});t&&q_(t)},rKe=e=>{for(let t=e.length-1;t>=0;t--){const{messages:n}=e[t];for(let r=n.length-1;r>=0;r--){const{message:{metadata:o}}=n[r],a=o?.open_in_canvas_view?.id??o?.canvas?.textdoc_id;if(a||t===0)return q_(G_(hs.getState(),s=>{s.latestTextdocId=a??null}))}}};function Y_(){return _r(e=>e.focusedObject)}function oKe(){const e=_r(t=>t.focusedObject);return e?.type!==tf.Textdoc?null:e}function aKe(){const e=_r(t=>t.focusedObject);return e?.type!==tf.Textdoc?null:e.history??null}function U9(){return Y_()!=null}function sKe(e){const t=Y_();return hs(({resolveTempTextdocId:n})=>{if(!e||t?.type!==tf.Textdoc)return!1;const r=n[t.textdocId]??t.textdocId,o=n[e]??e;return r===o})}function iKe(e){for(let t=e.length-1;t>=0;t--)if(e[t].message.author.role===se.Assistant)return e[t]}function lKe(e){for(let t=e.length-1;t>=0;t--)if(e[t].message.author.role===se.Tool)return e[t]}function cKe(e){for(let t=e.length-1;t>=0;t--){const r=e[t].message.metadata?.canvas?.textdoc_id;if(r)return r}return null}function V9(e,t){return e.replace(new RegExp(\"\\\\\\\\(\\\\d+)|\\\\\\\\g<(?:(\\\\d+)|(\\\\D[^>]*))>|((?<!\\\\\\\\)\\\\\\\\(?:g(?:<[^>]*)?)?$)\",\"gi\"),(n,r,o,a,s)=>{if(r===\"0\")return\"\\\\0\";const i=r??o;if(i)return t[O9(i)]??\"\";if(a)return t.groups?.[a]??\"\";if(s)return\"\";throw new Error(\"Unreachable\")})}function W9(e,t){let n=\"\",r=0,o=0,a=0,s=0,i=!1;const l=y=>{r+=y},c=y=>{r>o&&(n+=e.slice(o,r)),r=o=r+y},u=y=>{c(0),n+=y},f=()=>{u(\"\\\\\"),l(1)},h=y=>{if(r+y<e.length)return e[r+y]},p=(y,b=0)=>r+b<e.length&&y===e[r+b],g=y=>{const b=e.indexOf(y,r);if(b===-1)c(e.length-r);else return b-r},v=y=>{let b=1;if(h(y)===\"\\\\\"){const w=h(y+1);b=w===\"U\"?10:w===\"u\"?6:w===\"x\"?4:2}const x=r+y+b>e.length;return x&&c(e.length-r),x};for(;r<e.length;){if(p(\"\\\\\")){if(v(0))continue;const x=h(1)??\"\";if(x===\"a\")c(2),u(\"\\\\x07\");else if(x===\"A\")c(2),u(\"^\");else if(x===\"z\")c(2),u(\"$\");else if(x===\"Z\")c(2),u(\"(?=\\\\n?$)\");else if(x===\"U\"){const w=e.slice(r+2,r+10);c(10),u(`\\\\u{${parseInt(w,16).toString(16)}}`)}else if(x===\"u\")l(6);else if(x===\"x\")l(4);else{let w;i?w=/[0bdDsSwWfnrtv()[\\]{}|/\\\\^-]/.test(x):/[1-9]/.test(x)?w=parseInt(x,10)<=s:w=/[0bBdDsSwWfnrtv()[\\]{}|/\\\\^$.?*+]/.test(x),w?l(2):c(1)}continue}if(p(\"]\")){i?(i=!1,l(1)):f();continue}else if(i){if(p(\"-\")&&v(1))continue;/[()[\\]{}|/\\\\]/.test(e[r])?f():l(1);continue}else if(p(\"[\")){i=!0,l(1),p(\"]\")&&f();continue}if(p(\"|\")&&v(1))continue;if(p(\"{\")){const x=/^\\{(?:\\d+(?:,\\d*)?(\\}|$)|$)/.exec(e.slice(r));r>0&&x?.[1]===\"}\"?l(x[0].length):r>0&&x&&t?c(x[0].length):f();continue}else if(p(\"}\")){f();continue}if(p(\"+\")){const x=h(-1);x&&/[*+?}]/.test(x)&&h(-2)!==\"\\\\\"?c(1):l(1);continue}if(p(\")\")){a>0?(a--,l(1)):f();continue}if(!p(\"(\")){l(1);continue}if(v(1))continue;if(h(1)!==\"?\"){a++,s++,l(1);continue}if(v(2))continue;const y=h(2);if(!y){c(2);continue}if(y===\"#\"){const x=g(\")\");x&&c(1+x);continue}if(y===\"P\"){if(h(3)===\"=\"){const x=g(\")\");if(x){const w=e.slice(r+4,r+x);c(1+x),u(`\\\\k<${w}>`)}}else{const x=g(\">\");if(x){const w=e.slice(r+4,r+x);if(c(1+x),v(0))continue;u(`(?<${w}>`),a++}}continue}if(/[-a-z]/.test(y)){const x=e.indexOf(\":\",r)>=0,w=g(x?\":\":\")\");if(w&&c(1+w),x){if(v(0))continue;u(\"(?:\"),a++}continue}if(y===\">\"){if(c(3),v(0))continue;u(\"(?:\"),a++;continue}const b=y===\"<\"?4:3;v(b)||(l(b),a++)}for(n+=e.slice(o,e.length),i&&(n+=\"]\");a-- >0;)n+=\")\";return n.length>0?n:\"(?!)\"}function U1(e){const t=[/^`{1,3}\\s*$/,/^```[^\\n]*\\n?/],n=[/\\n?`{1,3}\\s*$/];for(const r of t)if(r.test(e)){e=e.replace(r,\"\");break}for(const r of n)if(r.test(e)){e=e.replace(r,\"\");break}return e}function H9({messageId:e}){return`temporary-id:textdoc:${e}`}function z9(e){let t=\"\";const n=e.length;let r=0,o=0;for(;r<n;){let a=e.charCodeAt(r);if(a!==92){r++;continue}if(o<r&&(t+=e.slice(o,r)),r++,r>=n){t+=\"\\\\\";break}switch(a=e.charCodeAt(r),a){case 110:t+=`\n`,r++;break;case 116:t+=\"\t\",r++;break;case 114:t+=\"\\r\",r++;break;case 98:t+=\"\\b\",r++;break;case 102:t+=\"\\f\",r++;break;case 118:t+=\"\\v\",r++;break;case 48:t+=\"\\0\",r++;break;case 39:t+=\"'\",r++;break;case 34:t+='\"',r++;break;case 92:t+=\"\\\\\",r++;break;case 120:if(r+2<n){const s=parseInt(e.slice(r+1,r+3),16);if(!isNaN(s)){t+=String.fromCharCode(s),r+=3;break}}t+=\"\\\\x\",r++;break;case 117:if(r+1<n)if(e.charAt(r+1)===\"{\"){const s=e.indexOf(\"}\",r+2);if(s!==-1){const i=parseInt(e.slice(r+2,s),16);if(!isNaN(i)&&i<=1114111){t+=String.fromCodePoint(i),r=s+1;break}}}else{const s=parseInt(e.slice(r+1,r+5),16);if(!isNaN(s)){t+=String.fromCharCode(s),r+=5;break}}t+=\"\\\\u\",r++;break;default:t+=\"\\\\\"+e.charAt(r),r++;break}o=r}return o<n&&(t+=e.slice(o)),t}var X_=(e=>(e.Unknown=\"unknown\",e.ShowToast=\"show_toast\",e))(X_||{});R9(Object.values(X_));function G9(){let e;const t=q9();switch(t){case\"android\":e=window.CanmoreNative;break;case\"ios\":e=window.webkit?.messageHandlers.canmoreNative;break;case\"web\":e=void 0;break}return{platform:t,isNative:t!==\"web\",bridge:e,sendMessage:n=>e?.postMessage(btoa(JSON.stringify(n)))}}function q9(){return typeof window.CanmoreNative<\"u\"?\"android\":typeof window.webkit<\"u\"&&typeof window.webkit.messageHandlers.canmoreNative<\"u\"?\"ios\":\"web\"}function B0(e,t){G.logEvent(e,{platform:G9().platform,...t??{}})}function Y9(e,t){B0(ee.canvasButtonClicked,{buttonName:e,...t??{}})}function X9(e){if(e instanceof Error){const{name:t,message:n,stack:r,cause:o}=e;return{name:t,message:n,stack:r,cause:o}}return e}function Q9(e,t,n){B0(ee.canvasError,{message:e,error:X9(t),attributes:n}),ie.addError(t)}const Z9={logButtonClick:Y9,logEvent:B0,logError:Q9},V1=e=>e===\" \"||e===`\n`||e===\"\\r\"||e===\"\t\";function K9(e,t=!1){let n=0,r=null;const o=[];if(!e)return[void 0,o];if(t)return[i(),o];try{return[JSON.parse(e),null]}catch(g){return r=g,[i(),o]}function a(){for(;n<e.length&&V1(e[n]);)n++;return n<e.length}function s(g){return a()&&e[n]===g?(n++,!0):!1}function i(){if(a())switch(e[n]){case\"{\":return f();case\"[\":return h();case'\"':{const[g]=c();return g}case\"f\":return p(\"false\",!1);case\"t\":return p(\"true\",!0);case\"n\":return p(\"null\",null);case\"-\":case\"0\":case\"1\":case\"2\":case\"3\":case\"4\":case\"5\":case\"6\":case\"7\":case\"8\":case\"9\":return u()}throw r}function l(g,v=!1){return v?z9(g):g}function c(g=!1){const v=n+1;let y=!1;for(n++;n<e.length;){const b=e[n++];if(b===\"\\\\\"){if(y=!0,n===e.length||e[n]===\"u\"&&n+4>=e.length){const x=n-1;return n=e.length,[l(e.slice(v,x),y),!1]}n++;continue}if(b==='\"'){let x=n;for(;x<e.length&&V1(e[x]);)x++;if(e[x]==null||e[x]===\",\"||e[x]===\"]\"||e[x]===\"}\"||g&&e[x]===\":\")return[l(e.slice(v,n-1),y),!0]}}return[l(e.slice(v,n),y),!1]}function u(){const g=n;for(;n<e.length&&/[0-9.eE+-]/.test(e[n]);)n++;const v=Number(e.slice(g,n));if(isNaN(v)){if(a())throw r;return 0}return v}function f(){n++;const g={};if(s(\"}\"))return g;for(;a();){const[v,y]=c(!0);if(!y||(o.push(v),!a()))break;if(!s(\":\"))throw r;if(!a()||(g[v]=i(),!a()))break;if(s(\"}\")){o.pop();break}if(!s(\",\"))throw r;o.pop()}return g}function h(){n++;const g=[];if(s(\"]\"))return g;for(o.push(0);a()&&(g.push(i()),!!a());){if(s(\"]\")){o.pop();break}if(!s(\",\"))throw r;o[o.length-1]=g.length}return g}function p(g,v){const y=n+g.length;if(y<=e.length?e.slice(n,y)===g:g.startsWith(e.slice(n)))return n=y,v;throw r}}function gh(e,t,n=!1){try{const[r,o]=K9(e);return[t(r),o]}catch(r){return n&&Z9.logError(\"JSON parsing\",r),[void 0,[]]}}function Rs(e,t){return e!=null&&t.every((n,r)=>e[r]===n)}class J9{isMultimodalTextMessage(t){return t.content.content_type===Ae.MultimodalText}isPartAssetPointer(t){return typeof t!=\"string\"&&(t.content_type===on.ImageAssetPointer||t.content_type===on.AudioAssetPointer)}isPartRealTimeUserAudioVideoAssetPointer(t){return typeof t!=\"string\"&&t.content_type===on.RealTimeUserAudioVideoAssetPointer}isPartAudioTranscription(t){return typeof t!=\"string\"&&t.content_type===on.AudioTranscription}getAudio(t){return this.isMultimodalTextMessage(t)?t.content.parts.filter(n=>typeof n!=\"string\"&&n.content_type===on.Audio):[]}getAssetPointers(t){return this.isMultimodalTextMessage(t)?t.content.parts.filter(n=>this.isPartAssetPointer(n)):[]}getImageAssetPointers(t){return this.isMultimodalTextMessage(t)?this.getImageAssetPointersFromParts(t.content.parts):[]}getImageAssetPointersFromParts(t){return t.filter(n=>this.isPartAssetPointer(n)&&n.content_type===on.ImageAssetPointer)}getFrameAssetPointers(t){return this.isMultimodalTextMessage(t)?t.content.parts.flatMap(n=>{if(typeof n!=\"string\"&&n.content_type===on.RealTimeUserAudioVideoAssetPointer)return n.frames_asset_pointers}).filter(n=>!!n):[]}getAudioAssetPointers(t){return this.isMultimodalTextMessage(t)?t.content.parts.map(n=>{if(typeof n!=\"string\")switch(n.content_type){case on.AudioAssetPointer:return n;case on.RealTimeUserAudioVideoAssetPointer:return n.audio_asset_pointer;default:return}}).filter(n=>!!n):[]}getPartsAsString(t){return this.isMultimodalTextMessage(t)?t.content.parts.map(n=>{if(typeof n==\"string\")return n;if(this.isPartAssetPointer(n))return`[media pointer=\"${n.asset_pointer}\"]`;if(this.isPartRealTimeUserAudioVideoAssetPointer(n)){const r=n.audio_asset_pointer?.asset_pointer;return r&&`[media pointer=\"${r}\"]`}else if(this.isPartAudioTranscription(n))return n.text}).filter(Boolean).join(`\n`):\"\"}}const U0=new J9,eN=\"contentReference\";var Le=(e=>(e[e.BrowseTool=0]=\"BrowseTool\",e[e.Browsing=1]=\"Browsing\",e[e.CanmoreTool=2]=\"CanmoreTool\",e[e.CodeInterpreter=3]=\"CodeInterpreter\",e[e.CodeInterpreterTool=4]=\"CodeInterpreterTool\",e[e.Dalle=5]=\"Dalle\",e[e.DalleTool=6]=\"DalleTool\",e[e.GizmoContactsTool=7]=\"GizmoContactsTool\",e[e.GizmoEditor=8]=\"GizmoEditor\",e[e.GizmoIntent=9]=\"GizmoIntent\",e[e.GizmoIntentTool=10]=\"GizmoIntentTool\",e[e.JITPlugin=11]=\"JITPlugin\",e[e.JITPluginTool=12]=\"JITPluginTool\",e[e.JawboneTool=13]=\"JawboneTool\",e[e.ImagePreloadTool=14]=\"ImagePreloadTool\",e[e.ModelEditableContext=15]=\"ModelEditableContext\",e[e.MultimodalText=16]=\"MultimodalText\",e[e.ParallelBrowsing=17]=\"ParallelBrowsing\",e[e.ParallelBrowsingTool=18]=\"ParallelBrowsingTool\",e[e.RetrievalBrowsing=19]=\"RetrievalBrowsing\",e[e.RetrievalBrowsingTool=20]=\"RetrievalBrowsingTool\",e[e.SearchResultTool=21]=\"SearchResultTool\",e[e.SearchGPTQuery=22]=\"SearchGPTQuery\",e[e.System=23]=\"System\",e[e.Text=24]=\"Text\",e[e.UserEditableContext=25]=\"UserEditableContext\",e[e.UserModelBio=26]=\"UserModelBio\",e[e.UserModelBioTool=27]=\"UserModelBioTool\",e[e.Unknown=28]=\"Unknown\",e[e.a8km123=29]=\"a8km123\",e[e.f959b8c=30]=\"f959b8c\",e))(Le||{}),tN=(e=>(e.BROWSER=\"browser\",e.CANMORE=\"canmore\",e.MTBROWSER=\"mtbrowser\",e.WIKI_BROWSER=\"wiki_browser\",e.MYFILES_BROWSER=\"myfiles_browser\",e.FILE_SEARCH=\"file_search\",e.GDRIVE_BROWSER=\"gdrive_browser\",e.BROWSING_TEAM=\"browsing_team\",e.BIO=\"bio\",e.PYTHON=\"python\",e.DALLE=\"dalle\",e.GIZMO_EDITOR=\"gizmo_editor\",e.JIT_PLUGIN=\"jit_plugin\",e.GIZMO_CONTACTS=\"gizmo_contacts\",e.SEARCH_RESULT=\"search_result\",e.SEARCH_RESULTS=\"search_results\",e.GIZMO_INTENT=\"gizmo_user_intent\",e.A8KM123=\"a8km123\",e.SEARCHGPT=\"web\",e.JAWBONE=\"jawbone\",e))(tN||{});function Qa(e){if(e.metadata?.f959b8c)return 30;if(e.author.role===se.Assistant){const t=W1(e.recipient);if(e.recipient===\"browser\"||e.recipient===\"wiki_browser\"||t?.namespace===\"mtbrowser\")return 1;if(e.recipient===\"web\")return 22;if(e.recipient===\"myfiles_browser\"||e.recipient===\"gdrive_browser\"||t?.namespace===\"file_search\"||t?.namespace===\"myfiles_browser\")return 19;if(e.recipient===\"browsing_team\")return 17;if(e.recipient===\"bio\")return 26;if(e.recipient===\"python\")return 3;if(t?.namespace===\"dalle\"||e.recipient===\"dalle\")return 5;if(t?.namespace===\"gizmo_editor\")return 8;if(e.recipient===\"gizmo_user_intent\"||t?.namespace===\"gizmo_user_intent\")return 10;if(t?.namespace===\"gizmo_contacts\")return 7;if(t?.namespace===\"canmore\")return 2;if(t?.namespace===\"jawbone\")return 13;if(H1(t?.namespace))return 11;if(t!=null)return 28;if(e.content.content_type===Ae.ModelEditableContext)return 15}else if(e.author.role===se.Tool){const t=W1(e.author.name);if(e.author.name===\"browser\"||e.author.name===\"wiki_browser\"||t?.namespace===\"mtbrowser\")return 0;if(e.author.name===\"myfiles_browser\"||e.author.name===\"gdrive_browser\"||e.author.name===\"file_search\"||t?.namespace===\"file_search\"||t?.namespace===\"myfiles_browser\")return 20;if(e.author.name===\"browsing_team\")return 18;if(e.author.name===\"search_result\"&&e.content.content_type===Ae.TetherQuote)return 21;if(e.author.name===\"search_results\"&&e.content.content_type===Ae.TetherBrowsingDisplay)return 14;if(e.author.name===\"bio\")return 27;if(e.author.name===\"a8km123\")return 29;if(e.author.name===\"python\")return 4;if(t?.namespace===\"dalle\"||e.author.name===\"dalle\")return 6;if(t?.namespace===\"gizmo_editor\")return 8;if(t?.namespace===\"gizmo_contacts\")return 7;if(t?.namespace===\"canmore\")return 2;if(e.author.name===\"gizmo_user_intent\"||H1(t?.namespace))return 12;if(t?.namespace===\"jawbone\")return 13;if(t!=null||e.author.name===\"plugin_service\")return nN(e)}else{if(e.author.role===se.System)return 23;if(e.author.role===se.User&&e.content.content_type===Ae.UserEditableContext)return 25}return e.content.content_type===Ae.Text||e.content.content_type===Ae.MultimodalText?24:28}function nN(e){return e.create_time&&e.create_time>17172e5?ie.addError(\"[Unknown tool] Encountered a message with an unknown tool. Rendering as Unknown message type, which is not visible.\",{message:e}):ie.addError(\"[Unknown tool] Encountered a message with an unknown tool, which is most likely an old plugin. Rendering as Unknown message type, which may not appear as expected.\",{message:e}),28}function uKe(e){return e.metadata?.finish_details!=null}function dKe(e){return e.content.content_type===Ae.Text?e.content.parts.some(t=>t.length>0):e.content.content_type===Ae.MultimodalText?U0.getPartsAsString(e).length>0:!1}function fKe(e){return e.metadata?.finish_details?.type===\"stop\"}function Q_(e){return e.metadata?.finish_details?.type===\"max_tokens\"}function hKe(e){return e.metadata?.finish_details?.type===\"interrupted\"}function rN(e){return e.metadata?.message_type===\"continue\"}function pKe(e){return e.recipient??\"\"}function W1(e){if(e==null||!e.includes(\".\"))return null;const[t,n]=e.split(\".\");return{namespace:t,functionName:n}}function oN(e,t){return{id:Or(),author:{role:se.System},content:{content_type:Ae.Text,parts:e},metadata:t}}function mKe(e,t){return{id:Or(),author:{role:se.User},content:{content_type:Ae.Text,parts:e},metadata:t}}function aN(e){return oN([`The user is referring to this in particular:\n${e}`],{exclude_after_next_user_message:!0})}function gKe(e){return{id:Or(),author:{role:se.System},content:e,metadata:{rebase_system_message:!0},recipient:\"all\"}}function H1(e){if(!e)return!1;if(e===\"gizmo_user_intent\")return!0;const t=e.split(\"__\");return t.findIndex(n=>n===\"jit_plugin\")===t.length-1}function z1(e){return e.author.role===se.Assistant?e.metadata?.gizmo_id:void 0}function sN(e){const t=Qa(e);return t===23||t===26||t===27||t===15||t===10||t===28||e.metadata?.is_visually_hidden_from_conversation}function iN(e){try{const n=new Intl.Segmenter(\"en-US\",{granularity:\"grapheme\"}).segment(e),r=[];for(const o of n)r.push(o.segment);return r}catch{return e.split(\"\")}}function lN(e){const t=[];for(let n=0;n<e.length;n++){const r=e.codePointAt(n);r!==void 0&&(t.push(r),r>65535&&n++)}return t}function G1(e){return String.fromCodePoint(...e)}function cN(e){for(var t=-1,n=e==null?0:e.length,r=0,o=[];++t<n;){var a=e[t];a&&(o[r++]=a)}return o}var uN=cN;const Vi=ue(uN);function dN(e,t=[]){const n=Z_(t);return K_(n,e,{includeDirectives:!1})}function vKe(e,t=[],n,r){const o=Z_(t,r);let a=Vi(o.filter(({index:i,displayType:l})=>i!=null&&l).map(({newContentReference:i})=>i)),s=K_(o,e);return s=fN(s),n&&({updatedText:s,updatedReferences:a}=hN(n,a,s)),{processedText:s,displayedContentReferences:a}}function Z_(e=[],t){let n=0;return[...e].sort((o,a)=>o.start_idx-a.start_idx||o.end_idx-a.end_idx).reduce((o,a)=>{let s,i;switch(a.type){case\"invalid\":case\"hidden\":s={...a,type:\"hidden\",invalid:a.type===\"invalid\"};break;case\"image_v2\":case\"nav_list\":case\"tldr\":case\"optimistic_image_citation\":case\"sources_footnote\":case\"sports_standings\":case\"sports_schedule\":case\"video\":i=\"block\",s={...a};break;case\"file\":case\"title_citation\":case\"location_search\":case\"time\":case\"grouped_webpages\":i=\"inline\",s={...a};break;case\"webpage\":case\"webpage_extended\":i=\"inline\",s={type:\"grouped_webpages\",matched_text:a.matched_text,start_idx:a.start_idx,end_idx:a.end_idx,alt:a.alt,items:[{...a}],safe_urls:a.safe_urls};break;case\"calculator\":case\"stock\":case\"forecast\":case\"map\":i=\"block\",s={...a};break;default:s={...a,type:\"hidden\",invalid:!0},i=\"alt\";break}return o.push({originalContentReference:a,newContentReference:s,index:n++,displayType:i}),t&&o.push({originalContentReference:a,newContentReference:{type:\"debug\",matched_text:a.matched_text.replace(/(^\u3010|\u3011$)/g,\"\"),...a.type===\"webpage_extended\"&&a.pub_date&&{pub_date:new Date(a.pub_date*1e3).toLocaleString()}},index:n++}),o},[])}function K_(e,t,n={includeDirectives:!0}){let r=\"\",o=0;const a=lN(t);let s=0;for(const i of e){const{originalContentReference:l,displayType:c}=i,{start_idx:u,end_idx:f}=l,h=a.slice(o,u);if(r+=G1(h),o=f,c){if(n.includeDirectives)switch(c){case\"block\":r+=wm(s,\"leaf\",\"newline\",\"newline\");break;case\"inline\":{const g=r.length!==0&&r[r.length-1].match(/\\s/)?void 0:\"zero-width-space\";r+=wm(s,\"inline\",g);break}case\"alt\":r+=l.alt??\"\";break}s++}}return r+=G1(a.slice(o)),r}const q1=\"&#8203;\";function wm(e,t,n,r){const o=`${eN}[oaicite:${e}]{index=${e}}`;return`${n===\"zero-width-space\"?q1:n===\"newline\"?`\n`:\"\"}${t===\"leaf\"?\"::\":\":\"}${o}${r===\"zero-width-space\"?q1:n===\"newline\"?`\n`:\"\"}`}function fN(e){let t=e;t=t.replace(/\u3010[^\u3011]*$/g,\"\");const n=t.match(/(\\n|^):::/g);return n&&n.length%2===1&&(t+=`\n:::`),t=t.replace(/^\\d+$/,\"\"),t}function hN(e,t,n){const r=e.find(a=>Qa(a)===Le.CodeInterpreter),o=e.find(a=>Qa(a)===Le.CodeInterpreterTool);if(r!=null&&o!=null){const a=t.length;n.endsWith(\"```\")&&(n+=`\n`),n+=\" \"+wm(a,\"inline\",\"zero-width-space\",\"zero-width-space\"),t.push({type:\"code_execution\",codeMessage:r,codeExecutionOutputMessage:o})}return{updatedText:n,updatedReferences:t}}function pu(e,t={shouldGetTextFromContentReferences:!1}){switch(e.content.content_type){case Ae.Text:{const n=e.content.parts.join(\"\");return t.shouldGetTextFromContentReferences&&e.metadata?.content_references?dN(n,e.metadata.content_references):n}case Ae.MultimodalText:return U0.getPartsAsString(e);case Ae.TetherBrowsingDisplay:return e.content.result;case Ae.TetherQuote:case Ae.TetherBrowsingCode:case Ae.Code:case Ae.ExecutionOutput:case Ae.SystemError:return e.content.text;case Ae.SystemMessage:case Ae.SystemContent:return e?.metadata?.__internal?.rendered_harmony_string??JSON.stringify(e.content,null,2);case Ae.UserEditableContext:return`${e.content.user_profile}\n${e.content.user_instructions}`;default:return\"\"}}const vh=\"canmore\";var ln=(e=>(e.CreateTextdoc=`${vh}.create_textdoc`,e.UpdateTextdoc=`${vh}.update_textdoc`,e.CommentTextdoc=`${vh}.comment_textdoc`,e))(ln||{});function pN(e){return e===ln.CreateTextdoc||e===ln.UpdateTextdoc||e===ln.CommentTextdoc}var Mt=(e=>(e[e.STREAMING=0]=\"STREAMING\",e[e.WAITING=1]=\"WAITING\",e[e.COMPLETE=2]=\"COMPLETE\",e[e.FAILED=3]=\"FAILED\",e[e.CANCELED=4]=\"CANCELED\",e[e.REDACTED=5]=\"REDACTED\",e))(Mt||{});const mN=pi({type:ro(Wo),name:ro(Wo),content:ro(Wo)}),gN=pi({updates:V_(pi({pattern:ro(Wo),multiple:ro(I9),replacement:ro(Wo)}))}),vN=pi({comments:V_(pi({pattern:ro(Wo),comment:ro(Wo)}))});function yN(e,t,n){const{id:r,author:o,recipient:a,create_time:s}=t;if(!s)throw new Error(\"Expected a create_time\");const i=pu(t),l=n?.metadata?.canvas;if(t?.metadata?.is_redacted||n?.metadata?.is_redacted)return{function:a,status:Mt.REDACTED,messageId:r,author:o,createdAt:s};switch(a){case ln.CreateTextdoc:{const[c,u]=gh(i,mN),f=l?.textdoc_type??(!c?.type||Rs(u,[\"type\"])?void 0:D9(c.type));return{function:ln.CreateTextdoc,status:yh(e,t,n,u!=null),messageId:r,author:o,createdAt:s,textdocId:l?.textdoc_id,versionInt:bh(l),title:c?.name,type:f,content:c?.content}}case ln.UpdateTextdoc:{const[c,u]=gh(i,gN,!e),f=c?.updates.map((h,p)=>({...h,isPartialPattern:Rs(u,[\"updates\",p,\"pattern\"]),isPartial:Rs(u,[\"updates\",p])}));return{function:ln.UpdateTextdoc,status:yh(e,t,n,u!=null),messageId:r,author:o,createdAt:s,textdocId:l?.textdoc_id,versionInt:bh(l),updates:f}}case ln.CommentTextdoc:{const[c,u]=gh(i,vN,!e),f=n?.metadata?.canvas?.comment_ids,h=c?.comments.map((p,g)=>({...p,id:f?.[g],isPartialPattern:Rs(u,[\"comments\",g,\"pattern\"]),isPartial:Rs(u,[\"comments\",g])}));return{function:ln.CommentTextdoc,status:yh(e,t,n,u!=null),messageId:r,author:o,createdAt:s,textdocId:l?.textdoc_id,versionInt:bh(l),comments:h}}}}function J_(e){return pN(e?.recipient)}function bN(e,t=0){for(let n=t;n<e.length;n++)if(J_(e[n].message))return!0;return!1}function yh(e,t,n,r){if(t?.metadata?.finish_details?.type===\"interrupted\")return Mt.CANCELED;if(n?.content.content_type===Ae.SystemError)return Mt.FAILED;if(e&&!n)return r?Mt.STREAMING:Mt.WAITING;const a=n?.metadata?.canvas;return a!=null&&a.is_failure!==!0?Mt.COMPLETE:Mt.FAILED}function bh(e){return e?.version??e?.version_int}function xN(e){var t=e==null?0:e.length;return t?e[t-1]:void 0}var wN=xN;const Wi=ue(wN);function mu(e,t){return t!=null||e!=null?{modelSelectionPositionRange:t,modelCursorPosition:e}:void 0}function $N(e,t,n){const r=[],o=t.start-t.end+n;for(const a of e){const s=SN(a.at,t,o);s&&r.push(s===a.at?a:{...a,at:s})}return r}function SN(e,t,n){return t.start>=e.end?e:t.start<=e.start&&t.end>=e.end?null:t.end<=e.start?n===0?e:{start:e.start+n,end:e.end+n}:t.start<=e.start?{start:t.end+n,end:e.end+n}:t.end>=e.end?{start:e.start,end:t.start}:{start:e.start,end:e.end+n}}const CN=/[*_-\\s\\d.\\\\`]+$/;function $m(e,t){return t?e.replace(CN,\"\"):e}function kN(){return{isEnabled:!1,fetchError:null,isFetchingFromPersistence:!1,textdocById:{},allTextdocIdSet:{},lastCanvasAssistantMessageById:{}}}function _N(e,t){return bn(e??kN(),t)}function Y1(e,t,n=!0){const r=e.textdocById[t.textdocId];if(r)e.textdocById[t.textdocId]=r,r.metadata.type=t.type,r.metadata.title=t.title,r.metadata.updatedAt=t.createdAt,n?r.versions.push(t):r.versions[r.versions.length-1]=t;else{const o={metadata:{textdocId:t.textdocId,type:t.type,title:t.title,createdAt:t.createdAt,updatedAt:t.createdAt},versions:[t]};e.allTextdocIdSet[t.textdocId]=t.textdocId,e.textdocById[t.textdocId]=o}}function EN(e,t){return _N(e,n=>{for(const r of t)if(r.kind===et.CREATE){const o=PN(r);Y1(n,o)}else{const o=n.textdocById[r.textdocId];if(!o){ie.addError(\"Attempted to apply canmore operation to an unknown target id\",{textdocOp:r});continue}const a=o.versions[o.versions.length-1],s=AN(a,r);Y1(n,s,TN(a,r))}})}function TN(e,t){if(t.author.role===se.User)return e.messageId?!0:t.createdAt-e.createdAt>3600;switch(t.kind){case et.REWRITE:return!0;case et.EDIT:return t.messageId!==e.messageId;case et.ADD_COMMENT:return!1;case et.REMOVE_COMMENT:return!1}}function PN(e){const t=!!e.isPartial,n=$m(e.content,t);return{textdocId:e.textdocId,versionInt:e.versionInt??null,messageId:e.messageId??null,title:e.title,type:e.type,content:n,createdAt:e.createdAt,isPartial:t,isCreation:t,isRewriting:!1,comments:[],modelCursor:mu(e.author.role===se.Assistant&&e.isPartial?n.length:void 0)}}function MN(e,t){if(!e.isPartial)return;if(e.isPartialRange)return mu(void 0,e.at);const n=e.at.start+t.length;return mu(n)}function AN(e,t){switch(t.kind){case et.REMOVE_COMMENT:return{...e,isCreation:!1,isRewriting:!1,versionInt:t.versionInt??e.versionInt,comments:e.comments.map(n=>n.id===t.commentId?{...n,status:t.reason===z_.ACCEPT?xm.ACCEPT_INITIATED:xm.DISMISSED}:n)};case et.REWRITE:{const n=e.isPartial||t.isPartial===!0,r=$m(t.content,n),o=t.author.role===se.Assistant&&t.isPartial?r.length:void 0;return{...e,isCreation:!1,versionInt:t.versionInt??e.versionInt,messageId:t.messageId??null,content:r,createdAt:t.createdAt,isPartial:n,comments:t.comments??e.comments,isRewriting:n,modelCursor:mu(o)}}case et.EDIT:{const n=t.isPartial&&t.isPartialRange?e.content.slice(t.at.start,t.at.end):$m(t.content,t.isPartial===!0),r=e.content.slice(0,t.at.start)+n+e.content.slice(t.at.end);return{...e,isCreation:!1,isRewriting:!1,versionInt:t.versionInt??e.versionInt,messageId:t.messageId??null,content:r,createdAt:t.createdAt,isPartial:!!t.isPartial,comments:$N(e.comments,t.at,n.length),modelCursor:MN(t,n)}}case et.ADD_COMMENT:{const n={id:t.id??t.tempId,tempId:t.tempId,at:t.at,content:t.content??\"\"},r=e.comments.concat(n);return{...e,isCreation:!1,isRewriting:!1,versionInt:t.versionInt??e.versionInt,messageId:t.messageId??null,createdAt:t.createdAt,isPartial:e.isPartial||!!t.isPartial,comments:r}}}}function ON(e){return function(){return e}}var eE=ON;function IN(e){return function(t,n,r){for(var o=-1,a=Object(t),s=r(t),i=s.length;i--;){var l=s[e?i:++o];if(n(a[l],l,a)===!1)break}return t}}var RN=IN,NN=RN,DN=NN(),LN=DN,jN=LN,FN=qk;function BN(e,t){return e&&jN(e,t,FN)}var V0=BN,UN=V0;function VN(e,t,n,r){return UN(e,function(o,a,s){t(r,n(o),a,s)}),r}var WN=VN,HN=WN;function zN(e,t){return function(n,r){return HN(n,e,t(r),{})}}var GN=zN,qN=eE,YN=GN,XN=Ri,QN=Object.prototype,ZN=QN.toString,KN=YN(function(e,t,n){t!=null&&typeof t.toString!=\"function\"&&(t=ZN.call(t)),e[t]=n},qN(XN)),JN=KN;const e7=ue(JN);function t7(e,t,n){if(!e||n==null)return null;const r=t?.[n]??n;let o=e.textdocById[r]??e.textdocById[n]??null;if(!o&&t){const a=e7(t);o=e.textdocById[a[r]]??null}return o}const n7=5;function yKe(e,t,n,r){let o=null;for(let a=0;a<r.length;a++){const{message:s}=r[a];if(J_(s)){const i=a+1<r.length&&r[a+1].message.author.name===s.recipient?r[a+1].message:null;i&&a++;const l=yN(e,s,i),c=l&&r7(t,n,l);c&&(o?o.push.apply(o,c):o=c,bN(r,a+1)&&(t=EN(t,o)))}}return o}function r7(e,t,n){if(n.status===Mt.FAILED||n.status===Mt.CANCELED)return null;if(n.function===ln.CreateTextdoc){if(!n.type)return null;const s=H9(n),i=n.content&&bm(n.type)?U1(n.content):n.content;return[{kind:et.CREATE,textdocId:n.textdocId??s,versionInt:n.versionInt,messageId:n.messageId,author:n.author,createdAt:n.createdAt,tempTextdocId:s,title:n.title??\"\",type:n.type,content:i??\"\",isPartial:n.status===Mt.STREAMING}]}const r=t?.latestTextdocId,o=n?.textdocId??r;if(o)r&&n?.textdocId&&n.textdocId!==r&&ie.addError(\"Attempted to parse canmore operation with incorrect client latest target id\",{latestTextdocId:r,toolCall:n});else return ie.addError(\"Attempted to parse canmore operation without target id\",{toolCall:n}),null;const a=Wi(t7(e,t?.resolveTempTextdocId??null,o)?.versions);if(!a)return ie.addError(\"Attempted to parse canmore operation against unknown target id\",{textdocId:o}),null;switch(n.function){case ln.UpdateTextdoc:{const s=[],i=n.updates??[];for(let l=0;l<i.length;l++){const c=i[l];if(c.isPartialPattern&&c.pattern&&c.pattern.length<n7)continue;if(c.pattern===\".*\"){const h=c.replacement?bm(a.type)?U1(c.replacement):c.replacement:\"\";return[{kind:et.REWRITE,textdocId:o,versionInt:n.versionInt,messageId:n.messageId,createdAt:n.createdAt,author:n.author,content:h,isPartial:n.status===Mt.STREAMING&&c.isPartial,comments:[]}]}const u=Q1(c.pattern,c.isPartialPattern,c.multiple);if(!u)continue;let f=!1;for(const h of X1(a.content,u,c.multiple)){f=!0;const p=Z1(h),g=c.replacement&&V9(c.replacement,h);for(const v of s)if(v.at.end<=p.start){if(!v.isPartialRange){const y=v.at.start-v.at.end+v.content.length;p.start+=y,p.end+=y}}else v.at.start<p.end;s.push({kind:et.EDIT,textdocId:o,versionInt:n.versionInt,messageId:n.messageId,author:n.author,createdAt:n.createdAt,at:p,content:g??\"\",isPartialRange:n.status===Mt.STREAMING&&c.isPartialPattern,isPartial:n.status===Mt.STREAMING&&c.isPartial})}if(!c.isPartialPattern&&!f)return null}return s.length>0?s:null}case ln.CommentTextdoc:{const s=[],i=n.comments??[];for(let l=0;l<i.length;l++){const c=i[l],u=Q1(c.pattern,c.isPartialPattern);if(!u)continue;let f=!1;for(const h of X1(a.content,u)){f=!0;const p=Z1(h);p.end>p.start&&s.push({kind:et.ADD_COMMENT,textdocId:o,versionInt:n.versionInt,messageId:n.messageId,author:n.author,createdAt:n.createdAt,id:c.id,tempId:`${n.messageId}.${l}`,at:p,content:c.comment??\"\",isPartialRange:n.status===Mt.STREAMING&&c.isPartialPattern,isPartial:n.status===Mt.STREAMING&&c.isPartial})}if(!c.isPartialPattern&&!f)return null}return s.length>0?s:null}}}function*X1(e,t,n=!1){if(n)yield*e.matchAll(t);else{const r=e.match(t);r&&(yield r)}}function Q1(e,t,n=!1){if(e)try{const r=W9(e,t);return new RegExp(r,n?\"gsv\":\"sv\")}catch(r){console.warn(\"Assistant returned invalid Regexp, dropping\",{pattern:e,error:r})}}function Z1(e){return{start:e.index,end:e.index+e[0].length}}var K1=Number.isNaN||function(t){return typeof t==\"number\"&&t!==t};function o7(e,t){return!!(e===t||K1(e)&&K1(t))}function a7(e,t){if(e.length!==t.length)return!1;for(var n=0;n<e.length;n++)if(!o7(e[n],t[n]))return!1;return!0}function tE(e,t){t===void 0&&(t=a7);var n=null;function r(){for(var o=[],a=0;a<arguments.length;a++)o[a]=arguments[a];if(n&&n.lastThis===this&&t(o,n.lastArgs))return n.lastResult;var s=e.apply(this,o);return n={lastResult:s,lastArgs:o,lastThis:this},s}return r.clear=function(){n=null},r}const W0=()=>({lastFlushedAt:null,lastTriggeredAt:null}),H0=qe(na(()=>({userEdits:{},timestamps:{}}))),{setState:nf}=H0,bKe=e=>H0(({timestamps:t})=>(t[e]?.lastTriggeredAt??0)>(t[e]?.lastFlushedAt??0)),xKe=e=>{nf(t=>{t.timestamps[e]??=W0(),t.timestamps[e].lastTriggeredAt=Date.now()})},wKe=({textdocId:e,basedOnVersionInt:t,content:n,comments:r})=>{nf(o=>{o.timestamps[e]??=W0(),o.timestamps[e].lastFlushedAt=Date.now(),o.userEdits[e]??=[],o.userEdits[e].push({content:n,basedOnVersionInt:t,nextVersionInt:null,isPending:!0,comments:r})})},$Ke=({textdocId:e,basedOnVersionInt:t,newVersion:n})=>{nf(r=>{r.userEdits[e]??=[];for(const o of r.userEdits[e])if(o.basedOnVersionInt===t){o.isPending=!1,o.nextVersionInt=n;break}})},SKe=e=>{nf(t=>{for(const{textdocId:n,versionInt:r}of e){const o=t.userEdits[n];o&&(t.userEdits[n]=o.filter(a=>a.basedOnVersionInt>(r??mi)),o.length===0&&(t.timestamps[n]=W0()))}})},s7=tE(({userEdits:e})=>e),i7=tE(e=>{const t=new Map;for(const[n,r]of Object.entries(e)){const o=Wi(r);if(!o)continue;const{content:a,comments:s,nextVersionInt:i,basedOnVersionInt:l}=o;t.set(n,{textdocId:n,comments:s,content:a,versionInt:i??l})}return t}),CKe=()=>H0(e=>i7(s7(e))),nE=qe(()=>({optimisticRestore:null})),{setState:uc,getState:l7}=nE;function kKe(e){uc(t=>{if(t.optimisticRestore){for(const{textdocId:n,versionInt:r}of e)if(t.optimisticRestore.textdocId===n&&t.optimisticRestore.versionInt!==-1&&(t.optimisticRestore.versionInt??mi)<=(r??mi))return{optimisticRestore:null}}return t})}function c7(){return nE(e=>e.optimisticRestore)}function _Ke(e,t,n){const r=Kt(),{mutateAsync:o}=Jt({mutationKey:[\"canvas\",\"textdoc\",\"persist\"],mutationFn:u7,retry:2,onSuccess:()=>{e&&r.invalidateQueries({queryKey:[e,\"textdocs\"]})}}),a=c7(),s=m.useCallback(async()=>{if(!t||!n||t.versionInt==null||n.versionInt==null||l7().optimisticRestore!=null)return;const{textdocId:i,versionInt:l}=t,c=n.versionInt,u={...n,versionInt:-1};uc(()=>({optimisticRestore:u})),W_(i);try{const f=await o({textdocId:i,versionInt:l,restoreFromVersionInt:c});uc(h=>({optimisticRestore:h.optimisticRestore&&{...h.optimisticRestore,versionInt:f}}))}catch{uc(()=>({optimisticRestore:null})),N9(i,{version:c})}},[t,n,o]);return{optimisticRestoredTextdocVersion:a,restoreHistoricalTextdocVersion:s}}async function u7({textdocId:e,versionInt:t,restoreFromVersionInt:n}){return(await Q.safePost(\"/textdoc/{textdoc_id}/restore\",{parameters:{path:{textdoc_id:e}},requestBody:{version:t,restore_from_version:n}})).version}const d7=async({lastVersion:e,textdocId:t,commentId:n,reason:r})=>(await Q.safeDelete(\"/textdoc/{textdoc_id}/{version}/comment/{comment_id}\",{parameters:{query:{reason:r},path:{textdoc_id:t,version:String(e),comment_id:n}}})).version,Sm=qe(()=>({persistingOp:null,ops:[]})),{setState:dc,getState:f7}=Sm,EKe=()=>{const e=Sm(({ops:n})=>n),t=Sm(({persistingOp:n})=>n);return m.useMemo(()=>[...e,t].filter(T9),[e,t])},TKe=e=>{dc(t=>{let n=t.ops;for(const{textdocId:r,versionInt:o}of e)n=n.filter(a=>a.textdocId!==r||(a.versionInt??mi)>(o??mi));return{ops:n}})},PKe=e=>m.useCallback(async(t,n)=>{const r=!!f7().persistingOp,o=e?.versionInt,a=e?.textdocId;if(r||o==null||a==null)return!1;const s={kind:et.REMOVE_COMMENT,textdocId:a,author:{role:se.User},versionInt:o,createdAt:Date.now()/1e3,commentId:t,reason:n};dc(({ops:i})=>({ops:i,isPersisting:!0,persistingOp:s}));try{const i=await d7({lastVersion:o,textdocId:a,commentId:t,reason:n});return dc(({ops:l})=>({ops:[...l,{...s,versionInt:i}],isPersisting:!1,persistingOp:null})),i}catch{return dc(({ops:i})=>({ops:i,isPersisting:!1,persistingOp:null})),!1}},[e]);function MKe(e){return at({queryKey:[\"system-hints\"],queryFn:async()=>(await re.getSystemHints()).system_hints.map(({name:n,description:r,logo:o,system_hint:a,required_features:s=[],required_models:i=[]})=>({name:n,description:r,logo:o,systemHint:a,requiredFeatures:s,requiredModels:i})),select:e,staleTime:1/0})}function h7({id:e,label:t,checked:n,onChange:r,disabled:o,className:a,labelClassName:s,readOnly:i,labelSide:l=\"right\"}){const c=t&&d.jsx(\"label\",{className:U(\"form-check-label text-token-text-primary\",s),htmlFor:e,children:t});return d.jsxs(\"div\",{className:\"form-check flex items-center gap-2\",children:[l===\"left\"&&c,d.jsx(\"input\",{className:U(\"form-check-input float-left h-4 w-4 appearance-none rounded-sm border border-gray-300 bg-white bg-contain bg-center bg-no-repeat align-top transition duration-200 checked:border-blue-600 checked:bg-blue-600 focus:outline-none\",o?\"cursor-not-allowed\":\"cursor-pointer\",a),type:\"checkbox\",disabled:o,onChange:r,checked:n,readOnly:i,id:e}),l===\"right\"&&c]})}const p7=\"https://help.openai.com/en/articles/8096356-custom-instructions-for-chatgpt\",AKe=\"https://help.openai.com/en/articles/7967234-enabling-multi-factor-authentication-mfa-with-openai#h_488a963a1e\",rE=\"Popover\",[oE,OKe]=Ir(rE,[Yk]),Hi=Yk(),[m7,uo]=oE(rE),g7=e=>{const{__scopePopover:t,children:n,open:r,defaultOpen:o,onOpenChange:a,modal:s=!1}=e,i=Hi(t),l=m.useRef(null),[c,u]=m.useState(!1),[f=!1,h]=ss({prop:r,defaultProp:o,onChange:a});return m.createElement(lR,i,m.createElement(m7,{scope:t,contentId:E0(),triggerRef:l,open:f,onOpenChange:h,onOpenToggle:m.useCallback(()=>h(p=>!p),[h]),hasCustomAnchor:c,onCustomAnchorAdd:m.useCallback(()=>u(!0),[]),onCustomAnchorRemove:m.useCallback(()=>u(!1),[]),modal:s},n))},v7=\"PopoverAnchor\",y7=m.forwardRef((e,t)=>{const{__scopePopover:n,...r}=e,o=uo(v7,n),a=Hi(n),{onCustomAnchorAdd:s,onCustomAnchorRemove:i}=o;return m.useEffect(()=>(s(),()=>i()),[s,i]),m.createElement(Xk,fe({},a,r,{ref:t}))}),b7=\"PopoverTrigger\",x7=m.forwardRef((e,t)=>{const{__scopePopover:n,...r}=e,o=uo(b7,n),a=Hi(n),s=$n(t,o.triggerRef),i=m.createElement(vt.button,fe({type:\"button\",\"aria-haspopup\":\"dialog\",\"aria-expanded\":o.open,\"aria-controls\":o.contentId,\"data-state\":iE(o.open)},r,{ref:s,onClick:Ie(e.onClick,o.onOpenToggle)}));return o.hasCustomAnchor?i:m.createElement(Xk,fe({asChild:!0},a),i)}),aE=\"PopoverPortal\",[w7,$7]=oE(aE,{forceMount:void 0}),S7=e=>{const{__scopePopover:t,forceMount:n,children:r,container:o}=e,a=uo(aE,t);return m.createElement(w7,{scope:t,forceMount:n},m.createElement(Ni,{present:n||a.open},m.createElement(Qk,{asChild:!0,container:o},r)))},gi=\"PopoverContent\",C7=m.forwardRef((e,t)=>{const n=$7(gi,e.__scopePopover),{forceMount:r=n.forceMount,...o}=e,a=uo(gi,e.__scopePopover);return m.createElement(Ni,{present:r||a.open},a.modal?m.createElement(k7,fe({},o,{ref:t})):m.createElement(_7,fe({},o,{ref:t})))}),k7=m.forwardRef((e,t)=>{const n=uo(gi,e.__scopePopover),r=m.useRef(null),o=$n(t,r),a=m.useRef(!1);return m.useEffect(()=>{const s=r.current;if(s)return cR(s)},[]),m.createElement(uR,{as:gm,allowPinchZoom:!0},m.createElement(sE,fe({},e,{ref:o,trapFocus:n.open,disableOutsidePointerEvents:!0,onCloseAutoFocus:Ie(e.onCloseAutoFocus,s=>{var i;s.preventDefault(),a.current||(i=n.triggerRef.current)===null||i===void 0||i.focus()}),onPointerDownOutside:Ie(e.onPointerDownOutside,s=>{const i=s.detail.originalEvent,l=i.button===0&&i.ctrlKey===!0,c=i.button===2||l;a.current=c},{checkForDefaultPrevented:!1}),onFocusOutside:Ie(e.onFocusOutside,s=>s.preventDefault(),{checkForDefaultPrevented:!1})})))}),_7=m.forwardRef((e,t)=>{const n=uo(gi,e.__scopePopover),r=m.useRef(!1),o=m.useRef(!1);return m.createElement(sE,fe({},e,{ref:t,trapFocus:!1,disableOutsidePointerEvents:!1,onCloseAutoFocus:a=>{var s;if((s=e.onCloseAutoFocus)===null||s===void 0||s.call(e,a),!a.defaultPrevented){var i;r.current||(i=n.triggerRef.current)===null||i===void 0||i.focus(),a.preventDefault()}r.current=!1,o.current=!1},onInteractOutside:a=>{var s,i;(s=e.onInteractOutside)===null||s===void 0||s.call(e,a),a.defaultPrevented||(r.current=!0,a.detail.originalEvent.type===\"pointerdown\"&&(o.current=!0));const l=a.target;((i=n.triggerRef.current)===null||i===void 0?void 0:i.contains(l))&&a.preventDefault(),a.detail.originalEvent.type===\"focusin\"&&o.current&&a.preventDefault()}}))}),sE=m.forwardRef((e,t)=>{const{__scopePopover:n,trapFocus:r,onOpenAutoFocus:o,onCloseAutoFocus:a,disableOutsidePointerEvents:s,onEscapeKeyDown:i,onPointerDownOutside:l,onFocusOutside:c,onInteract\nThe file is too long and its contents have been truncated.\n", "title": "kovfiydeinrm6blw.js", "tether_id": null}, "status": "finished_successfully", "end_turn": null, "weight": 1.0, "metadata": {"command": "context_stuff", "is_visually_hidden_from_conversation": false, "message_type": "variant", "model_slug": "gpt-4o-canmore", "requested_model_slug": "gpt-4o-canmore", "default_model_slug": "gpt-4o", "parent_id": "8d4077af-e81b-4c43-8e1a-00af5f6095f0", "model_switcher_deny": [{"slug": "o1-preview", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-preview", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}]}, "recipient": "all", "channel": null}, "conversation_id": "670f2a64-5f30-8005-b7bd-f2e05d76260d", "error": null}, "c": 2}    
+data: {"v": "\uff0c\u6211"}   
 
 event: delta
-data: {"v": {"message": {"id": "59c72e03-6ea0-46f3-9806-e0c77980897e", "author": {"role": "tool", "name": "myfiles_browser", "metadata": {}}, "create_time": null, "update_time": null, "content": {"content_type": "text", "parts": ["\nPlease remember to search the user's documents if an answer to their question is not contained in the above snippets.\n"]}, "status": "finished_successfully", "end_turn": null, "weight": 1.0, "metadata": {"is_visually_hidden_from_conversation": false, "command": "prompt", "message_type": "variant", "model_slug": "gpt-4o-canmore", "requested_model_slug": "gpt-4o-canmore", "default_model_slug": "gpt-4o", "parent_id": "e80b6c9a-f6ed-4bb7-a39b-13f911a19741", "model_switcher_deny": [{"slug": "o1-preview", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-preview", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}]}, "recipient": "all", "channel": null}, "conversation_id": "670f2a64-5f30-8005-b7bd-f2e05d76260d", "error": null}, "c": 3}  
+data: {"v": "\u660e"} 
 
 event: delta
-data: {"v": {"message": {"id": "fe66b8f4-77dd-4398-9693-5eaa9c9d5585", "author": {"role": "assistant", "name": null, "metadata": {}}, "create_time": 1729054210.29571, "update_time": null, "content": {"content_type": "text", "parts": [""]}, "status": "in_progress", "end_turn": null, "weight": 1.0, "metadata": {"citations": [], "content_references": [], "gizmo_id": null, "message_type": "variant", "model_slug": "gpt-4o-canmore", "requested_model_slug": "gpt-4o-canmore", "default_model_slug": "gpt-4o", "parent_id": "59c72e03-6ea0-46f3-9806-e0c77980897e", "model_switcher_deny": [{"slug": "o1-preview", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-preview", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "regenerate", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}, {"slug": "o1-mini", "context": "conversation", "reason": "unsupported_attachment", "description": "\u6b64\u6a21\u578b\u4e0d\u652f\u6301\u6587\u4ef6\u9644\u5f55\u3002"}]}, "recipient": "all", "channel": null}, "conversation_id": "670f2a64-5f30-8005-b7bd-f2e05d76260d", "error": null}, "c": 4}
+data: {"v": "\u767d"} 
 
 event: delta
-data: {"p": "/message/content/parts/0", "o": "append", "v": "\u770b\u6765"}   
+data: {"v": "\u4f60\u7684"}   
 
 event: delta
-data: {"v": "\u60a8"} 
-
-event: delta
-data: {"v": "\u4e0a\u4f20"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": "\u4e00\u4e2a"}   
-
-event: delta
-data: {"v": "\u5305\u542b"}   
-
-event: delta
-data: {"v": "\u5927\u91cf"}   
-
-event: delta
-data: {"v": "\u4ee3\u7801"}   
-
-event: delta
-data: {"v": "\u7247"} 
-
-event: delta
-data: {"v": "\u6bb5"} 
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "JS"}     
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u6d89\u53ca"}   
-
-event: delta
-data: {"v": "\u5230"} 
-
-event: delta
-data: {"v": "\u8bb8"} 
-
-event: delta
-data: {"v": "\u591a"} 
-
-event: delta
-data: {"v": "\u4f9d"} 
-
-event: delta
-data: {"v": "\u8d56"} 
-
-event: delta
-data: {"v": "\u548c"} 
-
-event: delta
-data: {"v": "\u590d\u6742"}   
-
-event: delta
-data: {"v": "\u7ed3\u6784"}   
-
-event: delta
-data: {"v": "\u3002\u8fd9"}   
-
-event: delta
-data: {"v": "\u6bb5"} 
-
-event: delta
-data: {"v": "\u4ee3\u7801"}   
-
-event: delta
-data: {"v": "\u5305\u542b"}   
-
-event: delta
-data: {"v": "\u4e86"} 
-
-event: delta
-data: {"v": "\u8bb8"} 
-
-event: delta
-data: {"v": "\u591a"} 
-
-event: delta
-data: {"v": "\u8d44\u4ea7"}   
-
-event: delta
-data: {"v": "\u5bfc"} 
-
-event: delta
-data: {"v": "\u5165"} 
-
-event: delta
-data: {"v": "\u548c"} 
-
-event: delta
-data: {"v": "\u4f9d"} 
-
-event: delta
-data: {"v": "\u8d56"} 
-
-event: delta
-data: {"v": "\u5173\u7cfb"}   
-
-event: delta
-data: {"v": "\uff0c\u770b"}   
-
-event: delta
-data: {"v": "\u8d77\u6765"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": "\u7ecf\u8fc7"}   
-
-event: delta
-data: {"v": "\u7f16"} 
-
-event: delta
-data: {"v": "\u8bd1"} 
-
-event: delta
-data: {"v": "\u6216\u8005"}   
-
-event: delta
-data: {"v": "\u6346"} 
-
-event: delta
-data: {"v": "\u7ed1"} 
-
-event: delta
-data: {"v": "\u540e\u7684"}   
-
-event: delta
-data: {"v": "\u4ee3\u7801"}   
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u6216\u8005"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": "\u67d0"} 
-
-event: delta
-data: {"v": "\u4e2a"} 
-
-event: delta
-data: {"v": "\u7279"} 
-
-event: delta
-data: {"v": "\u5b9a"} 
-
-event: delta
-data: {"v": "\u6846"} 
-
-event: delta
-data: {"v": "\u67b6"} 
-
-event: delta
-data: {"v": "\u6216\u8005"}   
-
-event: delta
-data: {"v": "\u5e93"} 
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u8f93\u51fa"}   
-
-event: delta
-data: {"v": "\u3002\n\n"}     
-
-event: delta
-data: {"v": "\u6839\u636e"}   
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u4e2d\u7684"}   
-
-event: delta
-data: {"v": "\u5185\u5bb9"}   
-
-event: delta
-data: {"v": "\uff0c\u8fd9"}   
-
-event: delta
-data: {"v": "\u4e9b"} 
-
-event: delta
-data: {"v": "\u8d44\u4ea7"}   
-
-event: delta
-data: {"v": "\uff08"} 
-
-event: delta
-data: {"v": "\u4f8b\u5982"}   
-
-event: delta
-data: {"v": " `."}    
-
-event: delta
-data: {"v": "js"}     
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": " \u548c"}
-
-event: delta
-data: {"v": " `."}    
-
-event: delta
-data: {"v": "css"}    
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": "\uff09"} 
-
-event: delta
-data: {"v": "\u53ef\u80fd"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": "\u901a\u8fc7"}   
-
-event: delta
-data: {"v": "\u67d0"} 
-
-event: delta
-data: {"v": "\u79cd"} 
-
-event: delta
-data: {"v": "\u6346"} 
-
-event: delta
-data: {"v": "\u7ed1"} 
-
-event: delta
-data: {"v": "\u5de5\u5177"}   
-
-event: delta
-data: {"v": "\uff08"} 
-
-event: delta
-data: {"v": "\u6bd4\u5982"}   
-
-event: delta
-data: {"v": " V"}     
-
-event: delta
-data: {"v": "ite"}    
-
-event: delta
-data: {"v": "\uff09"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\uff0c\u5e76"}   
-
-event: delta
-data: {"v": "\u4e14"} 
-
-event: delta
-data: {"v": "\u4f9d"} 
-
-event: delta
-data: {"v": "\u8d56"} 
-
-event: delta
-data: {"v": "\u4e8e"} 
-
-event: delta
-data: {"v": "\u591a\u4e2a"}   
-
-event: delta
-data: {"v": "\u4e0d\u540c"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
+data: {"v": "\u8981\u6c42"}   
 
 event: delta
 data: {"v": "\u3002"} 
 
 event: delta
-data: {"v": "\u6587\u4ef6"}   
+data: {"v": "\u4e3a\u4e86"}   
 
 event: delta
-data: {"v": "\u4e2d"} 
+data: {"v": "\u83b7\u53d6"}   
 
 event: delta
-data: {"v": "\u7528"} 
-
-event: delta
-data: {"v": "\u5230\u4e86"}   
-
-event: delta
-data: {"v": "\u50cf"} 
-
-event: delta
-data: {"v": " `"}     
-
-event: delta
-data: {"v": "import"} 
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": "\u3001"} 
-
-event: delta
-data: {"v": "\u4f9d"} 
-
-event: delta
-data: {"v": "\u8d56"} 
-
-event: delta
-data: {"v": "\u9879"} 
-
-event: delta
-data: {"v": "\u52a8\u6001"}   
-
-event: delta
-data: {"v": "\u6620"} 
-
-event: delta
-data: {"v": "\u5c04"} 
-
-event: delta
-data: {"v": "\u548c"} 
-
-event: delta
-data: {"v": "\u5bfc"} 
-
-event: delta
-data: {"v": "\u5165"} 
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u65b9\u5f0f"}   
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u901a\u5e38"}   
-
-event: delta
-data: {"v": "\u89c1"} 
-
-event: delta
-data: {"v": "\u4e8e"} 
-
-event: delta
-data: {"v": "\u73b0\u4ee3"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "Java"}   
-
-event: delta
-data: {"v": "Script"} 
-
-event: delta
-data: {"v": "\u5f00\u53d1"}   
+data: {"v": "\u4f60\u7684"}   
 
 event: delta
 data: {"v": "\u73af\u5883"}   
 
 event: delta
-data: {"v": "\u4e2d"} 
+data: {"v": "\u4fe1\u606f"}   
 
 event: delta
-data: {"v": "\uff0c\u6bd4\u5982"}     
+data: {"v": "\uff0c\u6211"}   
 
 event: delta
-data: {"v": " React"} 
+data: {"v": "\u4f1a"} 
 
 event: delta
-data: {"v": " \u6216"}
+data: {"v": "\u7f16"} 
 
 event: delta
-data: {"v": "\u8005"} 
+data: {"v": "\u5199"} 
 
 event: delta
-data: {"v": " Vue"}   
-
-event: delta
-data: {"v": " \u7684"}
-
-event: delta
-data: {"v": "\u9879\u76ee"}   
-
-event: delta
-data: {"v": "\u4e2d"} 
-
-event: delta
-data: {"v": "\u4f7f\u7528"}   
-
-event: delta
-data: {"v": " V"}     
-
-event: delta
-data: {"v": "ite"}    
-
-event: delta
-data: {"v": " "}      
-
-event: delta
-data: {"v": "\u8fdb\u884c"}   
-
-event: delta
-data: {"v": "\u6784"} 
-
-event: delta
-data: {"v": "\u5efa"} 
-
-event: delta
-data: {"v": "\u3002\n\n"}     
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u90e8\u5206"}   
-
-event: delta
-data: {"v": "\u6838\u5fc3"}   
-
-event: delta
-data: {"v": "\u51fd\u6570"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": " `"}     
-
-event: delta
-data: {"v": "__"}     
-
-event: delta
-data: {"v": "vite"}   
-
-event: delta
-data: {"v": "__"}     
-
-event: delta
-data: {"v": "map"}    
-
-event: delta
-data: {"v": "Deps"}   
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u8fd9\u4e2a"}   
-
-event: delta
-data: {"v": "\u51fd\u6570"}   
-
-event: delta
-data: {"v": "\u88ab"} 
-
-event: delta
-data: {"v": "\u7528"} 
-
-event: delta
-data: {"v": "\u6765"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": "\u8d44\u6e90"}   
-
-event: delta
-data: {"v": "\u6620"} 
-
-event: delta
-data: {"v": "\u5c04"} 
-
-event: delta
-data: {"v": "\u548c"} 
-
-event: delta
-data: {"v": "\u5bfc"} 
-
-event: delta
-data: {"v": "\u5165"} 
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
-
-event: delta
-data: {"v": "\u5217\u8868"}   
-
-event: delta
-data: {"v": "\u3002\u4ece"}   
-
-event: delta
-data: {"v": "\u8fd9\u4e2a"}   
-
-event: delta
-data: {"v": "\u7ed3\u6784"}   
-
-event: delta
-data: {"v": "\u6765\u770b"}   
-
-event: delta
-data: {"v": "\uff0c\u8fd9"}   
-
-event: delta
-data: {"v": "\u4e2a"} 
-
-event: delta
-data: {"v": "JS"}     
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u6709"} 
-
-event: delta
-data: {"v": "\u5f88"} 
-
-event: delta
-data: {"v": "\u5927\u7684"}   
-
-event: delta
-data: {"v": "\u53ef\u80fd"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": "\u67d0"} 
-
-event: delta
-data: {"v": "\u4e2a"} 
-
-event: delta
-data: {"v": "\u590d\u6742"}   
-
-event: delta
-data: {"v": "\u5e94\u7528"}   
-
-event: delta
-data: {"v": "\u7684\u4e00"}   
-
-event: delta
-data: {"v": "\u90e8\u5206"}   
-
-event: delta
-data: {"v": "\uff0c\u662f"}   
-
-event: delta
-data: {"v": "\u4e00\u4e2a"}   
-
-event: delta
-data: {"v": "\u5305\u542b"}   
-
-event: delta
-data: {"v": "\u4e86"} 
-
-event: delta
-data: {"v": "\u591a\u4e2a"}   
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u5165\u53e3"}   
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u3002\n\n"}     
-
-event: delta
-data: {"v": "###"}    
-
-event: delta
-data: {"v": " \u5982\u4f55"}  
-
-event: delta
-data: {"v": "\u7528"} 
-
-event: delta
-data: {"v": "\u8fd9\u4e2a"}   
-
-event: delta
-data: {"v": " JS"}    
-
-event: delta
-data: {"v": " \u6587\u4ef6"}  
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": " Event"} 
-
-event: delta
-data: {"v": "Stream"} 
-
-event: delta
-data: {"v": "\n"}     
-
-event: delta
-data: {"v": "\u5982\u679c"}   
-
-event: delta
-data: {"v": "\u60a8"} 
-
-event: delta
-data: {"v": "\u5e0c\u671b"}   
-
-event: delta
-data: {"v": "\u4f7f\u7528"}   
-
-event: delta
-data: {"v": "\u8fd9\u4e2a"}   
-
-event: delta
-data: {"v": " JS"}    
-
-event: delta
-data: {"v": " \u6587\u4ef6"}  
-
-event: delta
-data: {"v": "\u6765"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": " Event"} 
-
-event: delta
-data: {"v": "Stream"} 
-
-event: delta
-data: {"v": "\uff0c\u90a3\u4e48"}     
-
-event: delta
-data: {"v": "\u53ef\u80fd"}   
-
-event: delta
-data: {"v": "\u9700\u8981"}   
-
-event: delta
-data: {"v": "\uff1a\n"}       
-
-event: delta
-data: {"v": "1"}      
-
-event: delta
-data: {"v": "."}      
-
-event: delta
-data: {"v": " **"}    
-
-event: delta
-data: {"v": "\u7406\u89e3"}   
+data: {"v": "\u4ee5\u4e0b"}   
 
 event: delta
 data: {"v": "\u4ee3\u7801"}   
 
 event: delta
-data: {"v": "\u7684"} 
+data: {"v": "\u6765"} 
 
 event: delta
-data: {"v": "\u7ed3\u6784"}   
+data: {"v": "\u68c0\u67e5"}   
 
 event: delta
-data: {"v": "\u548c"} 
+data: {"v": "\u4f60\u7684"}   
 
 event: delta
-data: {"v": "\u4f9d"} 
+data: {"v": "\u64cd\u4f5c"}   
 
 event: delta
-data: {"v": "\u8d56"} 
+data: {"v": "\u7cfb\u7edf"}   
 
 event: delta
-data: {"v": "\uff1a"} 
+data: {"v": "\u3001"} 
 
 event: delta
-data: {"v": "**"}     
+data: {"v": "Python"} 
 
 event: delta
-data: {"v": " \u9996"}
+data: {"v": "\u7248\u672c"}   
 
 event: delta
-data: {"v": "\u5148"} 
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u60a8"} 
-
-event: delta
-data: {"v": "\u9700\u8981"}   
-
-event: delta
-data: {"v": "\u7406\u89e3"}   
-
-event: delta
-data: {"v": "\u6bcf"} 
-
-event: delta
-data: {"v": "\u4e00\u4e2a"}   
-
-event: delta
-data: {"v": " `"}     
-
-event: delta
-data: {"v": "import"} 
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": " \u5bfc"}
-
-event: delta
-data: {"v": "\u5165"} 
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u4f5c\u7528"}   
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u5c24\u5176"}   
-
-event: delta
-data: {"v": "\u662f"} 
-
-event: delta
-data: {"v": "\u54ea\u4e9b"}   
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
-
-event: delta
-data: {"v": "\u53ef\u80fd"}   
-
-event: delta
-data: {"v": "\u63d0\u4f9b"}   
-
-event: delta
-data: {"v": "\u4e86"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": " Event"} 
-
-event: delta
-data: {"v": "Stream"} 
-
-event: delta
-data: {"v": " \u7684"}
-
-event: delta
-data: {"v": "\u903b"} 
-
-event: delta
-data: {"v": "\u8f91"} 
-
-event: delta
-data: {"v": "\u3002\n"}       
-
-event: delta
-data: {"v": "2"}      
-
-event: delta
-data: {"v": "."}      
-
-event: delta
-data: {"v": " **"}    
-
-event: delta
-data: {"v": "\u5bfb\u627e"}   
-
-event: delta
-data: {"v": "\u5bf9\u5e94"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
-
-event: delta
-data: {"v": "\uff1a"} 
-
-event: delta
-data: {"v": "**"}     
-
-event: delta
-data: {"v": " \u770b"}
-
-event: delta
-data: {"v": "\u8d77\u6765"}   
-
-event: delta
-data: {"v": "\u8fd9\u4e9b"}   
-
-event: delta
-data: {"v": "\u8d44\u4ea7"}   
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u4e2d"} 
-
-event: delta
-data: {"v": "\u5b58\u5728"}   
-
-event: delta
-data: {"v": "\u4e00\u4e2a"}   
-
-event: delta
-data: {"v": " `"}     
-
-event: delta
-data: {"v": "fs"}     
-
-event: delta
-data: {"v": "ld"}     
-
-event: delta
-data: {"v": "ft"}     
-
-event: delta
-data: {"v": "ql"}     
-
-event: delta
-data: {"v": "3"}      
-
-event: delta
-data: {"v": "hg"}     
-
-event: delta
-data: {"v": "x"}      
-
-event: delta
-data: {"v": "sg"}     
-
-event: delta
-data: {"v": "gg"}     
-
-event: delta
-data: {"v": ".js"}    
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": " \u6587\u4ef6"}  
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u53ef\u80fd"}   
-
-event: delta
-data: {"v": "\u5305\u542b"}   
-
-event: delta
-data: {"v": "\u4e86"} 
-
-event: delta
-data: {"v": "\u4e0e"} 
-
-event: delta
-data: {"v": " Event"} 
-
-event: delta
-data: {"v": "Stream"} 
-
-event: delta
-data: {"v": " "}      
-
-event: delta
-data: {"v": "\u76f8\u5173"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u903b"} 
-
-event: delta
-data: {"v": "\u8f91"} 
-
-event: delta
-data: {"v": "\u3002"} 
-
-event: delta
-data: {"v": "\u5efa\u8bae"}   
-
-event: delta
-data: {"v": "\u60a8"} 
-
-event: delta
-data: {"v": "\u8fdb\u4e00\u6b65"}     
-
-event: delta
-data: {"v": "\u6df1\u5165"}   
-
-event: delta
-data: {"v": "\u67e5\u770b"}   
-
-event: delta
-data: {"v": "\u8fd9\u4e2a"}   
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u770b\u770b"}   
-
-event: delta
-data: {"v": "\u5176\u4e2d"}   
+data: {"v": "\u4ee5\u53ca"}   
 
 event: delta
 data: {"v": "\u662f\u5426"}   
 
 event: delta
-data: {"v": "\u6709"} 
+data: {"v": "\u652f\u6301"}   
 
 event: delta
-data: {"v": "\u4e0e"} 
+data: {"v": "B"}      
 
 event: delta
-data: {"v": " `"}     
-
-event: delta
-data: {"v": "Event"}  
-
-event: delta
-data: {"v": "Source"} 
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": " \u6216"}
-
-event: delta
-data: {"v": "\u8005"} 
-
-event: delta
-data: {"v": " Web"}   
-
-event: delta
-data: {"v": "Socket"} 
-
-event: delta
-data: {"v": " "}      
-
-event: delta
-data: {"v": "\u76f8\u5173"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u4ee3\u7801"}   
-
-event: delta
-data: {"v": "\u3002\n"}       
-
-event: delta
-data: {"v": "3"}      
-
-event: delta
-data: {"v": "."}      
-
-event: delta
-data: {"v": " **"}    
-
-event: delta
-data: {"v": "\u4f7f\u7528"}   
-
-event: delta
-data: {"v": "\u7279"} 
-
-event: delta
-data: {"v": "\u5b9a"} 
-
-event: delta
-data: {"v": "\u51fd\u6570"}   
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": "\u4e8b\u4ef6"}   
-
-event: delta
-data: {"v": "\u6d41"} 
-
-event: delta
-data: {"v": "\uff1a"} 
-
-event: delta
-data: {"v": "**"}     
-
-event: delta
-data: {"v": " \u5982\u679c"}  
-
-event: delta
-data: {"v": "\u60a8"} 
-
-event: delta
-data: {"v": "\u627e"} 
-
-event: delta
-data: {"v": "\u5230\u4e86"}   
-
-event: delta
-data: {"v": "\u4e00\u4e2a"}   
-
-event: delta
-data: {"v": "\u4e13"} 
-
-event: delta
-data: {"v": "\u95e8"} 
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u51fd\u6570"}   
-
-event: delta
-data: {"v": "\u6765"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": " Event"} 
-
-event: delta
-data: {"v": "Stream"} 
-
-event: delta
-data: {"v": "\uff0c\u4f8b\u5982"}     
-
-event: delta
-data: {"v": "\u901a\u8fc7"}   
-
-event: delta
-data: {"v": " Web"}   
-
-event: delta
-data: {"v": "Socket"} 
-
-event: delta
-data: {"v": " \u6216"}
-
-event: delta
-data: {"v": "\u8005"} 
-
-event: delta
-data: {"v": " `"}     
-
-event: delta
-data: {"v": "fetch"}  
-
-event: delta
-data: {"v": "`"}      
-
-event: delta
-data: {"v": " API"}   
-
-event: delta
-data: {"v": "\uff0c\u90a3\u4e48"}     
-
-event: delta
-data: {"v": "\u5c31"} 
-
-event: delta
-data: {"v": "\u53ef\u4ee5"}   
-
-event: delta
-data: {"v": "\u4f7f\u7528"}   
-
-event: delta
-data: {"v": "\u5b83"} 
-
-event: delta
-data: {"v": "\u6765"} 
-
-event: delta
-data: {"v": "\u63a5"} 
-
-event: delta
-data: {"v": "\u6536"} 
-
-event: delta
-data: {"v": "\u548c"} 
-
-event: delta
-data: {"v": "\u5904\u7406"}   
-
-event: delta
-data: {"v": "\u4e8b\u4ef6"}   
-
-event: delta
-data: {"v": "\u6d41"} 
+data: {"v": "ash"}    
 
 event: delta
 data: {"v": "\u3002\n\n"}     
-
-event: delta
-data: {"v": "\u5177\u4f53"}   
-
-event: delta
-data: {"v": "\u5982\u4f55"}   
-
-event: delta
-data: {"v": "\u4f7f\u7528"}   
-
-event: delta
-data: {"v": "\uff0c\u8fd8"}   
-
-event: delta
-data: {"v": "\u53d6"} 
-
-event: delta
-data: {"v": "\u51b3"} 
-
-event: delta
-data: {"v": "\u4e8e"} 
-
-event: delta
-data: {"v": "\u8be5"} 
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u4e2d"} 
-
-event: delta
-data: {"v": "\u66b4"} 
-
-event: delta
-data: {"v": "\u9732"} 
-
-event: delta
-data: {"v": "\u4e86"} 
-
-event: delta
-data: {"v": "\u54ea\u4e9b"}   
-
-event: delta
-data: {"v": "\u51fd\u6570"}   
-
-event: delta
-data: {"v": "\u548c"} 
-
-event: delta
-data: {"v": "\u63a5\u53e3"}   
-
-event: delta
-data: {"v": "\u3002"} 
 
 event: delta
 data: {"v": "\u8bf7"} 
 
 event: delta
-data: {"v": "\u786e\u8ba4"}   
+data: {"v": "\u6267\u884c"}   
 
 event: delta
-data: {"v": "\u662f\u5426"}   
+data: {"v": "\u4ee5\u4e0b"}   
 
 event: delta
-data: {"v": "\u6709"} 
+data: {"v": "bash"}   
 
 event: delta
-data: {"v": "\u4e00\u4e2a"}   
+data: {"v": "\u811a"} 
 
 event: delta
-data: {"v": "\u5168"} 
+data: {"v": "\u672c"} 
 
 event: delta
-data: {"v": "\u5c40"} 
+data: {"v": "\uff0c\u5b83"}   
 
 event: delta
-data: {"v": "\u53d8\u91cf"}   
-
-event: delta
-data: {"v": "\u6216\u8005"}   
-
-event: delta
-data: {"v": "\u6a21\u5757"}   
+data: {"v": "\u4f1a"} 
 
 event: delta
 data: {"v": "\u8f93\u51fa"}   
 
 event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u80fd\u591f"}   
-
-event: delta
-data: {"v": "\u8ba9"} 
-
-event: delta
-data: {"v": "\u60a8"} 
-
-event: delta
-data: {"v": "\u4ece"} 
-
-event: delta
-data: {"v": "\u5916"} 
-
-event: delta
-data: {"v": "\u90e8"} 
-
-event: delta
-data: {"v": "\u8c03\u7528"}   
-
-event: delta
 data: {"v": "\u76f8\u5173"}   
 
 event: delta
-data: {"v": "\u51fd\u6570"}   
+data: {"v": "\u7684"} 
 
 event: delta
-data: {"v": "\u3002\u5982\u679c"}     
+data: {"v": "\u64cd\u4f5c"}   
 
 event: delta
-data: {"v": "\u9700\u8981"}   
+data: {"v": "\u7cfb\u7edf"}   
+
+event: delta
+data: {"v": "\u548c"} 
+
+event: delta
+data: {"v": "\u73af\u5883"}   
+
+event: delta
+data: {"v": "\u4fe1\u606f"}   
+
+event: delta
+data: {"v": "\uff1a\n\n"}     
+
+event: delta
+data: {"v": "```"}    
+
+event: delta
+data: {"v": "bash"}   
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "#!/"}    
+
+event: delta
+data: {"v": "bin"}    
+
+event: delta
+data: {"v": "/bash"}  
+
+event: delta
+data: {"v": "\n\n"}   
+
+event: delta
+data: {"v": "#"}      
+
+event: delta
+data: {"v": " \u6253"}
+
+event: delta
+data: {"v": "\u5370"} 
+
+event: delta
+data: {"v": "\u64cd\u4f5c"}   
+
+event: delta
+data: {"v": "\u7cfb\u7edf"}   
+
+event: delta
+data: {"v": "\u4fe1\u606f"}   
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "echo"}   
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "\u64cd\u4f5c"}   
+
+event: delta
+data: {"v": "\u7cfb\u7edf"}   
+
+event: delta
+data: {"v": "\u4fe1\u606f"}   
+
+event: delta
+data: {"v": "\uff1a"} 
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": "uname"}  
+
+event: delta
+data: {"v": " -"}     
+
+event: delta
+data: {"v": "a"}      
+
+event: delta
+data: {"v": "\n\n"}   
+
+event: delta
+data: {"v": "#"}      
+
+event: delta
+data: {"v": " \u68c0"}
+
+event: delta
+data: {"v": "\u67e5"} 
+
+event: delta
+data: {"v": "bash"}   
+
+event: delta
+data: {"v": "\u662f\u5426"}   
+
+event: delta
+data: {"v": "\u53ef"} 
+
+event: delta
+data: {"v": "\u7528"} 
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "if"}     
+
+event: delta
+data: {"v": " command"}       
+
+event: delta
+data: {"v": " -"}     
+
+event: delta
+data: {"v": "v"}      
+
+event: delta
+data: {"v": " bash"}  
+
+event: delta
+data: {"v": " >/"}    
+
+event: delta
+data: {"v": "dev"}    
+
+event: delta
+data: {"v": "/null"}  
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": "2"}      
+
+event: delta
+data: {"v": ">&"}     
+
+event: delta
+data: {"v": "1"}      
+
+event: delta
+data: {"v": ";"}      
+
+event: delta
+data: {"v": " then"}  
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " echo"}  
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "B"}      
+
+event: delta
+data: {"v": "ash"}    
+
+event: delta
+data: {"v": " \u5df2"}
+
+event: delta
+data: {"v": "\u5b89\u88c5"}   
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " bash"}  
+
+event: delta
+data: {"v": " --"}    
+
+event: delta
+data: {"v": "version"}
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "else"}   
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " echo"}  
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "B"}      
+
+event: delta
+data: {"v": "ash"}    
+
+event: delta
+data: {"v": " \u672a"}
+
+event: delta
+data: {"v": "\u5b89\u88c5"}   
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": "fi"}     
+
+event: delta
+data: {"v": "\n\n"}   
+
+event: delta
+data: {"v": "#"}      
+
+event: delta
+data: {"v": " \u68c0"}
+
+event: delta
+data: {"v": "\u67e5"} 
+
+event: delta
+data: {"v": "Python"} 
+
+event: delta
+data: {"v": "\u7248\u672c"}   
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "if"}     
+
+event: delta
+data: {"v": " command"}       
+
+event: delta
+data: {"v": " -"}     
+
+event: delta
+data: {"v": "v"}      
+
+event: delta
+data: {"v": " python"}
+
+event: delta
+data: {"v": "3"}      
+
+event: delta
+data: {"v": " >/"}    
+
+event: delta
+data: {"v": "dev"}    
+
+event: delta
+data: {"v": "/null"}  
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": "2"}      
+
+event: delta
+data: {"v": ">&"}     
+
+event: delta
+data: {"v": "1"}      
+
+event: delta
+data: {"v": ";"}      
+
+event: delta
+data: {"v": " then"}  
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " echo"}  
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "Python"} 
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": "\u7248\u672c"}   
+
+event: delta
+data: {"v": "\u4fe1\u606f"}   
+
+event: delta
+data: {"v": "\uff1a"} 
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " python"}
+
+event: delta
+data: {"v": "3"}      
+
+event: delta
+data: {"v": " --"}    
+
+event: delta
+data: {"v": "version"}
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "else"}   
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " echo"}  
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "Python"} 
+
+event: delta
+data: {"v": " \u672a"}
+
+event: delta
+data: {"v": "\u5b89\u88c5"}   
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": "fi"}     
+
+event: delta
+data: {"v": "\n\n"}   
+
+event: delta
+data: {"v": "#"}      
+
+event: delta
+data: {"v": " \u5217"}
+
+event: delta
+data: {"v": "\u51fa"} 
+
+event: delta
+data: {"v": "\u5df2"} 
+
+event: delta
+data: {"v": "\u5b89\u88c5"}   
+
+event: delta
+data: {"v": "\u7684"} 
+
+event: delta
+data: {"v": "Python"} 
+
+event: delta
+data: {"v": "\u5e93"} 
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "if"}     
+
+event: delta
+data: {"v": " command"}       
+
+event: delta
+data: {"v": " -"}     
+
+event: delta
+data: {"v": "v"}      
+
+event: delta
+data: {"v": " pip"}   
+
+event: delta
+data: {"v": "3"}      
+
+event: delta
+data: {"v": " >/"}    
+
+event: delta
+data: {"v": "dev"}    
+
+event: delta
+data: {"v": "/null"}  
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": "2"}      
+
+event: delta
+data: {"v": ">&"}     
+
+event: delta
+data: {"v": "1"}      
+
+event: delta
+data: {"v": ";"}      
+
+event: delta
+data: {"v": " then"}  
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " echo"}  
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "\u5df2"} 
+
+event: delta
+data: {"v": "\u5b89\u88c5"}   
+
+event: delta
+data: {"v": "\u7684"} 
+
+event: delta
+data: {"v": "Python"} 
+
+event: delta
+data: {"v": "\u5e93"} 
+
+event: delta
+data: {"v": "\uff1a"} 
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " pip"}   
+
+event: delta
+data: {"v": "3"}      
+
+event: delta
+data: {"v": " list"}  
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "else"}   
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": " "}      
+
+event: delta
+data: {"v": " echo"}  
+
+event: delta
+data: {"v": " \""}    
+
+event: delta
+data: {"v": "pip"}    
+
+event: delta
+data: {"v": "3"}      
+
+event: delta
+data: {"v": " \u672a"}
+
+event: delta
+data: {"v": "\u5b89\u88c5"}   
+
+event: delta
+data: {"v": "\"\n"}   
+
+event: delta
+data: {"v": "fi"}     
+
+event: delta
+data: {"v": "\n"}     
+
+event: delta
+data: {"v": "``"}     
+
+event: delta
+data: {"v": "`\n\n"}  
+
+event: delta
+data: {"v": "\u8bf7"} 
+
+event: delta
+data: {"v": "\u6267\u884c"}   
+
+event: delta
+data: {"v": "\u6b64"} 
+
+event: delta
+data: {"v": "\u4ee3\u7801"}   
+
+event: delta
+data: {"v": "\uff0c\u5e76"}   
+
+event: delta
+data: {"v": "\u5c06"} 
+
+event: delta
+data: {"v": "\u7ed3\u679c"}   
+
+event: delta
+data: {"v": "\u8fd4\u56de"}   
+
+event: delta
+data: {"v": "\u7ed9"} 
+
+event: delta
+data: {"v": "\u6211"} 
+
+event: delta
+data: {"v": "\u3002\u6211"}   
+
+event: delta
+data: {"v": "\u4f1a"} 
+
+event: delta
+data: {"v": "\u6839\u636e"}   
+
+event: delta
+data: {"v": "\u7ed3\u679c"}   
+
+event: delta
+data: {"v": "\u8fdb\u884c"}   
 
 event: delta
 data: {"v": "\u8fdb\u4e00\u6b65"}     
@@ -1337,67 +728,22 @@ event: delta
 data: {"v": "\u5206\u6790"}   
 
 event: delta
-data: {"v": "\u6216"} 
+data: {"v": "\u5e76"} 
 
 event: delta
-data: {"v": "\u8fd8"} 
+data: {"v": "\u63d0\u51fa"}   
 
 event: delta
-data: {"v": "\u539f"} 
+data: {"v": "\u540e"} 
 
 event: delta
-data: {"v": "\u5b8c\u6574"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u903b"} 
-
-event: delta
-data: {"v": "\u8f91"} 
-
-event: delta
-data: {"v": "\uff0c"} 
-
-event: delta
-data: {"v": "\u53ef\u80fd"}   
-
-event: delta
-data: {"v": "\u9700\u8981"}   
-
-event: delta
-data: {"v": "\u66f4\u591a"}   
+data: {"v": "\u7eed"} 
 
 event: delta
 data: {"v": "\u7684"} 
 
 event: delta
-data: {"v": "\u4e0a\u4e0b"}   
-
-event: delta
-data: {"v": "\u6587"} 
-
-event: delta
-data: {"v": "\u6216\u8005"}   
-
-event: delta
-data: {"v": "\u7406\u89e3"}   
-
-event: delta
-data: {"v": "\u8fd9\u4e2a"}   
-
-event: delta
-data: {"v": "\u6587\u4ef6"}   
-
-event: delta
-data: {"v": "\u7684"} 
-
-event: delta
-data: {"v": "\u6574\u4f53"}   
-
-event: delta
-data: {"v": "\u7ed3\u6784"}   
+data: {"v": "\u5efa\u8bae"}   
 
 event: delta
 data: {"v": "\u3002"} 
@@ -1406,7 +752,9 @@ event: delta
 data: {"p": "", "o": "patch", "v": [{"p": "/message/status", "o": "replace", "v": "finished_successfully"}, {"p": "/message/end_turn", "o": "replace", "v": true}]}   
 
 event: delta
-data: {"p": "/message/metadata", "o": "append", "v": {"is_complete": true, "finish_details": {"type": "stop", "stop_tokens": [200002]}}}      
+data: {"p": "/message/metadata", "o": "append", "v": {"timestamp_": "absolute", "request_id": "8d38ca976d4dcba4-LAX", "finish_details": {"type": "stop", "stop_tokens": [200002]}, "is_complete": true}}      
+
+data: 
 
 data: [DONE]
 

@@ -1,9 +1,10 @@
 import { createParser, EventSourceParser } from 'eventsource-parser';
 import { EventSourceParserStream } from 'eventsource-parser/stream';
 import * as eventstreamCodec from '@smithy/eventstream-codec';
-import { handleServerEvent } from '../src/share.github'
+import { createHandler } from '../src/share.github'
 import path from 'path';
 import fs from 'fs';
+import  util  from 'util';
 
 // 用来存储最终拼接的消息数据
 let fullMessage = "";
@@ -151,15 +152,94 @@ if (!response.body) {
 //  console.log(eventstreamCodec)
 
 
-const parser2 = createParser((event) => {
-  // console.log(`获得事件:${JSON.stringify(event)}`)
-  handleServerEvent(event);
-});
+// const parser2 = createParser((event) => {
+//   // console.log(`获得事件:${JSON.stringify(event)}`)
+//   handleServerEvent(event);
+// });
 // const events = sseData2.split(/\r?\n/)
 // for(const event of events){
 //   console.log(`处理数据${event}`)
 const content = fs.readFileSync(path.join(__dirname, 'test.txt'), 'utf-8');
-parser2.feed(content)
+function triggerEvent(event:any) {
+  // 假设这里触发 UI 更新或其他业务逻辑
+  console.log("Event triggered:", util.inspect(event, { depth: null, colors: true }));
+}
+createHandler().onMessage(parsedData=>{
+  triggerEvent(parsedData);
+// //   if ("type" in parsedData) {
+// //     switch (parsedData.type) {
+// //         case "gizmo_inline_review":
+// //             triggerEvent({
+// //                 type: "gizmo_inline_review",
+// //                 gizmoId: parsedData.gizmo_id
+// //             });
+// //             break;
+
+// //         case "title_generation":
+// //             triggerEvent({
+// //                 type: "title_generation",
+// //                 title: parsedData.title,
+// //                 conversation_id: parsedData.conversation_id
+// //             });
+// //             break;
+
+// //         case "moderation":
+// //             triggerEvent({
+// //                 type: "moderation",
+// //                 conversationId: parsedData.conversation_id,
+// //                 messageId: parsedData.message_id,
+// //                 isCompletion: parsedData.is_completion,
+// //                 flagged: parsedData.moderation_response.flagged,
+// //                 blocked: parsedData.moderation_response.blocked,
+// //                 disclaimers: parsedData.moderation_response.disclaimers,
+// //                 metadata: parsedData.moderation_response.metadata
+// //             });
+// //             break;
+
+// //         case "url_moderation":
+// //             triggerEvent({
+// //                 type: "url_moderation",
+// //                 conversationId: parsedData.conversation_id,
+// //                 messageId: parsedData.message_id,
+// //                 url: parsedData.url_moderation_result.full_url,
+// //                 isSafe: parsedData.url_moderation_result.is_safe
+// //             });
+// //             break;
+
+// //         case "num_variants_in_stream":
+// //             triggerEvent({
+// //                 type: "num_variants_in_stream",
+// //                 num_variants_in_stream: parsedData.num_variants_in_stream,
+// //                 display_treatment: parsedData.display_treatment
+// //             });
+// //             break;
+
+// //         case "conversation_detail_metadata":
+// //             triggerEvent(parsedData);
+// //             break;
+// //     }
+// // }
+// // // 处理普通消息
+// // else {
+// //     triggerEvent({
+// //         type: "message",
+// //         message: parsedData.message,
+// //         conversationId: parsedData.conversation_id
+// //     });
+
+//     // 结束流的逻辑
+//     // 检查是否为助手发送的消息并结束处理
+//     // if (isProcessing && parsedData.message.author.role === "assistant" &&
+//     //     parsedData.message.content.content_type === "text" &&
+//     //     parsedData.message.content.parts[0] !== "") {
+//     //     isProcessing = false;
+//     //     // messageProcessing.end();
+//     // }
+// }
+}).onEnd(data=>{
+    console.log("事件处理完成:",util.inspect(data, { depth: null, colors: true }))
+}).handler(content)
+// parser2.feed(content)
 // }
 
 

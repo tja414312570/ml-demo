@@ -2,6 +2,7 @@ import { execFile, exec } from 'child_process';
 import { promisify } from 'util';
 import util from 'util';
 import { IncomingHttpHeaders } from 'http';
+import { SseHandler } from './share.github';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
 // 使用 promisify 将子进程命令转换为 Promise
@@ -143,6 +144,21 @@ const processResponse = async (headers:IncomingHttpHeaders|undefined, body:strin
         }
         const sseData = body;
         // 将 SSE 数据根据事件分隔符 \n\n 进行分割
+        //处理delta编码
+        const start = performance.now();
+   
+        if(body.startsWith('event: delta_encoding')){
+            new SseHandler().onMessage((data:any)=>{
+
+            }).onError(err=>{
+                reject(err)
+            }).onEnd((data:any)=>{
+                const end = performance.now();
+                console.log(`解析数据耗时： ${(end - start).toFixed(2)} ms`);
+                resolve(data.message.content.parts[0]);
+            }).handler(sseData)
+            return;
+        }
         const events = sseData.split('\n\n');
         let completedResponse:string
         // 遍历每个事件并处理
