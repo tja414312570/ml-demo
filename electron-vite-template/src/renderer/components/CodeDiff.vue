@@ -19,18 +19,20 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from 'vue';
+import { defineProps, Ref } from 'vue';
 
 interface Props {
-    content: string;
+    content: Ref<string>;
     del: () => void;
     send: () => void;
 }
 
-const handleExecute = () => {
-    console.log("删除")
+const onMessage = (message) => {
+    console.log("删除", message)
 }
-
+defineExpose({
+    onMessage
+})
 const props = defineProps<Props>();
 </script>
 

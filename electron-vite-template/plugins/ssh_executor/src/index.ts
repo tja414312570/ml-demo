@@ -141,8 +141,9 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
             try {
               const result = await this.executeLine(id, instruct,line, execId, executeContext);
               results.push(result.result);
-              if (isCommandSuccessful(result.code)) {
+              if (!isCommandSuccessful(result.code)) {
                 results.push("程序异常退出，退出码:"+result.code);
+                executeContext.abort(`程序异常退出，退出码${result.code}`)
                 break; 
               }
               // 如果需要在执行成功后处理 result，可以在这里添加逻辑
@@ -190,6 +191,9 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
           for (const _line of lines) {
             console.log(`读取行:"${_line}"${executeing}`);
             const lineTrim = removeInvisibleChars(_line);
+            if(!executeing){
+              return;
+            }
             if (lineTrim.length > 1 && lineTrim.startsWith(end_tag)) {
               executeing = false;
               const exitCode = lineTrim.substring(end_tag.length);

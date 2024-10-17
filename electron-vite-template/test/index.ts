@@ -1,24 +1,52 @@
-import path from "path";
-import pluginManager from "../src/main/plugin/plugin-manager";
+class AnsiStateManager {
+    constructor() {
+        this.state = [];
+    }
 
-import { PluginInfo, PluginType } from "../src/main/plugin/type/plugin";
-import pluginContext from "../src/main/plugin/plugin-context";
-import { Bridge } from "../src/main/plugin/type/bridge";
+    // 添加新的 ANSI 输出
+    addOutput(output) {
+        // 将新的输出解析为行并处理状态
+        const lines = output.split('\n');
+        lines.forEach(line => {
+            this.processLine(line);
+        });
+    }
 
+    // 处理每一行，更新状态
+    processLine(line) {
+        // 去掉 ANSI 转义字符
+        line = line.replace(/\x1b\[[0-9;]*m/g, '');
 
-pluginManager.loadPluginFromDir(path.join(__dirname, '../plugins'))
-const type = PluginType.bridge;
-pluginManager.resolvePluginModule<Bridge>(type).then(module => {
-    console.log(`获取插件成功${module}`)
-    // module.onResponse("来自组件")
-}).catch(err => {
-    console.error(`错误:`, err)
-})
+        // 如果是回车符，则更新最后一行
+        if (line.includes('\r')) {
+            const lastLineIndex = this.state.length - 1;
+            this.state[lastLineIndex] = line;
+        } else {
+            // 否则将新行添加到状态
+            this.state.push(line);
+        }
+    }
 
-// 模拟当前 URL 场景（实际中你可以从请求或上下文中获取 URL）
-// const currentURL = 'https://chat.openai.com/some/path';
+    // 获取最终合并的状态
+    getFinalOutput() {
+        return this.state.join('\n');
+    }
+}
 
-// 获取符合当前 URL 的插件
-// const matchedPlugins = pluginManager.getPluginsByURL(currentURL);
-// console.log(`匹配到的插件: ${matchedPlugins.map((p) => p.name).join(', ')}`);
-// pluginManager.unload()
+// 使用示例
+const ansiManager = new AnsiStateManager();
+
+// 模拟增量输出
+const outputs = [
+    'hello world',
+    '\x1b[32mTask 1: 20% [==========>                                       ]\r',
+    '\x1b[32mTask 2: 40% [==================>                               ]\r',
+    '\x1b[32mTask 1: 80% [=========================>                        ]\r',
+    '\x1b[33mAll tasks completed!\n'
+];
+
+// 添加输出并获取最终状态
+outputs.forEach(output => {
+    ansiManager.addOutput(output)
+    console.log(ansiManager.getFinalOutput());
+});

@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { createVNode, nextTick, onMounted, ref, render, shallowRef } from 'vue'
+import { createVNode, h, nextTick, onMounted, Ref, ref, render, shallowRef } from 'vue'
 import CodeTools from './CodeTools.vue';
 import * as monaco from 'monaco-editor';
 import { InstructContent } from '@main/ipc/code-manager';
@@ -90,7 +90,7 @@ const setExecutionMarker = (lineNumber: number) => {
     console.error("Editor instance is not available to set decorations.");
   }
 };
-const viewZones: Map<string, { viewZoneId: string, prop: any, vnode: any, viewZone: monaco.editor.IViewZone, domNode: HTMLDivElement }> = new Map();
+const viewZones: Map<string, { viewZoneId: string, prop: any, vnode: any, viewZone: monaco.editor.IViewZone, domNode: HTMLDivElement, $ref: Ref<any> }> = new Map();
 function removeInlineDiff(editor) {
   for (let execId of viewZones.keys()) {
     let viewZoneId = viewZones.get(execId).viewZoneId;
@@ -109,7 +109,6 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
   const viewContext = viewZones.get(execId);
   if (viewContext) {
     viewContext.prop.content.value += diffContent;
-    console.log(`prop:${viewContext.prop.content.value}`)
     const ovsolve = () => {
       requestAnimationFrame(() => {
         // 获取渲染后 DOM 的实际高度
@@ -145,7 +144,7 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
       heightInLines: 0,
     };
     const viewZoneId = accessor.addZone(viewZone);
-    // 创建虚拟 DOM，并渲染到 ViewZone 中
+    const $ref = ref(null);
     const prop = {
       content: ref(diffContent), del: () => {
         render(null, domNode);
@@ -153,13 +152,21 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
         viewZones.delete(execId);
       }, send: () => {
         codeApi.send('send_execute-result', prop.content.value)
-      }
+      }, ref: $ref
     };
-    const vnode = createVNode(CodeDiff, prop);
+    const vnode = h({
+      setup() {
+        // 使用 onMounted 确保子组件挂载完成
+        onMounted(() => {
 
+
+        });
+        return () => h(CodeDiff, prop) // 返回渲染的子组件
+      }
+    });
     vnode.appContext = context.getApp()._context;
     render(vnode, domNode);
-    viewZones.set(execId, { viewZoneId, prop, vnode, viewZone, domNode })
+    viewZones.set(execId, { viewZoneId, prop, vnode, viewZone, domNode, $ref })
     const ovsolve = () => {
       requestAnimationFrame(() => {
         // 获取渲染后 DOM 的实际高度
