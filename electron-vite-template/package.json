@@ -24,6 +24,7 @@
     "@guolao/vue-monaco-editor": "^1.5.4",
     "@mdi/font": "^7.4.47",
     "@mdi/js": "^7.4.47",
+    "ansi-up": "^1.0.0",
     "axios": "^1.7.7",
     "blessed": "^0.1.81",
     "dockview-core": "^1.17.1",

@@ -34,7 +34,12 @@ ptyProcess.on('data', (data) => {
     });
     console.log(printableOutput)
     console.log("=============================================")
-    console.log(output)
+    const printableOutput2 = output.replace(/[\x00-\x1F\x7F]/g, (char) => {
+        // 处理控制字符
+        const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
+        return `\\x${hex}`;
+    });
+    console.log(printableOutput2)
 });
 
 ptyProcess.on('error', (error) => {

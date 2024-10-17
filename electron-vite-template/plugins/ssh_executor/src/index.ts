@@ -2,7 +2,7 @@ import { InstructContent, InstructExecutor, InstructResult, InstructResultType }
 import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
 import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { v4 as uuidv4 } from 'uuid';
-
+import VirtualWindow from './virtual-window'
 
 const removeInvisibleChars = (str: string) => {
   // 移除 ANSI 转义序列 (\u001b 是转义字符, \[\d*(;\d*)*m 匹配 ANSI 的样式)
@@ -110,9 +110,22 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
         throw new Error("代码正在执行中")
       }
       const executeContext = new ExecuteContext();
+      const virtualWindow = new VirtualWindow();
+      
       this.cache.set(id,executeContext);
       executeContext.onWrite(data=>pluginContext.pty.write(data));
-      const disable = pluginContext.pty.onData(data =>  executeContext.callData(data))
+      const disable = pluginContext.pty.onData(data =>  {
+        virtualWindow.write(data); // 将数据写入虚拟窗口
+        const output = virtualWindow.render();
+        pluginContext.sendIpcRender('codeViewApi.insertLine', {
+          id,
+          code:output,
+          execId,
+          line,
+          type: InstructResultType.executing
+        })
+        // executeContext.callData(data)
+      })
       executeContext.onEnd(()=>{
         disable.dispose( )
         this.cache.delete(id)})

@@ -1,6 +1,6 @@
 <template>
     <div class="diff-content">
-        <pre style="">{{ content }}</pre>
+        <div style="" v-html="view"></div>
         <div>
             <v-tooltip bottom>
                 <template v-slot:activator="{ props }">
@@ -19,13 +19,17 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, Ref } from 'vue';
+import { AnsiUp } from 'ansi-up';
+import { defineProps, ref, Ref, watch } from 'vue';
+
+
 
 interface Props {
     content: Ref<string>;
     del: () => void;
     send: () => void;
 }
+
 
 const onMessage = (message) => {
     console.log("删除", message)
@@ -34,6 +38,17 @@ defineExpose({
     onMessage
 })
 const props = defineProps<Props>();
+
+const ansiUp = new AnsiUp();
+const view = ref('')
+watch(
+    () => props.content,
+    (newValue) => {
+        view.value = ansiUp.ansi_to_html(newValue.value);
+    },
+    { deep: true } // 深度监听对象
+);
+
 </script>
 
 <style scoped>

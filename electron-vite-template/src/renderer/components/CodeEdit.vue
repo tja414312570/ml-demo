@@ -108,7 +108,7 @@ function removeInlineDiff(editor) {
 function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber: number, diffContent: string, execId: string) {
   const viewContext = viewZones.get(execId);
   if (viewContext) {
-    viewContext.prop.content.value += diffContent;
+    viewContext.prop.content.value = diffContent;
     const ovsolve = () => {
       requestAnimationFrame(() => {
         // 获取渲染后 DOM 的实际高度
