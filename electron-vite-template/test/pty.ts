@@ -5,8 +5,8 @@ const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cwd: process.env.HOME,
     env: process.env,
-    cols: 256,
-    rows: 256,
+    cols: 40,
+    rows: 40,
 });
 const virtualWindow = new VirtualWindow;
 // (async () => {
@@ -23,9 +23,9 @@ const virtualWindow = new VirtualWindow;
 
 // 将 PTY 输出发送到前端
 ptyProcess.on('data', (data) => {
-    virtualWindow.write(data); // 将数据写入虚拟窗口
+    virtualWindow.write(data.toString('utf8')); // 将数据写入虚拟窗口
     const output = virtualWindow.render();
-    console.clear()
+    // console.clear()
     console.log("----------------------------原始相应")
     const printableOutput = data.replace(/[\x00-\x1F\x7F]/g, (char) => {
         // 处理控制字符
@@ -54,4 +54,4 @@ ptyProcess.on('exit', (code, signal) => {
 // ptyProcess.write('for i in {1..100}; do printf "\\rProgress: %d%%" "$i"; sleep 0.1; done; echo\n');
 
 // ptyProcess.write('ls ;for i in {1..100}; do printf "\\rProgress: %d%%" "$i"; sleep 0.1; done; echo "done";clear\n');
-ptyProcess.write('brew\n');
+ptyProcess.write('top\n');

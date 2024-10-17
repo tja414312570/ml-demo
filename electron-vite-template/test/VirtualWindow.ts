@@ -4,7 +4,7 @@ type EscapeSequence = {
 };
 
 class VirtualWindow {
-    private buffer: string[]; // 使用数组作为文本缓冲区
+    private buffer: string[]; // 行缓冲区
     private cursorX: number;
     private cursorY: number;
 
@@ -32,20 +32,15 @@ class VirtualWindow {
                 this.cursorX = 0;
                 this.ensureLineExists(this.cursorY);
             } else if (char === '\r') {
-                this.cursorX = 0;
+                this.cursorX = 0; // 回车符重置光标到行首
             } else if (char === '\x1b') {
                 const seq = this.parseEscapeSequence(remainingText);
                 if (seq) {
-                    // 对光标控制符做处理，但不保存它们到 buffer 中
                     this.handleEscapeSequence(seq);
                     const seqLength = seq.params.join(';').length + 3;
                     remainingText = remainingText.substring(seqLength);
-                } else {
-                    // 未解析出完整序列时，将原始字符保存到 buffer
-                    this.addCharToBuffer(char);
                 }
             } else {
-                // 普通字符和非光标的 ANSI 控制符会被保留
                 this.addCharToBuffer(char);
             }
         }
@@ -53,13 +48,16 @@ class VirtualWindow {
 
     private addCharToBuffer(char: string): void {
         this.ensureLineExists(this.cursorY);
+
         if (this.cursorX < this.buffer[this.cursorY].length) {
+            // 替换已有字符
             this.buffer[this.cursorY] =
                 this.buffer[this.cursorY].substring(0, this.cursorX) +
                 char +
                 this.buffer[this.cursorY].substring(this.cursorX + 1);
         } else {
-            this.buffer[this.cursorY] += char;
+            // 光标超出行尾时，追加空格再添加字符
+            this.buffer[this.cursorY] = this.buffer[this.cursorY].padEnd(this.cursorX) + char;
         }
         this.cursorX++;
     }
@@ -74,33 +72,34 @@ class VirtualWindow {
 
     private handleEscapeSequence(seq: EscapeSequence): void {
         const command = seq.command;
+        const [param1, param2] = seq.params.map(p => parseInt(p) || 0);
 
         switch (command) {
-            case 'H': // 光标移动到指定位置
-                const row = parseInt(seq.params[0]) - 1 || 0;
-                const col = parseInt(seq.params[1]) - 1 || 0;
-                this.cursorY = Math.max(0, Math.min(row, this.buffer.length - 1));
-                this.cursorX = Math.max(0, Math.min(col, this.buffer[this.cursorY].length));
+            case 'H': // 光标移动到指定位置 (row, col)
+                this.cursorY = param1 - 1;
+                this.cursorX = param2 - 1;
+                this.ensureLineExists(this.cursorY);
                 break;
             case 'A': // 光标上移
-                this.cursorY = Math.max(0, this.cursorY - 1);
+                this.cursorY = Math.max(0, this.cursorY - param1);
                 break;
             case 'B': // 光标下移
-                this.cursorY = Math.min(this.buffer.length - 1, this.cursorY + 1);
+                this.cursorY = Math.min(this.buffer.length - 1, this.cursorY + param1);
                 break;
             case 'C': // 光标右移
-                this.cursorX = Math.min(this.buffer[this.cursorY].length, this.cursorX + 1);
+                this.cursorX = Math.min(this.buffer[this.cursorY].length, this.cursorX + param1);
                 break;
             case 'D': // 光标左移
-                this.cursorX = Math.max(0, this.cursorX - 1);
+                this.cursorX = Math.max(0, this.cursorX - param1);
                 break;
             case 'J': // 清屏
-                this.clear();
+                if (param1 === 2) {
+                    this.clear(); // 清除整个屏幕
+                }
                 break;
             case 'K': // 清除当前行光标后的内容
                 this.buffer[this.cursorY] = this.buffer[this.cursorY].substring(0, this.cursorX);
                 break;
-            // 其他控制符根据需求添加...
         }
     }
 
