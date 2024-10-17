@@ -1,7 +1,7 @@
 "use strict";
 
 import { useMainDefaultIpc } from "./services/ipc-main";
-import { app, ipcMain, IpcMainEvent, session } from "electron";
+import { app, BrowserWindow, ipcMain, IpcMainEvent, session } from "electron";
 import InitWindow from "./services/window-manager";
 import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
@@ -16,6 +16,7 @@ import pluginManager from "./plugin/plugin-manager";
 import path from "path";
 import { showErrorDialog } from "./utils/dialog";
 import './plugin/ipc-bind'
+import { init as ptyInit } from './services/pty'
 const innerPluginPath = path.join(__dirname, '../../../plugins');
 console.log(`加载内置插件，位置：${innerPluginPath}`)
 pluginManager.loadPluginFromDir(innerPluginPath)
@@ -73,9 +74,15 @@ app.on("window-all-closed", () => {
   // 所有平台均为所有窗口关闭就退出软件
   app.quit();
 });
-app.on("browser-window-created", () => {
-  console.log("window-created", global.mainWindow);
+app.on("browser-window-created", (event: Event,
+  window: BrowserWindow) => {
+  console.log("window-created", window);
+  window.once("ready-to-show", () => {
+    console.log("启动终端")
+    ptyInit()
+  });
 });
+
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {

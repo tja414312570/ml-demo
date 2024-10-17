@@ -10,6 +10,9 @@ import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid';
 
 class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructExecutor {
+  abort(instruct: InstructContent): Promise<InstructResult | void> {
+    throw new Error('Method not implemented.');
+  }
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { code, language ,id} = instruct;
     let execute_result = '';

@@ -22,8 +22,8 @@ import context from '@renderer/context';
 
 
 const code = ref<string>(`
-echo "Operating System:" && uname -a
-echo "Python Version:" && python3 --version
+dir
+ll
 `);
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 const decorations = ref<string[]>([]);

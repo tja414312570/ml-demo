@@ -36,6 +36,47 @@ ipcMain.on('send_execute-result', (event, input) => {
 //     console.log("搜到执行结果", input)
 //     executeCodeCompleted(input)
 // });
+
+ipcMain.handle('codeViewApi.execute', (event, code: InstructContent) => {
+    return executeCode(code)
+})
+ipcMain.handle('codeViewApi.execute.stop', (event, code: InstructContent) => {
+    return stopExecute(code)
+})
+export const stopExecute = async (code_body: InstructContent) => {
+    console.log(`执行代码:\n${JSON.stringify(code_body)}`);
+    const { code, language, executor } = code_body;
+    pluginManager.resolvePluginModule(PluginType.executor, (pluginInfoList: Set<PluginInfo>) => {
+        if (executor) {
+            return pluginManager.getPluginFromId(executor);
+        }
+        for (const pluginInfo of pluginInfoList) {
+            if (pluginInfo.instruct.indexOf(language) != -1) {
+                return pluginInfo;
+            }
+        }
+        return null;
+    }).then((module: InstructExecutor) => {
+        module.abort(code_body).then((result: InstructResult) => {
+            console.log("停止执行", result)
+            // sendMessage(result)
+        }).catch(err => {
+            console.error(err)
+            showErrorDialog(`停止执行指令异常:${String(err)}`)
+        })
+    }).catch(err => {
+        console.error(err)
+        showErrorDialog(`执行器异常:${String(err)}`)
+    })
+    // const result = await executor.execute(code);
+
+    // send_ipc_render('terminal-input', code)
+    // console.log(`执行结果:\n${result}`);
+    // notify(`执行 ${language} 结果:\n${result}`);
+    // executeCodeCompleted({ code, language, result })
+    // return result;
+    // await dispatcherResult(result);
+}
 export const executeCode = async (code_body: InstructContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language, executor } = code_body;

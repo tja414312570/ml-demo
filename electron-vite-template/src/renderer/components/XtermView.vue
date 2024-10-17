@@ -108,6 +108,7 @@ onMounted(async () => {
     const { cols, rows } = size;
     // 检查 cols 和 rows 是否为正数
     // debouncedResize(cols, rows);
+    console.log('重置终端:', cols, rows)
     if (cols > 0 && rows > 0) {
       terminalApi.send('terminal-resize', cols, rows);
     }

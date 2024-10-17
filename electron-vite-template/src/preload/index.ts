@@ -34,20 +34,7 @@ exposeInMainWorld('core-api', {
   //  off: ipcRenderMapper.off
 });
 
-exposeInMainWorld('ipcRenderer', {
-  send: (channel, data) => ipcRenderer.send(channel, data),
-  on: (channel, listener) => {
-    if (typeof listener === 'function') {
-      // bindListener(_id_, channel, listener)
-      ipcRenderMapper.on(channel, listener);
-      onUnmounted(() => ipcRenderer.off(channel, listener))
-    } else {
-      console.error(`The callback provided to ipcRenderer.on for channel "${channel}" is not a function.`);
-    }
-  },
-  invoke: (channel, data) => ipcRenderer.invoke(channel, data),
-  //  off: ipcRenderMapper.off
-});
+exposeInMainWorld('ipcRenderer', {});
 
 
 contextBridge.exposeInMainWorld('notificationAPI', {

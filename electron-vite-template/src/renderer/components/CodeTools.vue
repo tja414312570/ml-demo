@@ -12,7 +12,8 @@
         <!-- 执行图标带提示 -->
         <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
-                <v-icon small v-bind="props" @click="executeCode" color="blue">mdi-play-outline</v-icon>
+                <v-icon small v-bind="props" @click="executeCode" color="blue">{{ isExecuting ? 'mdi-close' :
+                    'mdi-play-outline' }}</v-icon>
             </template>
             <span>执行代码</span>
         </v-tooltip>
@@ -147,6 +148,14 @@ const handleDebugExecute = () => {
 
 // 模拟的代码执行函数
 const executeCode = () => {
+    if (isExecuting.value) {
+        codeApi.invoke("codeViewApi.execute.stop", { id: props.id, executor: selected.value } as InstructContent).then(result => {
+            alert("发送信息成功")
+        }).catch(err => {
+            console.log('代码停止执行错误:', err)
+        })
+        return;
+    }
     isExecuting.value = true;
     codeApi.executeCode({ code: props.code, id: props.id, language: props.language, executor: selected.value } as InstructContent).then(result => {
         console.log('代码已执行:', props.code)

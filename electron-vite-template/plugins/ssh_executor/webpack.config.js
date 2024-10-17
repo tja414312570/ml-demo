@@ -64,6 +64,9 @@ module.exports = {
     libraryTarget: 'commonjs2', // 生成 CommonJS2 格式的输出
   },
   mode: 'production',
+  optimization: {
+    minimize: false, // 禁用代码压缩
+  },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
