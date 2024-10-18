@@ -43,13 +43,11 @@ class VirtualWindow {
                 this.cursorX = 0; // 回车符重置光标到行首
             } else if (char === '\x1b') {
                 const seq = this.parseEscapeSequence('\x1b' + remainingText);
-                if (seq) {
-                    console.log(`Handling sequence: \\x1b[${seq.params.join(';')}${seq.command}`);
-                    this.handleEscapeSequence(seq);
+                if (seq && this.handleEscapeSequence(seq)) {
                     remainingText = remainingText.substring(seq.fullLength);
                     continue; // 确保处理过的控制字符不被保留
                 } else {
-                    console.log(`未识别的控制序列: ${debug(char + remainingText)}`);
+                    console.log(`未识别的控制序列1: ${debug(char + remainingText)}`);
                     this.addCharToBuffer(char);
                 }
             } else {
@@ -88,10 +86,10 @@ class VirtualWindow {
         return null;
     }
 
-    private handleEscapeSequence(seq: EscapeSequence): void {
+    private handleEscapeSequence(seq: EscapeSequence): boolean {
         const command = seq.command;
         const [param1, param2] = seq.params.map(p => parseInt(p) || 0);
-
+        let support = true;
         switch (command) {
             case 'H': // 光标移动到指定位置 (row, col)
             case 'f': // 与 'H' 功能相同
@@ -172,12 +170,13 @@ class VirtualWindow {
                 }
                 break;
             default:
-                console.log(`未识别的控制序列: \\x1b[${seq.params.join(';')}${seq.command}`);
+                support = false;
                 break;
         }
 
         // 确保光标位置与缓冲区行的长度一致
         this.ensureLineLength(this.cursorY, this.cursorX);
+        return support;
     }
 
 

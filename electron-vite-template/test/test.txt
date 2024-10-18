@@ -1,0 +1,55 @@
+----------------------------原始帧数据:1
+\x1b[?9001h\x1b[?1004h
+=============================虚拟窗口状态:1
+[?1004h\x0a[Cursor Visible: true, Cursor Position: (1, 8)]
+
+
+未识别的控制序列1: \x1b[m\x1b[HWindows PowerShell\x0d\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x1b[4;1H安装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07\x1b[?25h
+未识别的控制序列1: \x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07\x1b[?25h
+----------------------------原始帧数据:2
+\x1b[?25l\x1b[2J\x1b[m\x1b[HWindows PowerShell\x0d\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x1b[4;1H安装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07\x1b[?25h
+=============================虚拟窗口状态:2
+[?1004h[2J\x1b[mindows PowerShell\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x0a\x0a装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07\x0a[Cursor Visible: true, Cursor Position: (4, 112)]
+
+
+----------------------------原始帧数据:3
+\x1b[?25l\x1b[6;1H\x1b[?25h
+=============================虚拟窗口状态:3
+[?1004h[2J\x1b[mindows PowerShell\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x0a\x0a装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07[6;1H\x0a[Cursor Visible: true, Cursor Position: (4, 117)]
+
+
+----------------------------原始帧数据:4
+PS C:\Users\tja41> 
+=============================虚拟窗口状态:4
+[?1004h[2J\x1b[mindows PowerShell\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x0a\x0a装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07[6;1HPS C:\Users\tja41> \x0a[Cursor Visible: true, Cursor Position: (4, 136)]
+
+
+----------------------------原始帧数据:5
+\x1b[?25l
+=============================虚拟窗口状态:5
+[?1004h[2J\x1b[mindows PowerShell\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x0a\x0a装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07[6;1HPS C:\Users\tja41> \x0a[Cursor Visible: false, Cursor Position: (4, 136)]
+
+
+未识别的控制序列1: \x1b[93mclear\x0d\x0a\x1b[?25h
+----------------------------原始帧数据:6
+\x1b[93mclear\x0d\x0a\x1b[?25h
+=============================虚拟窗口状态:6
+[?1004h[2J\x1b[mindows PowerShell\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x0a\x0a装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07[6;1HPS C:\Users\tja41> \x1b[93mclear\x0a\x0a[Cursor Visible: true, Cursor Position: (5, 1)]
+
+
+----------------------------原始帧数据:7
+\x1b[?25l\x1b[m\x1b[H\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x1b[H\x1b[?25h
+=============================虚拟窗口状态:7
+[?1004h[2J\x1b[mindows PowerShell[K\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a[H\x0a[Cursor Visible: true, Cursor Position: (23, 3)]
+
+
+----------------------------原始帧数据:8
+\x1b[?25l\x1b[3J\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x0d\x0a\x1b[K\x1b[H\x1b[?25h
+=============================虚拟窗口状态:8
+[?1004h[2J\x1b[mindows PowerShell[K\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a[H[3J\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a[H\x0a[Cursor Visible: true, Cursor Position: (45, 3)]
+
+
+----------------------------原始帧数据:9
+PS C:\Users\tja41>
+=============================虚拟窗口状态:9
+[?1004h[2J\x1b[mindows PowerShell[K\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a[H[3J\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a\x0a[HPS C:\Users\tja41> \x0a[Cursor Visible: true, Cursor Position: (45, 22)]
