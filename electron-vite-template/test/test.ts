@@ -18,3 +18,4 @@ function testVirtualWindow(data: string) {
 }
 
 testVirtualWindow('\x1b[?9001h\x1b[?1004h');
+// testVirtualWindow('\x1b[?25l\x1b[2J\x1b[m\x1b[HWindows PowerShell\x0d\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x1b[4;1H安装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07\x1b[?25h')

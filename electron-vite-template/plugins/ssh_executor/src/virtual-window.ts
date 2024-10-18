@@ -71,13 +71,13 @@ class VirtualWindow {
     }
 
     private parseEscapeSequence(text: string): EscapeSequence | null {
-        // 更新：扩展匹配所有标准ANSI控制序列
+        // 尝试匹配标准ANSI控制序列
         const match = text.match(/^\x1b\[(\d*(;\d*)*)([A-Za-z])/);
         if (match) {
             return { params: match[1].split(';'), command: match[3], fullLength: match[0].length };
         }
 
-        // 匹配私有模式控制序列，例如 \x1b[?25l 和 \x1b[?25h
+        // 尝试匹配私有模式控制序列，例如 \x1b[?25l 和 \x1b[?25h
         const privateMatch = text.match(/^\x1b\[\?(\d{1,4})([hl])/);
         if (privateMatch) {
             return { params: [privateMatch[1]], command: privateMatch[2], fullLength: privateMatch[0].length };
@@ -85,6 +85,7 @@ class VirtualWindow {
 
         return null;
     }
+
 
     private handleEscapeSequence(seq: EscapeSequence): boolean {
         const command = seq.command;
@@ -162,11 +163,15 @@ class VirtualWindow {
             case 'h': // 设置模式 (例如 ?25h 显示光标)
                 if (parseInt(seq.params[0]) === 25) {
                     this.cursorVisible = true;
+                } else {
+                    support = false;
                 }
                 break;
             case 'l': // 重置模式 (例如 ?25l 隐藏光标)
                 if (parseInt(seq.params[0]) === 25) {
                     this.cursorVisible = false;
+                } else {
+                    support = false;
                 }
                 break;
             default:
