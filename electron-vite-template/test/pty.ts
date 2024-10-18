@@ -2,7 +2,7 @@ import * as pty from 'node-pty';
 const shell = process.platform === 'win32' ? 'powershell.exe' : 'zsh';
 import VirtualWindow from '../plugins/ssh_executor/src/virtual-window'
 
-let isDebug = true;
+let isDebug = false;
 export function debug(data: string) {
     return isDebug ? data.replace(/[\x00-\x1F\x7F]/g, (char) => {
         const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
@@ -51,8 +51,8 @@ ptyProcess.on('error', (error) => {
 ptyProcess.on('exit', (code, signal) => {
     console.log(`Process exited with code: ${code}, signal: ${signal}`);
 });
-ptyProcess.write('clear\r'); // 发送隐藏光标序列
-// ptyProcess.write('for i in {1..100}; do printf "\\rProgress: %d%%" "$i"; sleep 0.1; done; echo\n');
+// ptyProcess.write('clear\r'); // 发送隐藏光标序列
+ptyProcess.write('for i in {1..100}; do printf "\\rProgress: %d%%" "$i"; sleep 0.1; done; echo\n');
 
 // ptyProcess.write('ls ;for i in {1..100}; do printf "\\rProgress: %d%%" "$i"; sleep 0.1; done; echo "done";clear\n');
 // ptyProcess.write('$max=3;for($i=0;$i-le $max;$i++){$p=($i/$max)*100;Write-Progress -Activity "正在处理数据..." -Status "$i% 完成" -PercentComplete $p;Start-Sleep -Milliseconds 500}\r');

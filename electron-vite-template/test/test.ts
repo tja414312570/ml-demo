@@ -1,4 +1,6 @@
+import path from 'path';
 import VirtualWindow from '../plugins/ssh_executor/src/virtual-window';
+import fs from 'fs';
 
 let isDebug = true;
 export function debug(data: string) {
@@ -7,15 +9,26 @@ export function debug(data: string) {
         return `\\x${hex}`;
     }) : data;
 }
+function reverseReplace(data) {
+    return data.replace(/\\x([0-9a-fA-F]{2})/g, (match, hex) => {
+        return String.fromCharCode(parseInt(hex, 16));
+    });
+}
+
 const vw = new VirtualWindow();
 function testVirtualWindow(data: string) {
     // 测试1：写入基础文本
     console.log("=================原始数据")
     console.log(debug(data));
-    vw.write(data);
     console.log("-----------------渲染数据")
+    vw.write(data);
     console.log(debug(vw.render()));
 }
+// const text = fs.readFileSync(path.join(__dirname, 'vim.txt')).toString()
+// const splits = text.split('\r\?n')
+// console.log(reverseReplace(splits[0]))
+// testVirtualWindow(reverseReplace(splits[0]))
+// testVirtualWindow('hello')
+// testVirtualWindow('hello')
 
-testVirtualWindow('\x1b[?9001h\x1b[?1004h');
-// testVirtualWindow('\x1b[?25l\x1b[2J\x1b[m\x1b[HWindows PowerShell\x0d\x0a版权所有（C） Microsoft Corporation。保留所有权利。\x1b[4;1H安装最新的 PowerShell，了解新功能和改进！https://aka.ms/PSWindows\x1b]0;C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe\x07\x1b[?25h')
+console.log(reverseReplace('word\x1b[?1hhello'))

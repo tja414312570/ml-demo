@@ -4,7 +4,14 @@ import pluginContext from "@main/plugin/plugin-context";
 import { IPty } from "@main/plugin/type/plugin";
 import { ipcMain } from "electron";
 import * as pty from 'node-pty';
+let isinit = false;
 function init() {
+    console.log(new Error(isinit + ''))
+    if (isinit) {
+        console.log("我日你妈")
+        throw new Error("超你妈的已经初始化了")
+    }
+    isinit = true;
     try {
         // 创建 PTY 实例
         const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';

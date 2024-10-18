@@ -2,6 +2,8 @@ type EscapeSequence = {
     params: string[];
     command: string;
     fullLength: number;
+    dec: boolean;
+    text: string;
 };
 
 function debug(data: string) {
@@ -18,6 +20,7 @@ class VirtualWindow {
     private savedCursorX: number;
     private savedCursorY: number;
     private cursorVisible: boolean;
+    private bel: boolean;
 
     constructor() {
         this.buffer = ['']; // 初始化时至少有一行
@@ -26,6 +29,7 @@ class VirtualWindow {
         this.savedCursorX = 0;
         this.savedCursorY = 0;
         this.cursorVisible = true; // 默认显示光标
+        this.bel = false;
     }
 
     write(text: string): void {
@@ -44,12 +48,16 @@ class VirtualWindow {
             } else if (char === '\x1b') {
                 const seq = this.parseEscapeSequence('\x1b' + remainingText);
                 if (seq && this.handleEscapeSequence(seq)) {
-                    remainingText = remainingText.substring(seq.fullLength);
+                    remainingText = remainingText.substring(seq.fullLength - 1);
                     continue; // 确保处理过的控制字符不被保留
                 } else {
-                    console.log(`未识别的控制序列1: ${debug(char + remainingText)}`);
+                    console.log(`未识别的控制序列1: ${debug(seq ? seq.text : '?' + char + remainingText)}`);
                     this.addCharToBuffer(char);
                 }
+            } else if (char === '\x07') {
+                this.bel = true;
+            } else if (char === '\x08') {
+                this.cursorX--;
             } else {
                 this.addCharToBuffer(char);
             }
@@ -72,20 +80,22 @@ class VirtualWindow {
 
     private parseEscapeSequence(text: string): EscapeSequence | null {
         // 尝试匹配标准ANSI控制序列
-        const match = text.match(/^\x1b\[(\d*(;\d*)*)([A-Za-z])/);
-        if (match) {
-            return { params: match[1].split(';'), command: match[3], fullLength: match[0].length };
-        }
+        // const match = text.match(/^\x1b\[(\d*(;\d*)*)([A-Za-z])/);
+        // const match = text.match(/^\x1b[\[\(P\]?[0-9;]*[A-Za-z]/);
+        const match = text.match(/^\x1b[\[\(P\]](\?*)([0-9;]*)([A-Za-z])/);
 
-        // 尝试匹配私有模式控制序列，例如 \x1b[?25l 和 \x1b[?25h
-        const privateMatch = text.match(/^\x1b\[\?(\d{1,4})([hl])/);
-        if (privateMatch) {
-            return { params: [privateMatch[1]], command: privateMatch[2], fullLength: privateMatch[0].length };
+        if (match) {
+            return {
+                params: match[2].split(';'),
+                command: match[3],
+                dec: match[1] === '?',
+                fullLength: match[0].length,
+                text: match[0]
+            };
         }
 
         return null;
     }
-
 
     private handleEscapeSequence(seq: EscapeSequence): boolean {
         const command = seq.command;
@@ -94,28 +104,28 @@ class VirtualWindow {
         switch (command) {
             case 'H': // 光标移动到指定位置 (row, col)
             case 'f': // 与 'H' 功能相同
-                this.cursorY = Math.max(0, param1 - 1);
-                this.cursorX = Math.max(0, param2 - 1);
+                this.cursorY = param1 - 1;
                 this.ensureLineExists(this.cursorY);
+                this.cursorX = param2 - 1;
                 this.ensureLineLength(this.cursorY, this.cursorX);
                 break;
             case 'A': // 光标上移
-                this.cursorY = Math.max(0, this.cursorY - param1);
+                this.cursorY = this.cursorY - (param1 ? param1 : 1);
                 this.ensureLineExists(this.cursorY);
                 break;
             case 'B': // 光标下移
-                this.cursorY = Math.min(this.buffer.length - 1, this.cursorY + param1);
+                this.cursorY = this.cursorY + (param1 ? param1 : 1);
                 this.ensureLineExists(this.cursorY);
                 break;
             case 'C': // 光标右移
-                this.cursorX = Math.min(this.buffer[this.cursorY].length, this.cursorX + param1);
+                this.cursorX = this.cursorX + (param1 ? param1 : 1);
                 this.ensureLineLength(this.cursorY, this.cursorX);
                 break;
             case 'D': // 光标左移
-                this.cursorX = Math.max(0, this.cursorX - param1);
+                this.cursorX = this.cursorX - (param1 ? param1 : 1);
                 break;
             case 'G': // 光标移到当前行的指定列
-                this.cursorX = Math.max(0, param1 - 1);
+                this.cursorX = param1 - 1;
                 this.ensureLineLength(this.cursorY, this.cursorX);
                 break;
             case 's': // 保存光标位置
@@ -123,8 +133,8 @@ class VirtualWindow {
                 this.savedCursorY = this.cursorY;
                 break;
             case 'u': // 恢复光标位置
-                this.cursorY = Math.min(this.savedCursorY, this.buffer.length - 1);
-                this.cursorX = Math.min(this.savedCursorX, this.buffer[this.cursorY].length);
+                this.cursorY = Math.max(0, Math.min(this.savedCursorY, this.buffer.length - 1));
+                this.cursorX = Math.max(0, Math.min(this.savedCursorX, this.buffer[this.cursorY].length));
                 this.ensureLineExists(this.cursorY);
                 this.ensureLineLength(this.cursorY, this.cursorX);
                 break;
@@ -184,11 +194,15 @@ class VirtualWindow {
         return support;
     }
 
-
     render(): string {
+
         const renderedBuffer = this.buffer.join('\n');
         const cursorState = `[Cursor Visible: ${this.cursorVisible}, Cursor Position: (${this.cursorY + 1}, ${this.cursorX + 1})]`;
-        return `${renderedBuffer}\n${cursorState}`;
+        const belState = `[BEL:${this.bel}]`;
+        if (this.bel) {
+            this.bel = false;
+        }
+        return `${renderedBuffer}\n${cursorState}\n${belState}`;
     }
 
     private ensureLineExists(lineIndex: number): void {

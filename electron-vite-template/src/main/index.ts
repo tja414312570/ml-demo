@@ -62,6 +62,7 @@ app.whenReady().then(() => {
   })
   startProxyServer(upstreamProxy).then(proxy => {
     onAppReady();
+    ptyInit()
     ipcMain.on('notificationAPI-ready', () => {
       notify("gpt拦截器已初始化完成！")
     })
@@ -76,10 +77,11 @@ app.on("window-all-closed", () => {
 });
 app.on("browser-window-created", (event: Event,
   window: BrowserWindow) => {
+  // 
   console.log("window-created", window);
   window.once("ready-to-show", () => {
     console.log("启动终端")
-    ptyInit()
+
   });
 });
 

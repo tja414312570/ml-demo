@@ -1,6 +1,6 @@
 import VirtualWindow from '../plugins/ssh_executor/src/virtual-window';
 
-let isDebug = true;
+let isDebug = false;
 export function debug(data: string) {
     return isDebug ? data.replace(/[\x00-\x1F\x7F]/g, (char) => {
         const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
