@@ -23,54 +23,53 @@ const removeInvisibleChars = (str: string) => {
 };
 
 
-function equalsAny(value:any, ...candidates:any[]) {
+function equalsAny(value: any, ...candidates: any[]) {
   return candidates.includes(value);
 }
 
-function isCommandSuccessful(exitCode:string|number) {
+function isCommandSuccessful(exitCode: string | number) {
   return equalsAny(exitCode, 0, '0', true, 'True', 'true');
 }
 class ExecuteContext {
- 
   private _data: ((data: string) => void) | undefined;
   private _write: ((data: string) => void) | undefined;
-  private _error:((data:Error) => void) | undefined;
-  private _end:(() => void) | undefined;
-  private _abort:((message?:any) => void) | undefined;
+  private _error: ((data: Error) => void) | undefined;
+  private _end: ((data?: string) => void) | undefined;
+  private _abort: ((message?: any) => void) | undefined;
   callData(data: string) {
     if (!this._data) {
       throw new Error("没有响应回调");
     }
     this._data(data);
   }
-  abort(message:string) {
+  abort(message: string) {
     if (!this._abort) {
       throw new Error("没有终止回调");
     }
     this._abort(message)
   }
-  write(data:string){
+  write(data: string) {
     if (!this._write) {
       throw new Error("没有发送回调");
     }
     this._write(data);
   }
-  error(data:string|Error){
+  error(data: string | Error) {
     if (!this._error) {
       throw new Error("没有错误回调");
     }
-    if(data instanceof Error){
+    if (data instanceof Error) {
       this._error(data);
-    }else{
+    } else {
       this._error(new Error(data))
     }
-    
   }
-  end(){
+
+  end(data?: | string) {
     if (!this._end) {
       throw new Error("没有结束回调");
     }
-    this._end();
+    this._end(data);
   }
   onAbort(callback: (data: string) => void) {
     this._abort = callback;
@@ -81,155 +80,152 @@ class ExecuteContext {
   onData(callback: (data: string) => void) {
     this._data = callback;
   }
-  onError(callback: (data: Error) => void){
+
+  onError(callback: (data: Error) => void) {
     this._error = callback;
   }
-  onEnd(callback: () => void){
+  onEnd(callback: () => void) {
     this._end = callback;
   }
 }
 
 class SshExecutor implements InstructExecutor, Pluginlifecycle {
-  private cache:Map<String,ExecuteContext> = new Map();
+  private cache: Map<String, ExecuteContext> = new Map();
   abort(instruct: InstructContent): Promise<InstructResult | void> {
-    return new Promise(resolve=>{
+    return new Promise(resolve => {
       const { id } = instruct;
-      const context =this.cache.get(id);
-      if(context){
+      const context = this.cache.get(id);
+      if (context) {
         context.abort("用户主动终止");
       }
       pluginContext.pty.write('\x03');
       resolve()
     })
   }
+
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { id, code } = instruct;
     const execId = uuidv4()
     return new Promise((resolve, reject) => {
-      if(this.cache.has(id)){
+      if (this.cache.has(id)) {
         throw new Error("代码正在执行中")
       }
       const executeContext = new ExecuteContext();
       const virtualWindow = new VirtualWindow();
-      
-      this.cache.set(id,executeContext);
-      executeContext.onWrite(data=>pluginContext.pty.write(data));
-      const disable = pluginContext.pty.onData(data =>  {
-        virtualWindow.write(data); // 将数据写入虚拟窗口
+      const line = code.split(/\r?\n/).length;
+      const render = (data: string, type: InstructResultType) => {
+        virtualWindow.write(data);
         const output = virtualWindow.render();
         pluginContext.sendIpcRender('codeViewApi.insertLine', {
           id,
-          code:output,
+          code: output,
           execId,
           line,
-          type: InstructResultType.executing
+          type,
         })
-        // executeContext.callData(data)
+      }
+
+      this.cache.set(id, executeContext);
+      executeContext.onWrite(data => pluginContext.pty.write(data));
+      const disable = pluginContext.pty.onData(data => {
+        render(data, InstructResultType.executing)
+        executeContext.callData(data)
       })
-      executeContext.onEnd(()=>{
-        disable.dispose( )
-        this.cache.delete(id)})
-      executeContext.onError((err)=>{
-        console.error("程序异常:",err)
-        executeContext.end();
-      })
-      executeContext.onAbort((err)=>{
-        console.error("程序异常:",err)
-        pluginContext.sendIpcRender('codeViewApi.insertLine', {
-          id,
-          code: `程序终止执行:${err}`,
+      const destory = () => {
+        disable.dispose()
+        this.cache.delete(id)
+      }
+      executeContext.onEnd((data?: string) => {
+        render(data ? data : '', InstructResultType.completed)
+        const output = virtualWindow.render();
+        resolve({
+          id: instruct.id,
+          // ret: output,
+          std: output,
           execId,
-          line,
           type: InstructResultType.completed
         })
-        executeContext.end();
+        destory();
       })
-      const line = code.split(/\r?\n/).length;
+      executeContext.onError((err) => {
+        render(`程序异常:${err}`, InstructResultType.completed),
+          destory();
+        const output = virtualWindow.render();
+        resolve({
+          id: instruct.id,
+          // ret: output,
+          std: output,
+          execId,
+          type: InstructResultType.completed
+        })
+      })
+      executeContext.onAbort((err) => {
+        render(`程序终止执行:${err}`, InstructResultType.completed),
+          destory();
+        const output = virtualWindow.render();
+        resolve({
+          id: instruct.id,
+          // ret: output,
+          std: output,
+          execId,
+          type: InstructResultType.completed
+        })
+      })
+
       const code_splits = instruct.code
         .split(/\r?\n/)
         .filter(line => line.trim() && !/^\s*(#|REM|::)/i.test(line));
-        (async () => {
-          const results = [];
-          for (const instruct of code_splits) {
-            try {
-              const result = await this.executeLine(id, instruct,line, execId, executeContext);
-              results.push(result.result);
-              if (!isCommandSuccessful(result.code)) {
-                results.push("程序异常退出，退出码:"+result.code);
-                executeContext.abort(`程序异常退出，退出码${result.code}`)
-                break; 
-              }
-              // 如果需要在执行成功后处理 result，可以在这里添加逻辑
-            } catch (error:any) {
-              // 在此捕获执行过程中可能发生的错误
-              console.error(`Error executing line: ${instruct}`, error);
-              executeContext.error(error)
-              break; // 如果发生错误，可以选择中断循环
+      (async () => {
+        for (const instruct of code_splits) {
+          try {
+            const exitCode = await this.executeLine(id, instruct, line, execId, executeContext);
+            if (!isCommandSuccessful(exitCode)) {
+              executeContext.abort(`程序异常退出，退出码${exitCode}`)
+              break;
             }
+            // 如果需要在执行成功后处理 result，可以在这里添加逻辑
+          } catch (error: any) {
+            // 在此捕获执行过程中可能发生的错误
+            console.error(`Error executing line: ${instruct}`, error);
+            executeContext.error(error)
+            break; // 如果发生错误，可以选择中断循环
           }
-          executeContext.end();
-          pluginContext.sendIpcRender('codeViewApi.insertLine', {
-            id,
-            code: ``,
-            execId,
-            line,
-            type: InstructResultType.completed
-          })
-          resolve({
-              id: instruct.id,
-              ret: results.join('\r\n'),
-              // std:results.join()
-              execId,
-              type: InstructResultType.completed
-          })
-        })();
+        }
+        executeContext.end();
+      })();
     });
   }
 
-  executeLine(id: string, instruct: string,line:number, execId: string, executeContext: ExecuteContext): Promise<{result:string,code:string}> {
+  executeLine(id: string, instruct: string, line: number, execId: string, executeContext: ExecuteContext): Promise<string> {
     let executeing = true;
-    let results: string[] = []
     const end_tag = `_${uuidv4()}_`;
     const cmd = process.platform === 'win32' ?
       `try { ${instruct} } catch { Write-Error $_.Exception.Message ;$_.ErrorRecord } finally { Write-Host "${end_tag}$?" }` ://ps
       `${instruct} ; echo "${end_tag}$?"`; //ssh
-      const msg = `命令[${instruct}]开始执行,执行id[${end_tag}],命令：${cmd}`;
-      console.log(msg)
-      pluginContext.notifyManager.notify(msg)
+    const msg = `命令[${instruct}]开始执行,执行id[${end_tag}],命令：${cmd}`;
+    console.log(msg)
+    pluginContext.notifyManager.notify(msg)
     return new Promise(resolve => {
       // 将 PTY 输出发送到前端
+      let remainingText='';
       executeContext.onData((data: string) => {
-        if (executeing) {
-          const lines = data.split(/\r?\n/); // 按换行符分割
-          for (const _line of lines) {
-            console.log(`读取行:"${_line}"${executeing}`);
+          remainingText+=data;
+          let index;
+          while((index = remainingText.indexOf('\n'))>-1 ){
+            const _line = remainingText.substring(0,index);
             const lineTrim = removeInvisibleChars(_line);
-            if(!executeing){
-              return;
-            }
             if (lineTrim.length > 1 && lineTrim.startsWith(end_tag)) {
               executeing = false;
               const exitCode = lineTrim.substring(end_tag.length);
               const msg = `命令[${instruct}]执行完成,执行id[${end_tag}]，退出状态[${exitCode}]`;
-              console.log(msg)
               pluginContext.notifyManager.notify(msg)
-              resolve({result:results.join('\r\n'),code:exitCode});
-            } else if (lineTrim.length > 1) {
-              const lineTrimProcess = lineTrim.replace(cmd.trim(), instruct);
-              results.push(lineTrimProcess)
-              pluginContext.sendIpcRender('codeViewApi.insertLine', {
-                id,
-                code: `${lineTrimProcess}\r\n`,
-                execId,
-                line,
-                type: InstructResultType.executing
-              })
+              resolve(exitCode);
             }
+            remainingText = remainingText.substring(index+1);
           }
-        }
       });
-      pluginContext.pty.write(cmd)
-       pluginContext.pty.write('\r')
+      executeContext.write(cmd)
+      executeContext.write('\r')
     })
   }
 

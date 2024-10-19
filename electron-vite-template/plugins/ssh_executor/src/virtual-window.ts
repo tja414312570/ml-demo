@@ -57,7 +57,7 @@ class VirtualWindow {
             } else if (char === '\x07') {
                 this.bel = true;
             } else if (char === '\x08') {
-                this.cursorX--;
+                this.cursorX > 0 && this.cursorX--;
             } else {
                 this.addCharToBuffer(char);
             }
@@ -104,13 +104,13 @@ class VirtualWindow {
         switch (command) {
             case 'H': // 光标移动到指定位置 (row, col)
             case 'f': // 与 'H' 功能相同
-                this.cursorY = param1 - 1;
+                this.cursorY = Math.max(0, param1 - 1);
                 this.ensureLineExists(this.cursorY);
-                this.cursorX = param2 - 1;
+                this.cursorX = Math.max(0, param2 - 1);
                 this.ensureLineLength(this.cursorY, this.cursorX);
                 break;
             case 'A': // 光标上移
-                this.cursorY = this.cursorY - (param1 ? param1 : 1);
+                this.cursorY = Math.max(0, this.cursorY - (param1 ? param1 : 1));
                 this.ensureLineExists(this.cursorY);
                 break;
             case 'B': // 光标下移
@@ -122,7 +122,7 @@ class VirtualWindow {
                 this.ensureLineLength(this.cursorY, this.cursorX);
                 break;
             case 'D': // 光标左移
-                this.cursorX = this.cursorX - (param1 ? param1 : 1);
+                this.cursorX = Math.max(0, this.cursorX - (param1 ? param1 : 1));
                 break;
             case 'G': // 光标移到当前行的指定列
                 this.cursorX = param1 - 1;
@@ -195,14 +195,13 @@ class VirtualWindow {
     }
 
     render(): string {
-
         const renderedBuffer = this.buffer.join('\n');
-        const cursorState = `[Cursor Visible: ${this.cursorVisible}, Cursor Position: (${this.cursorY + 1}, ${this.cursorX + 1})]`;
-        const belState = `[BEL:${this.bel}]`;
+        // const cursorState = `[Cursor Visible: ${this.cursorVisible}, Cursor Position: (${this.cursorY + 1}, ${this.cursorX + 1})]`;
+        // const belState = `[BEL:${this.bel}]`;
         if (this.bel) {
             this.bel = false;
         }
-        return `${renderedBuffer}\n${cursorState}\n${belState}`;
+        return `${renderedBuffer}`;
     }
 
     private ensureLineExists(lineIndex: number): void {
