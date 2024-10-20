@@ -4,8 +4,14 @@ import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
 import { processResponse } from './dispatcher';
+import path from 'path';
 
 class ChatGptBridge implements Bridge, Pluginlifecycle {
+  requireJs(): Promise<string | void> {
+    return new Promise(resolve=>{
+      resolve(path.join("file://", path.join(__dirname,"assets","js_bridge.js")))
+    })
+  }
   pluginContext: PluginExtensionContext | undefined;
   onRequest(ctx: IContext): Promise<string | void> {
     // console.log("请求", ctx.proxyToServerRequestOptions.host)

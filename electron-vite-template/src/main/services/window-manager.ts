@@ -5,6 +5,9 @@ import { useProcessException } from "@main/hooks/exception-hook";
 import path from "path";
 import "./executor";
 import { bindListenerChannel, removeListenerChannel } from "./web-content-listener";
+import pluginManager from "@main/plugin/plugin-manager";
+import { PluginType } from "@main/plugin/type/plugin";
+import { Bridge } from "@main/plugin/type/bridge";
 
 
 class MainInit {
@@ -60,7 +63,13 @@ class MainInit {
 
 
     ipcMain.handle('load-script', (event, fileName) => {
-      return path.join("file://", getPreloadFile(fileName))
+      return new Promise((resolve, reject) => {
+        pluginManager.resolvePluginModule<Bridge>(PluginType.agent).then(module => {
+          resolve(module.requireJs());
+        }).catch(error => {
+          reject(error)
+        })
+      })
     });
 
 

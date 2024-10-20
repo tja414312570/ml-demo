@@ -26,5 +26,6 @@ window.addEventListener('DOMContentLoaded', () => {
     loadModule(file_addr);
   }).catch(err => {
     console.error("加载脚本异常", err)
+    alert("加载脚本异常:" + err)
   })
 });

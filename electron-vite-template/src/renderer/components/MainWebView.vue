@@ -49,6 +49,7 @@ function onStartLoading() {
 
 // 页面加载完成时更新按钮状态，并停止 loading 状态
 function onLoad() {
+  webviews.value.openDevTools()
   loading.value = false;
   if (webviews.value) {
     canGoBack.value = webviews.value.canGoBack();
@@ -58,6 +59,7 @@ function onLoad() {
 
 onMounted(() => {
   const myWebview = webviews.value;
+
   if (myWebview) {
     myWebview.addEventListener('did-navigate', (event) => {
       if (!isFocused.value) {
