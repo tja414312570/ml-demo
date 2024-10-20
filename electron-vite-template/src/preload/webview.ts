@@ -4,15 +4,7 @@ import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
 
 const api = 'webview-api'
 
-exposeInMainWorld(api, {
-  on: (channel, callback) => {
-    console.log("webview监听:", channel)
-    ipcRenderMapper.on(channel, (event, message) => {
-      console.log("webview消息:", message)
-      callback(event, message)
-    })
-  }
-})
+exposeInMainWorld(api, {})
 
 window.addEventListener('DOMContentLoaded', () => {
   console.log('DOM 已经加载完成');
@@ -28,7 +20,7 @@ window.addEventListener('DOMContentLoaded', () => {
     };
     document.head.appendChild(script);  // 将 script 标签插入到页面
   }
-  ipcRenderer.invoke("load-script", 'js_bridge').then(file_addr => {
+  ipcRenderer.invoke("load-script", location.href).then(file_addr => {
     console.log(`获取文集：${file_addr}`)
     // 调用示例，加载模块化的 JavaScript 文件
     loadModule(file_addr);

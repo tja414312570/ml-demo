@@ -4,10 +4,6 @@ import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
 import { processResponse } from './dispatcher';
-import { resolve } from 'path';
-import performance from 'perf_hooks';
-
-
 
 class ChatGptBridge implements Bridge, Pluginlifecycle {
   pluginContext: PluginExtensionContext | undefined;
@@ -68,7 +64,6 @@ class ChatGptBridge implements Bridge, Pluginlifecycle {
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }
-
 
 }
 export default new ChatGptBridge();
