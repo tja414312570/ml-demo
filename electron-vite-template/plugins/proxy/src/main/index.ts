@@ -8,7 +8,7 @@ import path from 'path';
 class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
   requireJs(): Promise<string | void> {
     return new Promise(resolve=>{
-      resolve(path.join("file://", path.join(__dirname,"assets","js_bridge.js")))
+      resolve(path.join("file://", path.join(__dirname,"render","js_bridge.js")))
     })
   }
   onRequest(ctx: IContext): Promise<string | void> {

@@ -1,62 +1,12 @@
 const path = require('path');
 const fs = require('fs');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const archiver = require('archiver');
 const glob = require('glob');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-class ZipPlugin {
-  apply(compiler) {
-    compiler.hooks.afterEmit.tap('ZipPlugin', (compilation) => {
-      const outputDir = path.resolve(__dirname, 'dist');
-      const buildDir = path.resolve(__dirname, 'build');
-      const zipFile = path.join(buildDir, 'dist.zip');
-
-      if (!fs.existsSync(buildDir)) {
-        fs.mkdirSync(buildDir);
-      }
-
-      const output = fs.createWriteStream(zipFile);
-      const archive = archiver('zip', {
-        zlib: { level: 9 },
-      });
-
-      output.on('close', () => {
-        console.log(`${archive.pointer()} total bytes`);
-        console.log('打包完成，zip 文件已生成在 build 目录下');
-      });
-
-      archive.on('warning', (err) => {
-        if (err.code === 'ENOENT') {
-          console.warn(err);
-        } else {
-          throw err;
-        }
-      });
-
-      archive.on('error', (err) => {
-        throw err;
-      });
-
-      archive.pipe(output);
-      archive.directory(outputDir, false);
-      archive.finalize();
-    });
-  }
-}
-
-module.exports = {
-  entry: {
-    // main 目录下的单一入口文件
-    main: './src/main/index.ts',
-    
-    // render 目录下的所有文件为单独的入口文件
-    ...glob.sync('./src/render/**/*.ts').reduce((entries, file) => {
-      const entry = path.basename(file, path.extname(file));
-      entries[`render/${entry}`] = file;
-      return entries;
-    }, {}),
-  },
-  target: 'node', // 确保为 node 环境编译
+// Webpack 配置：Node.js 环境，用于打包 `main` 目录
+const mainConfig = {
+  entry: './src/main/index.ts',  // 入口文件为 main 目录下的 index.ts
+  target: 'node',  // Node.js 环境
   module: {
     rules: [
       {
@@ -70,21 +20,57 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   output: {
-    filename: '[name].js', // 动态生成文件名，包含路径结构
-    path: path.resolve(__dirname, 'dist'),
-    libraryTarget: 'commonjs2', // 生成 CommonJS2 格式的输出
+    filename: 'main.js',  // 输出文件名
+    path: path.resolve(__dirname, 'dist'),  // 输出到 dist 目录
+    libraryTarget: 'commonjs2',  // Node.js 使用 CommonJS2
   },
   mode: 'production',
   optimization: {
-    minimize: false, // 禁用代码压缩
+    minimize: false,  // 禁用压缩
+  }
+};
+
+// Webpack 配置：Web 环境，用于打包 `render` 目录
+const renderConfig = {
+  entry: glob.sync('./src/render/**/*.ts').reduce((entries, file) => {
+    const entry = path.basename(file, path.extname(file));
+    entries[`render/${entry}`] = file;
+    return entries;
+  }, {}),  // render 目录下所有 TypeScript 文件为入口文件
+  target: 'web',  // 浏览器环境
+  module: {
+    rules: [
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+    ],
   },
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  output: {
+    filename: '[name].js',  // 输出文件名保持 render 目录结构
+    path: path.resolve(__dirname, 'dist'),  // 输出到 dist 根目录，render 文件夹不再重复嵌套
+  },
+  mode: 'production',
+  optimization: {
+    minimize: false,  // 禁用压缩
+  }
+};
+
+const copy = {
+  entry: {},  // 无需入口文件
+  mode: 'production',
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'manifest.json', to: 'manifest.json' },
-        { from: 'assets', to: 'assets' },
+        { from: 'manifest.json', to: 'manifest.json' },  // 复制到 dist 根目录
+        { from: 'assets', to: 'assets' },  // 复制到 dist 根目录
       ],
     }),
-    new ZipPlugin(),
   ],
 };
+
+module.exports = [mainConfig, renderConfig,copy];  // 导出多个配置
