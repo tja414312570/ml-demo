@@ -1,6 +1,6 @@
-import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../lib/src/main/bridge'
-import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
-import { PluginExtensionContext } from "../../../lib/src/main/plugin";
+import { InstructContent, InstructExecutor, InstructResult, InstructResultType, pluginContext } from 'mylib/main'
+import { Pluginlifecycle } from 'mylib/main'
+import { PluginExtensionContext } from 'mylib/main';
 import { v4 as uuidv4 } from 'uuid';
 import VirtualWindow from './virtual-window'
 
@@ -127,7 +127,7 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
 
       this.cache.set(id, executeContext);
       executeContext.onWrite(data => pluginContext.pty.write(data));
-      const disable = pluginContext.pty.onData(data => {
+      const disable = pluginContext.pty.onData((data:string) => {
         render(data, InstructResultType.executing)
         executeContext.callData(data)
       })
@@ -230,7 +230,6 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
   }
 
   onMounted(ctx: PluginExtensionContext): void {
-    global.pluginContext = ctx;
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }
