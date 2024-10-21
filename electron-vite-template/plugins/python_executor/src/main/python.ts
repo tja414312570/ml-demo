@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { InstructResultType } from "../../../src/main/plugin/type/bridge";
+import { InstructResultType, pluginContext } from "mylib/main";
 
 export const runPythonCode = async (id: string, code: string, execId: string): Promise<string> => {
   return new Promise((resolve, reject) => {

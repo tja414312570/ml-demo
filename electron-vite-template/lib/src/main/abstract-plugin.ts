@@ -1,4 +1,4 @@
-import { PluginExtensionContext } from "../../../lib/src/main/plugin";
+import { PluginExtensionContext } from "./plugin";
 
 export class AbstractPlugin {
     _init__(ctx: PluginExtensionContext) {

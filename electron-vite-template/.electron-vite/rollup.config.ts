@@ -74,6 +74,7 @@ export default (env = "production", type = "main") => {
       alias({
         entries: [
           { find: "@main", replacement: path.join(__dirname, "../src/main") },
+          { find: "@lib", replacement: path.join(__dirname, "../lib/src") },
           {
             find: "@config",
             replacement: path.join(__dirname, "..", "config"),

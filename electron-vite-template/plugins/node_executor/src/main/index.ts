@@ -1,8 +1,7 @@
-import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../src/main/plugin/type/bridge';
-import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle';
-import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
+import { AbstractPlugin, InstructContent, InstructExecutor, InstructResult, InstructResultType, pluginContext } from  'mylib/main';
+import { Pluginlifecycle } from 'mylib/main';
+import { PluginExtensionContext } from 'mylib/main';
 import { createContext, runInContext } from 'vm';
-import { AbstractPlugin } from './abstract-plugin';
 import {stringify} from 'circular-json';
 import { rejects } from 'assert';
 import util from 'util'

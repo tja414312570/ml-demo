@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import pluginManager from "./plugin-manager";
 import _ from 'lodash';  // 使用 ES6 import 语法
-import { PluginInfo } from "./type/plugin";
+import { PluginInfo } from '@lib/main';
 
 
 const arrayPool = {

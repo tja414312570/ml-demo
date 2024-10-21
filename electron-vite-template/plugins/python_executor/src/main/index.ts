@@ -1,11 +1,14 @@
-import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../src/main/plugin/type/bridge'
-import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
-import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
+import { AbstractPlugin, InstructContent, InstructExecutor, InstructResult, InstructResultType } from 'mylib/main'
+import { Pluginlifecycle } from 'mylib/main'
+import { PluginExtensionContext } from 'mylib/main'
 import { v4 as uuidv4 } from 'uuid';
 import { runPythonCode } from './python';
 import util from 'util'
 
-class PythonExecutor implements InstructExecutor, Pluginlifecycle {
+class PythonExecutor extends AbstractPlugin implements InstructExecutor, Pluginlifecycle {
+  abort(instruct: InstructContent): Promise<InstructResult | void> {
+    throw new Error('Method not implemented.');
+  }
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { id, code } = instruct;
     const execId = uuidv4();
@@ -33,7 +36,6 @@ class PythonExecutor implements InstructExecutor, Pluginlifecycle {
   }
 
   onMounted(ctx: PluginExtensionContext): void {
-    global.pluginContext = ctx;
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }

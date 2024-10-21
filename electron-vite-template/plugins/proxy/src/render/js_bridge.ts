@@ -1,17 +1,19 @@
-import { getIpcApi } from '../renderer/ts/ipc-api'
+import { getIpcApi } from 'mylib/render'
+declare var Vue: any;
 
+const _doc = document as any;
 const js_bridge = () => {
-  if (document.myApp) {
-    console.log("桥接程序已初始化", document.myApp)
+  if (_doc.myApp) {
+    console.log("桥接程序已初始化", _doc.myApp)
     return;
   }
-  let myApp = document.myApp = {
+  let myApp = _doc.myApp = {
     sendButton: null,
     vueInstance: null,
     currentLocation: null,
-    send: function (message) {
+    send: function (message:string) {
       // 找到 textarea 元素
-      let textarea = document.querySelector('#prompt-textarea');
+      let textarea = document.querySelector('#prompt-textarea') as any;
       // 清空 textarea 的内容并填写新内容
       if (textarea) {
         console.log(textarea.tagName.toLowerCase())
@@ -38,15 +40,15 @@ const js_bridge = () => {
       // 找到具有 data-testid="send-button" 的按钮
 
       // 立即点击按钮
-      console.log("发送按钮", document.myApp.sendButton, document)
-      if (document.myApp.sendButton) {
+      console.log("发送按钮", _doc.myApp.sendButton, _doc)
+      if (_doc.myApp.sendButton) {
         var loop = setInterval(() => {
-          if (!document.myApp.sendButton.hasAttribute('disabled') && document.myApp.sendButton.getAttribute('data-testid') === 'send-button') {
-            document.myApp.sendButton.click();
-            console.log("按钮一点击", document.myApp.sendButton)
+          if (!_doc.myApp.sendButton.hasAttribute('disabled') && _doc.myApp.sendButton.getAttribute('data-testid') === 'send-button') {
+            _doc.myApp.sendButton.click();
+            console.log("按钮一点击", _doc.myApp.sendButton)
             clearInterval(loop)
           } else {
-            console.log("按钮不可用", document.myApp.sendButton)
+            console.log("按钮不可用", _doc.myApp.sendButton)
             if (textarea == null || textarea.value === '') {
               clearInterval(loop)
             }
@@ -59,20 +61,20 @@ const js_bridge = () => {
       const loadVueScript = () => {
         console.log("加载vuejs1")
         return new Promise((resolve, reject) => {
-          var script = document.createElement('script');
+          var script = _doc.createElement('script');
           script.src = 'https://cdn.jsdelivr.net/npm/vue@2';
           script.onload = resolve; // 成功加载时执行 resolve
           script.onerror = reject; // 加载失败时执行 reject
-          document.head.appendChild(script);
+          _doc.head.appendChild(script);
           console.log("加载vuejs")
         });
       };
 
       loadVueScript().then(() => {
         // Vue 加载成功的逻辑
-        const appDiv = document.createElement('div');
+        const appDiv = _doc.createElement('div');
         appDiv.id = 'vue-app';
-        document.body.appendChild(appDiv);
+        _doc.body.appendChild(appDiv);
         console.log("加载vue脚本")
         // 定义 Vue 应用
         const App = {
@@ -100,7 +102,7 @@ const js_bridge = () => {
         };
 
         // 挂载 Vue 应用到动态插入的 div 上
-        document.myApp.vueInstance = new Vue({
+        _doc.myApp.vueInstance = new Vue({
           el: '#vue-app',
           data: App.data,
           template: App.template
@@ -111,21 +113,21 @@ const js_bridge = () => {
         myApp.error('Vue 加载失败，请检查网络或重试。', { autoClose: 5000 });
       });
     },
-    notify: function (newMessage) {
-      if (document.myApp.vueInstance) {
+    notify: function (newMessage:string) {
+      if (_doc.myApp.vueInstance) {
         // 更新 Vue 实例中的 message
-        document.myApp.vueInstance.message = newMessage;
+        _doc.myApp.vueInstance.message = newMessage;
       } else {
         console.error('Vue 实例尚未初始化，请确保调用了 createApp 方法。');
       }
     },
     // 错误通知的方法
-    error: function (message, options = {}) {
-      let errorDiv = document.querySelector('#error-notification');
+    error: function (message:string, options :{[key:string]:any} = {} as any) {
+      let errorDiv = _doc.querySelector('#error-notification');
 
       if (!errorDiv) {
         // 如果不存在错误提示框，则创建
-        errorDiv = document.createElement('div');
+        errorDiv = _doc.createElement('div');
         errorDiv.id = 'error-notification';
         errorDiv.style.position = 'fixed';
         errorDiv.style.bottom = options.bottom || '10px';
@@ -196,11 +198,11 @@ const js_bridge = () => {
         let sendButton = document.querySelector('button[data-testid="send-button"]');
         console.log("查找发送按钮", sendButton, document)
         if (sendButton) {
-          document.myApp.sendButton = sendButton;
+          _doc.myApp.sendButton = sendButton;
           const mark = document.querySelector('form[type="button"]');
           if (myApp.currentLocation != mark) {
-            myApp.currentLocation = mark;
-            document.myApp.send(`
+            (myApp.currentLocation as any) = mark;
+            _doc.myApp.send(`
                             现在我发送要求给你，你可以写python或bash代码，我会执行你的代码，并返回执行结果你。你可以解析结果，并解读给我。对于python或bash的执行结果你可以自定义，比如json，字符串等。
                             对于某些情况，你可能需要我上传文件，此时你可以在打印中另起一行，以fileupload:['file1','file2']的格式输出，我看到了会解析里面的文件，并一并上传给你，对于文件，建议你都通过上传文件的方式处理。
                             对于报错没有相关组件时，我执行了代码之后，会把执行结果给你，你可以依据相关结果继续执行相关指令。
@@ -242,8 +244,8 @@ const js_bridge = () => {
   return "ok";
 }
 const webviewApi: any = getIpcApi('webview-api')
-webviewApi.on("webviewApi.send-content", (event, message) => {
+webviewApi.on("webviewApi.send-content", (event:any, message:any) => {
   console.log("搜到webview消息：", event, message)
-  document.myApp.send(message)
+  _doc.myApp.send(message)
 })
 js_bridge()

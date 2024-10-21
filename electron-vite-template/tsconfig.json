@@ -18,11 +18,12 @@
       "@config/*": ["config/*"],
       "@renderer/*": ["src/renderer/*"],
       "@main/*": ["src/main/*"],
-      "@store/*": ["src/renderer/store/modules/*"]
+      "@store/*": ["src/renderer/store/modules/*"],
+      "@lib/*":["lib/src/*"]
     },
     "typeRoots": ["node_modules/@types"],
     "lib": ["ES2022", "dom"]
   },
-  "include": ["src/**/*", "customTypes/*", "test/index.ts"],
+  "include": ["src/**/*", "customTypes/*", "test/index.ts", "lib/preload/ipc-api.ts", "lib/main/bridge.ts", "lib/main/plugin.ts"],
   "exclude": ["node_modules"]
 }

@@ -16,7 +16,7 @@ import CodeTools from './CodeTools.vue';
 import * as monaco from 'monaco-editor';
 import { InstructContent } from '@main/ipc/code-manager';
 import CodeDiff from './CodeDiff.vue';
-import { getIpcApi } from '@renderer/ts/ipc-api';
+import { getIpcApi } from '@lib/preload/ipc-api';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
 import context from '@renderer/context';
 

@@ -1,6 +1,6 @@
-import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../src/main/plugin/type/bridge'
+import { InstructContent, InstructExecutor, InstructResult, InstructResultType } from '../../../lib/src/main/bridge'
 import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
-import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
+import { PluginExtensionContext } from "../../../lib/src/main/plugin";
 import { v4 as uuidv4 } from 'uuid';
 import VirtualWindow from './virtual-window'
 
@@ -207,22 +207,22 @@ class SshExecutor implements InstructExecutor, Pluginlifecycle {
     pluginContext.notifyManager.notify(msg)
     return new Promise(resolve => {
       // 将 PTY 输出发送到前端
-      let remainingText='';
+      let remainingText = '';
       executeContext.onData((data: string) => {
-          remainingText+=data;
-          let index;
-          while((index = remainingText.indexOf('\n'))>-1 ){
-            const _line = remainingText.substring(0,index);
-            const lineTrim = removeInvisibleChars(_line);
-            if (lineTrim.length > 1 && lineTrim.startsWith(end_tag)) {
-              executeing = false;
-              const exitCode = lineTrim.substring(end_tag.length);
-              const msg = `命令[${instruct}]执行完成,执行id[${end_tag}]，退出状态[${exitCode}]`;
-              pluginContext.notifyManager.notify(msg)
-              resolve(exitCode);
-            }
-            remainingText = remainingText.substring(index+1);
+        remainingText += data;
+        let index;
+        while ((index = remainingText.indexOf('\n')) > -1) {
+          const _line = remainingText.substring(0, index);
+          const lineTrim = removeInvisibleChars(_line);
+          if (lineTrim.length > 1 && lineTrim.startsWith(end_tag)) {
+            executeing = false;
+            const exitCode = lineTrim.substring(end_tag.length);
+            const msg = `命令[${instruct}]执行完成,执行id[${end_tag}]，退出状态[${exitCode}]`;
+            pluginContext.notifyManager.notify(msg)
+            resolve(exitCode);
           }
+          remainingText = remainingText.substring(index + 1);
+        }
       });
       executeContext.write(cmd)
       executeContext.write('\r')

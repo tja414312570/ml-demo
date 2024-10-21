@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const archiver = require('archiver');
+const glob = require('glob');
 
 class ZipPlugin {
   apply(compiler) {
@@ -44,7 +45,17 @@ class ZipPlugin {
 }
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    // main 目录下的单一入口文件
+    main: './src/main/index.ts',
+    
+    // render 目录下的所有文件为单独的入口文件
+    ...glob.sync('./src/render/**/*.ts').reduce((entries, file) => {
+      const entry = path.basename(file, path.extname(file));
+      entries[`render/${entry}`] = file;
+      return entries;
+    }, {}),
+  },
   target: 'node', // 确保为 node 环境编译
   module: {
     rules: [
@@ -59,11 +70,14 @@ module.exports = {
     extensions: ['.ts', '.js'],
   },
   output: {
-    filename: 'bundle.js',
+    filename: '[name].js', // 动态生成文件名，包含路径结构
     path: path.resolve(__dirname, 'dist'),
     libraryTarget: 'commonjs2', // 生成 CommonJS2 格式的输出
   },
   mode: 'production',
+  optimization: {
+    minimize: false, // 禁用代码压缩
+  },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [

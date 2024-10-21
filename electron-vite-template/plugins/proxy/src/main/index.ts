@@ -1,22 +1,21 @@
-import { Bridge } from '../../../src/main/plugin/type/bridge'
-import { Pluginlifecycle } from '../../../src/main/plugin/type/plugin-lifecycle'
-import { PluginExtensionContext } from "../../../src/main/plugin/type/plugin";
+import { Bridge ,PluginExtensionContext,AbstractPlugin} from 'mylib/main'
+import { Pluginlifecycle } from 'mylib/main'
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
 import { processResponse } from './dispatcher';
 import path from 'path';
 
-class ChatGptBridge implements Bridge, Pluginlifecycle {
+class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
   requireJs(): Promise<string | void> {
     return new Promise(resolve=>{
       resolve(path.join("file://", path.join(__dirname,"assets","js_bridge.js")))
     })
   }
-  pluginContext: PluginExtensionContext | undefined;
   onRequest(ctx: IContext): Promise<string | void> {
     // console.log("请求", ctx.proxyToServerRequestOptions.host)
     return new Promise<string | void>((resolve, rejects) => {
       const requestData = ctx.clientToProxyRequest;
+      
       let body: Uint8Array[] = [];
       requestData.on('data', (chunk) => {
         body.push(chunk);
@@ -64,8 +63,6 @@ class ChatGptBridge implements Bridge, Pluginlifecycle {
     })
   }
   onMounted(ctx: PluginExtensionContext): void {
-    this.pluginContext = ctx;
-    global.pluginContext = ctx;
     console.log("proxy代理已挂载")
   }
   onUnmounted(ctx: PluginExtensionContext): void {

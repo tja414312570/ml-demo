@@ -7,9 +7,11 @@
     "lint": "eslint 'src/**/*.{ts,js}' --fix",
     "build": "webpack",
     "clean": "rimraf build dist",
+    "test": "tsx test/test.ts",
     "zip": "npm run clean && npm run build"
   },
   "devDependencies": {
+    "mylib":"file://../../lib",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
     "@typescript-eslint/parser": "^8.8.0",
     "archiver": "^5.3.0",

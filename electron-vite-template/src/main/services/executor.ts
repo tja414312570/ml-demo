@@ -5,8 +5,8 @@ import { send_ipc_render } from "@main/ipc/send_ipc";
 import { ipcMain } from "electron";
 import { sendMessage } from "@main/ipc/webview-api";
 import pluginManager from "@main/plugin/plugin-manager";
-import { PluginInfo, PluginType } from "@main/plugin/type/plugin";
-import { InstructExecutor, InstructResult } from "@main/plugin/type/bridge";
+import { PluginInfo, PluginType } from '@lib/main';
+import { InstructExecutor, InstructResult } from '@lib/main';
 import { showErrorDialog } from "@main/utils/dialog";
 // loadModules('../executor', (file, module) => {
 //     if (!module.execute) {

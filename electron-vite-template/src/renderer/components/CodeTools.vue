@@ -43,10 +43,10 @@
 
 <script lang="ts" setup>
 import { InstructContent } from '@main/ipc/code-manager';
-import { InstructResultType } from '@main/plugin/type/bridge';
-import { PluginInfo } from '@main/plugin/type/plugin';
+import { InstructResultType } from '@lib/main';
+import { PluginInfo } from '@lib/main';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
-import { getIpcApi } from '@renderer/ts/ipc-api';
+import { getIpcApi } from '@lib/preload';
 import { onMounted, ref, watch } from 'vue';
 import * as monaco from 'monaco-editor';
 

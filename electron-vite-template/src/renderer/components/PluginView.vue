@@ -109,10 +109,10 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, vShow } from 'vue';
-import { PluginManifest } from '@main/plugin/type/plugin';
+import { PluginManifest } from '@lib/main';
 
 
-import { getIpcApi } from '@renderer/ts/ipc-api';
+import { getIpcApi } from '@lib/preload';
 
 const pluginViewApi: any = getIpcApi('plugin-view-api');
 const loading = ref(true);

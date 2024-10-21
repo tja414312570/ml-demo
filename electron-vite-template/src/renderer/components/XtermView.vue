@@ -13,7 +13,7 @@ import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { Terminal } from 'xterm';
 import { debounce } from 'lodash';
 import { FitAddon } from 'xterm-addon-fit';
-import { getIpcApi } from '../ts/ipc-api'
+import { getIpcApi } from '@lib/preload'
 import { WebLinksAddon } from 'xterm-addon-web-links';
 const fitAddon = new FitAddon();
 const terminalRef = ref(null);

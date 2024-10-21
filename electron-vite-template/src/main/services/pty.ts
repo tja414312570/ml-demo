@@ -1,7 +1,7 @@
 import { send_ipc_render } from "@main/ipc/send_ipc";
 import { wrapper } from "@main/plugin/Iproxy";
 import pluginContext from "@main/plugin/plugin-context";
-import { IPty } from "@main/plugin/type/plugin";
+import { IPty } from '@lib/main'
 import { ipcMain } from "electron";
 import * as pty from 'node-pty';
 let isinit = false;

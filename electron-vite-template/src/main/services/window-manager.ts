@@ -6,8 +6,7 @@ import path from "path";
 import "./executor";
 import { bindListenerChannel, removeListenerChannel } from "./web-content-listener";
 import pluginManager from "@main/plugin/plugin-manager";
-import { PluginType } from "@main/plugin/type/plugin";
-import { Bridge } from "@main/plugin/type/bridge";
+import { Bridge, PluginType } from '@lib/main';
 
 
 class MainInit {

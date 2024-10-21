@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import util from 'util';
 import { IncomingHttpHeaders } from 'http';
 import { SseHandler } from './share.github';
+import { notifyManager } from 'mylib/main';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
 // 使用 promisify 将子进程命令转换为 Promise

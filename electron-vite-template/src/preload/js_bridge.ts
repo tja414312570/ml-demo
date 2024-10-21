@@ -1,4 +1,4 @@
-import { getIpcApi } from '../renderer/ts/ipc-api'
+import { getIpcApi } from '@lib/preload'
 
 const js_bridge = () => {
   if (document.myApp) {

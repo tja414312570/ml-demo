@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-function showCustomAlert(message) {
+function showCustomAlert(message: string) {
     const alertDiv = document.createElement('div');
     alertDiv.innerText = message;
     alertDiv.style.position = 'fixed';
@@ -9,11 +9,11 @@ function showCustomAlert(message) {
     alertDiv.style.backgroundColor = 'white';
     alertDiv.style.padding = '10px';
     alertDiv.style.border = '1px solid black';
-    alertDiv.style.zIndex = 1000;
+    alertDiv.style.zIndex = '1000';
     document.body.appendChild(alertDiv);
 }
 
-
+const _win:{[key:string]:any} = (window as any);
 
 class IpcApi {
     private uuid: string;
@@ -23,13 +23,13 @@ class IpcApi {
     constructor(channel: string) {
         this.uuid = uuidv4();  // 生成 UUID
         this.channel = channel;  // 初始化 channel
-        if (!window[channel]) {
+        if (!_win[channel]) {
             const message = `IPC-API错误，没有找到渠道:${channel} `
-            window['core-api'].send('error-notify', message)
+            _win['core-api'].send('error-notify', message)
             showCustomAlert(message)
             throw new Error(message)
         }
-        this.ipcApi = window[channel]
+        this.ipcApi = _win[channel]
     }
     _getId__ = () => {
         return this.uuid;
@@ -54,7 +54,7 @@ export function getIpcApi<T>(channel: string): IpcApi & T {
         get(target, prop) {
             if (prop in target) {
                 // 如果方法存在，则调用原始对象的方法
-                return target[prop];
+                return (target as any)[prop];
             } else {
                 // 如果方法不存在，输出调用的方法名并返回一个默认值
                 return (...args: any[]) => {
@@ -64,7 +64,7 @@ export function getIpcApi<T>(channel: string): IpcApi & T {
                         return result;
                     } catch (err) {
                         const message = `ipc通信异常:${String(err)},目标:${channel}.${String(prop)}`
-                        window['core-api'].send('error-notify', message)
+                        _win['core-api'].send('error-notify', message)
                         showCustomAlert(message)
                         throw new Error(message, { cause: err })
                     } finally {

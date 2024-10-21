@@ -22,6 +22,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@main': resolve('src/main'),
+      '@lib': resolve('lib/src'),
       "@renderer": root,
       "@store": join(root, "/store/modules"),
       'vue': 'vue/dist/vue.esm-bundler.js',

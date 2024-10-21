@@ -4,8 +4,8 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 
 import { info } from '../utils/logger'
 import pluginManager from '@main/plugin/plugin-manager';
-import { PluginType } from '@main/plugin/type/plugin';
-import { Bridge } from '@main/plugin/type/bridge';
+import { PluginType } from '@lib/main';
+import { Bridge } from '@lib/main';
 import { notifyError } from '@main/ipc/notify-manager';
 import { dispatch } from './dispatcher';
 

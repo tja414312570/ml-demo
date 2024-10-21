@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType } from './type/plugin';
+import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType } from '../../../lib/src/main';
 import { v4 as uuidv4 } from 'uuid';
 import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
