@@ -1,4 +1,4 @@
-import { Bridge ,PluginExtensionContext,AbstractPlugin} from 'mylib/main'
+import { Bridge ,PluginExtensionContext,AbstractPlugin, pluginContext} from 'mylib/main'
 import { Pluginlifecycle } from 'mylib/main'
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
@@ -64,6 +64,7 @@ class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
   }
   onMounted(ctx: PluginExtensionContext): void {
     console.log("proxy代理已挂载")
+    pluginContext.
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }

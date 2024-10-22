@@ -1,5 +1,6 @@
 import { getIpcApi } from 'mylib/render'
-import Vue from 'vue';
+//@ts-ignore
+import Vue from 'vue/dist/vue.esm.js';
 // console.log('vue:',Vue)
 const _doc = document as any;
 
@@ -70,7 +71,6 @@ const js_bridge = () => {
         // Vue 加载成功的逻辑
         const appDiv = _doc.createElement('div');
         appDiv.id = 'vue-app';
-        appDiv.innerHTML='cnm'
         _doc.body.appendChild(appDiv);
         console.log("加载vue脚本",appDiv)
         // 定义 Vue 应用
@@ -103,7 +103,7 @@ const js_bridge = () => {
           data: App.data,
           template: App.template
         });
-        _doc.myApp.vueInstance.$mount(appDiv);
+        _doc.myApp.vueInstance.$mount(appDiv,true);
         console.log("加载vue脚本2",document.querySelector('#vue-app'))
         myApp.foundForm();
      
@@ -188,17 +188,28 @@ const js_bridge = () => {
       }
     },
     foundBtn:()=>{
+      myApp.notify("初始化中:"+(myApp.times++)+"s")
+      if(myApp.times > 60){
+        myApp.notify("初始化中失败，请刷新网页或进入正确的页面")
+        return;
+      }
       const sendBtn = document.querySelector('button[data-testid="send-button"]') as HTMLElement ;
       const textarea = document.querySelector('#prompt-textarea') as any;
       if(sendBtn && textarea){
         myApp.ready = true;
         myApp.notify("桥接程序已就绪！")
+        webviewApi.send('webview.agent.ready','true')
         return;
       }
       setTimeout(myApp.foundBtn, 1000)
     },
+    times:0,
     foundForm: () => {
-        myApp.notify("正在查找表单组件")
+        myApp.notify("正在查找表单组件："+(myApp.times++)+"s")
+        if(myApp.times > 60){
+          myApp.notify("没有找到表单组件，请刷新网页或进入正确的页面")
+          return;
+        }
         let from = document.querySelector('form[type="button"]') as HTMLElement ;
         if(from){
           from.dataset.info = 'test';
@@ -225,6 +236,7 @@ const js_bridge = () => {
             childList: true,
             subtree: true
           });
+          myApp.foundBtn();
           return;
         } 
         // button[data-testid="send-button"]
