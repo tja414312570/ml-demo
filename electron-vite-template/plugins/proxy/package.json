@@ -11,12 +11,12 @@
     "zip": "npm run clean && npm run build"
   },
   "devDependencies": {
-    "mylib":"file://../../lib",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
     "@typescript-eslint/parser": "^8.8.0",
     "archiver": "^5.3.0",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^9.12.0",
+    "mylib": "file://../../lib",
     "rimraf": "^3.0.2",
     "ts-loader": "^9.3.1",
     "typescript": "^4.5.4",
@@ -25,10 +25,12 @@
   },
   "dependencies": {
     "@smithy/eventstream-codec": "^3.1.6",
+    "@types/vue": "^1.0.31",
     "eventsource-parser": "^2.0.1",
     "fast-json-patch": "^3.1.1",
     "immer": "^10.1.1",
     "jsonpatch": "^3.1.0",
-    "perf_hooks": "^0.0.1"
+    "perf_hooks": "^0.0.1",
+    "vue": "^2.7.16"
   }
 }

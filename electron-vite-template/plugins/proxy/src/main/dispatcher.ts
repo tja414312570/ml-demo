@@ -136,7 +136,6 @@ async function decodeResult(resultString:string) {
 
 const processResponse = async (headers:IncomingHttpHeaders|undefined, body:string):Promise<string|void> => {
     const contentType = headers?.['content-type'] || '';
-        
     return new Promise<string | void>((resolve,reject)=>{
         // 检查是否为 SSE (text/event-stream)
         if (!contentType.includes('text/event-stream')) {
