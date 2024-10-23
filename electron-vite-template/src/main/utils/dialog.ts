@@ -1,4 +1,4 @@
-import { dialog } from 'electron';
+import { dialog, MessageBoxOptions, MessageBoxReturnValue } from 'electron';
 const showErrorDialog = (errorMessage) => {
     dialog.showMessageBox({
         type: 'error',
@@ -14,6 +14,7 @@ const showErrorDialog = (errorMessage) => {
         console.error('显示错误弹窗时发生错误:', err);
     });
 };
+
 
 export {
     showErrorDialog

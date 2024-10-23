@@ -163,7 +163,7 @@ class MainInit {
 
     this.loadWindow.loadURL(loadingURL);
     this.loadWindow.show();
-    this.loadWindow.setAlwaysOnTop(true);
+    // this.loadWindow.setAlwaysOnTop(true);
     this.createMainWindow();
   }
   // 初始化窗口函数

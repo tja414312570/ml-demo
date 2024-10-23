@@ -1,15 +1,17 @@
 import { send_ipc_render } from "@main/ipc/send_ipc";
 import { wrapper } from "@main/plugin/Iproxy";
-import pluginContext from "@main/plugin/plugin-context";
+import { pluginContext } from "@lib/main";
 import { IPty } from '@lib/main'
 import { ipcMain } from "electron";
 import * as pty from 'node-pty';
 let isinit = false;
 function init() {
+    if (true)
+        return;
     console.log(new Error(isinit + ''))
     if (isinit) {
-        console.log("我日你妈")
-        throw new Error("超你妈的已经初始化了")
+        console.log("已经初始化")
+        throw new Error("已经初始化")
     }
     isinit = true;
     try {
@@ -28,7 +30,6 @@ function init() {
 
         pluginContext.pty = wrapper<IPty>(ptyProcess);
         (pluginContext.pty as any).type = shell;
-
         // 监听输入事件
         ipcMain.on('terminal-input', (event, input) => {
             console.log('Received terminal input:', input);

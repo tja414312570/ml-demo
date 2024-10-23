@@ -1,9 +1,10 @@
-import { Bridge ,PluginExtensionContext,AbstractPlugin, pluginContext} from 'mylib/main'
+import { AbstractPlugin, Bridge ,pluginContext,PluginExtensionContext}  from 'mylib/main'
 import { Pluginlifecycle } from 'mylib/main'
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
 import { processResponse } from './dispatcher';
 import path from 'path';
+
 
 class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
   requireJs(): Promise<string | void> {
@@ -64,7 +65,14 @@ class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
   }
   onMounted(ctx: PluginExtensionContext): void {
     console.log("proxy代理已挂载")
-    pluginContext.
+    pluginContext.ipcMain.handle('webview.agent.ready',(event,arg)=>{
+      console.log('插件已就绪');
+      pluginContext.showDialog({
+        message: '插件已就绪'
+      }).then(result=>{
+        console.log("对话框点击")
+      })
+    })
   }
   onUnmounted(ctx: PluginExtensionContext): void {
   }

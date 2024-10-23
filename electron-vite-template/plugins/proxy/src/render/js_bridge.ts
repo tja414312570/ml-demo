@@ -198,7 +198,7 @@ const js_bridge = () => {
       if(sendBtn && textarea){
         myApp.ready = true;
         myApp.notify("桥接程序已就绪！")
-        webviewApi.send('webview.agent.ready','true')
+        webviewApi.invoke('webview.agent.ready','true')
         return;
       }
       setTimeout(myApp.foundBtn, 1000)

@@ -1,15 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType } from '../../../lib/src/main';
+import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType, pluginContext } from '@lib/main';
 import { v4 as uuidv4 } from 'uuid';
 import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
-import pluginContext from './plugin-context';
-import { ipcMain } from 'electron';
+import init from './context-inited'
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
 // 定义常见的特殊属性集合
-const special_key_props = new Set(["toString", "valueOf", "then", "toJSON", "onMounted"]);
+const special_key_props = new Set(["toString", "valueOf", "then", "toJSON", "onMounted", "_init__"]);
 // 插件管理类
 class PluginManager {
 
@@ -18,7 +17,7 @@ class PluginManager {
     private idMapping: { [key: string]: PluginInfo } = {}
     private typeMapping: MapSet<PluginInfo> = new MapSet();
     constructor() {
-
+        init()
     }
     add(pluginInfo: PluginInfo) {
         this.idMapping[pluginInfo.id] = pluginInfo;
@@ -65,25 +64,24 @@ class PluginManager {
     private wrapperModule(pluginInfo: PluginInfo) {
         const proxyHandler: ProxyHandler<any> | any = {
             _plugin: pluginInfo,
-            get(_target: any, prop: string) {
-                const module = pluginInfo.module;
-                // 1. 直接处理特殊属性和 Symbol
+            get(target: any, prop: string) {
+                // // 1. 直接处理特殊属性和 Symbol
                 if (special_key_props.has(prop) || typeof prop === "symbol") {
-                    return module[prop];
+                    return target[prop];
                 }
                 // 2. 检查插件状态
-                if (!module || pluginInfo.status !== PluginStatus.load) {
+                if (!target || !pluginInfo.module || pluginInfo.status !== PluginStatus.load) {// || pluginInfo.status !== PluginStatus.load
                     throw new Error(`插件 ${pluginInfo.name} 当前状态：${pluginInfo.status}，无法访问属性或方法 ${String(prop)}`);
                 }
-                if (prop in module) {
+                if (prop in target) {
                     // 如果方法存在，则调用原始对象的方法
-                    return module[prop];
+                    return target[prop];
                 } else {
                     throw new Error(`组件${pluginInfo.name}不存在方法或属性'${String(prop)}'`)
                 }
             }
         }
-        return new Proxy({}, proxyHandler);
+        return new Proxy(pluginInfo.module, proxyHandler);
     }
     resolvePluginModule<T>(type: PluginType, filter?: (pluginsOfType: Set<PluginInfo>) => PluginInfo | Set<PluginInfo> | undefined): Promise<T> {
         return new Promise<T>((resolve, rejects) => {
@@ -125,6 +123,9 @@ class PluginManager {
         pluginInfo.module = orgin.default; // 或使用 import(pluginEntryPath) 来加载模块
         pluginInfo.proxy = this.wrapperModule(pluginInfo);
         pluginContext.register(pluginInfo);
+        if ('_init__' in pluginInfo.module) {
+            pluginInfo.module['_init__'](pluginContext)
+        }
         pluginInfo.module.onMounted(pluginContext);
         pluginInfo.status = PluginStatus.load;
     }

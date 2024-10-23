@@ -1,4 +1,4 @@
-import { IpcMainEvent, WebContents, WebFrameMain } from 'electron';
+import { IpcMainEvent, MessageBoxOptions, MessageBoxReturnValue, WebContents, WebFrameMain } from 'electron';
 import { Pluginlifecycle } from './plugin-lifecycle';
 import { IEvent } from 'node-pty';
 import EventEmitter from 'events';
@@ -58,7 +58,10 @@ export interface PluginExtensionContext {
     ipcMain: IIpcMain;
     pty: IPty
     sendIpcRender: (event_: string, message: any) => void
+    showDialog: (message: DialogOpt) => Promise<DialogReturnValue>
 }
+export type DialogOpt = MessageBoxOptions;
+export type DialogReturnValue = MessageBoxReturnValue;
 
 /**
    * An interface representing a pseudoterminal, on Windows this is emulated via the winpty library.

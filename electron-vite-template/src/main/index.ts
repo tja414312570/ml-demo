@@ -11,7 +11,7 @@ import { startProxyServer } from "./services/proxy";
 import fs, { glob } from "fs"
 import { notify } from "./ipc/notify-manager";
 import { listeners } from "process";
-import pluginContext from './plugin/plugin-context'
+import pluginContext from '../../lib/src/main/plugin-context'
 import pluginManager from "./plugin/plugin-manager";
 import path from "path";
 import { showErrorDialog } from "./utils/dialog";

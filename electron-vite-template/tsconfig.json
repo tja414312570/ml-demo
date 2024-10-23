@@ -6,8 +6,8 @@
     "outDir": "./dist/electron/main",
     "sourceMap": true,
     "declaration": false,
-    "module": "esnext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -24,6 +24,6 @@
     "typeRoots": ["node_modules/@types"],
     "lib": ["ES2022", "dom"]
   },
-  "include": ["src/**/*", "customTypes/*", "test/index.ts", "lib/preload/ipc-api.ts", "lib/main/bridge.ts", "lib/main/plugin.ts"],
+  "include": ["src/**/*", "customTypes/*", "test/index.ts", "lib/preload/ipc-api.ts", "lib/main/bridge.ts", "lib/main/plugin.ts", "lib/src/main/plugin-context.ts"],
   "exclude": ["node_modules"]
 }

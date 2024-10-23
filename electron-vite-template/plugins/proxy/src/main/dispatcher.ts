@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import util from 'util';
 import { IncomingHttpHeaders } from 'http';
 import { SseHandler } from './share.github';
-import { notifyManager } from 'mylib/main';
+import { pluginContext } from 'mylib/main';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
 // 使用 promisify 将子进程命令转换为 Promise
@@ -28,7 +28,7 @@ function extractCodeBlocksFromMarkdown(responseBody:string) {
 // 调度响应并执行 Python 或 Bash 代码
 async function dispatcherResponse(responseData:string) {
     console.log(`处理命令: ${responseData}`);
-    notifyManager.notify(`处理命令: ${responseData}`);
+    pluginContext.notifyManager.notify(`处理命令: ${responseData}`);
 
     const codeBlocks = extractCodeBlocksFromMarkdown(responseData);
 
@@ -54,7 +54,7 @@ async function dispatcherResponse(responseData:string) {
         }
     } else {
         console.log("未检测到代码块", responseData);
-        notifyManager.notify("未检测到代码块");
+        pluginContext.notifyManager.notify("未检测到代码块");
     }
 }
 

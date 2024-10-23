@@ -1,4 +1,4 @@
-import { InstructContent, InstructExecutor, InstructResult, InstructResultType, pluginContext } from 'mylib/main'
+import { AbstractPlugin, InstructContent, InstructExecutor, InstructResult, InstructResultType, pluginContext } from 'mylib/main'
 import { Pluginlifecycle } from 'mylib/main'
 import { PluginExtensionContext } from 'mylib/main';
 import { v4 as uuidv4 } from 'uuid';
@@ -89,7 +89,7 @@ class ExecuteContext {
   }
 }
 
-class SshExecutor implements InstructExecutor, Pluginlifecycle {
+class SshExecutor extends AbstractPlugin implements InstructExecutor, Pluginlifecycle {
   private cache: Map<String, ExecuteContext> = new Map();
   abort(instruct: InstructContent): Promise<InstructResult | void> {
     return new Promise(resolve => {
