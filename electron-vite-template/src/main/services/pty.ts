@@ -6,8 +6,6 @@ import { ipcMain } from "electron";
 import * as pty from 'node-pty';
 let isinit = false;
 function init() {
-    if (true)
-        return;
     console.log(new Error(isinit + ''))
     if (isinit) {
         console.log("已经初始化")
