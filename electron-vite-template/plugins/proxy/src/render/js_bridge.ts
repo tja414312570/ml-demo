@@ -3,6 +3,18 @@ import { getIpcApi } from 'mylib/render'
 import Vue from 'vue/dist/vue.esm.js';
 // console.log('vue:',Vue)
 const _doc = document as any;
+// 保存原始的 matches 方法
+const originalMatches = Element.prototype.matches;
+
+// 重写 matches 方法
+Element.prototype.matches = function(selector) {
+    console.log(`调用 matches 方法，选择器: ${selector}`);
+      if(selector.indexOf('.text-token-text-primary') != -1){
+        return false;
+      }
+    // 调用原始的 matches 方法
+    return originalMatches.call(this, selector);
+};
 
 const webviewApi: any = getIpcApi('webview-api')
 webviewApi.on("webviewApi.send-content", (event:any, message:any) => {
@@ -20,6 +32,11 @@ const js_bridge = () => {
     vueInstance: null,
     currentLocation: null,
     form:null,
+    continuer:null,
+    desotory:()=>{
+      webviewApi.offAll();
+      _doc.myApp = null;
+    },
     send: function (message:string) {
       if (!myApp.ready) {
         alert("桥接未就绪")
@@ -57,16 +74,30 @@ const js_bridge = () => {
         const sendBtn = document.querySelector('button[data-testid="send-button"]') as HTMLElement ;
         console.log("查找发送按钮:",sendBtn)
         if (sendBtn && !sendBtn.hasAttribute('disabled') &&sendBtn.getAttribute('data-testid') === 'send-button') {
+          if (textarea.tagName.toLowerCase() === 'textarea' && textarea.value !== message) {
+            let result = confirm("检查到输入框信息被替换，是否替换为原始输入值?")
+            if(result){
+              textarea.value = message
+            }
+          }
+          // 判断是否为 contenteditable 的 div
+          else if (textarea.getAttribute('contenteditable') === 'true' && textarea.textContent !== message) {
+            let result = confirm("检查到输入框信息被替换，是否替换为原始输入值?")
+            if(result){
+              textarea.value = message
+            }
+          }
           sendBtn.click();
           return;
         }
-        if(times++ >10){
+        if(times++ >60){
           myApp.notify("发送按钮不可用，请刷新页面");
           alert("页面异常，请刷新页面再试")
           return;
         }
        setTimeout(loopBtn, 500);
       }
+      loopBtn();
     }, createApp: function () {
         // Vue 加载成功的逻辑
         const appDiv = _doc.createElement('div');
@@ -104,6 +135,17 @@ const js_bridge = () => {
           template: App.template
         });
         _doc.myApp.vueInstance.$mount(appDiv,true);
+        myApp.continuer = appDiv;
+        let observer = new MutationObserver(function (mutationsList, observer) {
+          console.log("vue实例变化")
+          const mutaForm = document.querySelector('#vue-app') as HTMLElement ;
+          if(!mutaForm){
+            console.log("vueui被销毁")
+            _doc.body.appendChild(appDiv);
+          }
+         });
+         // 开始观察整个 body 元素，检测子节点变化
+        observer.observe(document.body,{childList:true,subtree:true});
         console.log("加载vue脚本2",document.querySelector('#vue-app'))
         myApp.foundForm();
      
@@ -193,12 +235,14 @@ const js_bridge = () => {
         myApp.notify("初始化中失败，请刷新网页或进入正确的页面")
         return;
       }
-      const sendBtn = document.querySelector('button[data-testid="send-button"]') as HTMLElement ;
+      const sendBtn = document.querySelector('button[data-testid]') as HTMLElement ;
       const textarea = document.querySelector('#prompt-textarea') as any;
+      textarea && (textarea['matches'] = () => false)
       if(sendBtn && textarea){
         myApp.ready = true;
         myApp.notify("桥接程序已就绪！")
-        webviewApi.invoke('webview.agent.ready','true')
+        console.log("桥接程序已就绪！")
+        webviewApi.invoke('webview.agent.ready',location.href)
         return;
       }
       setTimeout(myApp.foundBtn, 1000)
@@ -210,12 +254,15 @@ const js_bridge = () => {
           myApp.notify("没有找到表单组件，请刷新网页或进入正确的页面")
           return;
         }
-        let from = document.querySelector('form[type="button"]') as HTMLElement ;
+        const mainTag = 'div[role="presentation"]'
+        let from = document.querySelector(mainTag) as HTMLElement ;
+        
         if(from){
           from.dataset.info = 'test';
+          console.log('aria-controls:',from.getAttribute('aria-controls'))
           console.log('dataset',from.dataset.info)
           let observer = new MutationObserver(function (mutationsList, observer) {
-           const mutaForm = document.querySelector('form[type="button"]') as HTMLElement ;
+           const mutaForm = document.querySelector(mainTag) as HTMLElement ;
             if(!mutaForm){
               myApp.notify("没有找到表单组件！")
               observer.disconnect();  // 停止观察

@@ -3,6 +3,8 @@ import { Pluginlifecycle } from 'mylib/main'
 import { IContext } from 'http-mitm-proxy';
 import { decompressedBody } from './decode';
 import { processResponse } from './dispatcher';
+import { URL } from 'url';
+import props from './promtps'
 import path from 'path';
 
 
@@ -45,11 +47,13 @@ class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
         contentType.includes('font')             // 字体文件
       );
 
-      if (isStaticResource) {
-        ctx.proxyToClientResponse.setHeader('Cache-Control', 'max-age=21600');
-        // 如果有需要，还可以修改 Expires 头
-        const expiresDate = new Date(Date.now() + 21600 * 1000).toUTCString();
-        ctx.proxyToClientResponse.setHeader('Expires', expiresDate);
+      if (isStaticResource ) {
+        if(response){
+          response.headers['cache-control'] = 'max-age=21600';
+          // 如果有需要，还可以修改 Expires 头
+          const expiresDate = new Date(Date.now() + 21600 * 1000).toUTCString();
+          response.headers['expires'] = expiresDate;
+        }
         resolve();
         return;
       }
@@ -63,18 +67,37 @@ class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
       resolve(sseData)
     })
   }
+
+getPathFromUrl(urlString:string) {
+  try {
+      const url = new URL(urlString);
+      return url.pathname; // 返回路径部分
+  } catch (error) {
+      console.error('Invalid URL:', error);
+      pluginContext.showDialog({type:'error',message:`无效的地址:${urlString}`})
+  }
+}
   onMounted(ctx: PluginExtensionContext): void {
     console.log("proxy代理已挂载")
-    pluginContext.ipcMain.handle('webview.agent.ready',(event,arg)=>{
-      console.log('插件已就绪');
-      pluginContext.showDialog({
-        message: '插件已就绪'
-      }).then(result=>{
-        console.log("对话框点击")
-      })
+    pluginContext.ipcMain.handle('webview.agent.ready',(event,urlString)=>{
+      console.log("请求地址:",urlString)
+      const path = this.getPathFromUrl(urlString);
+      if(path?.trim() === '/'){
+          this.send2webview(props)
+      }
+      console.log(`插件已就绪:[${path}]`);
+      // pluginContext.showDialog({
+      //   message: '插件已就绪！'
+      // }).then(result=>{
+      //   console.log("对话框点击")
+      // })
     })
   }
+  send2webview(props: string) {
+    pluginContext.sendIpcRender('webviewApi.send-content',props)
+  }
   onUnmounted(ctx: PluginExtensionContext): void {
+    pluginContext.ipcMain.removeHandler('webview.agent.ready')
   }
 
 }
