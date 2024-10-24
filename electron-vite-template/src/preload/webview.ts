@@ -2,6 +2,8 @@ import { ipcRenderer } from "electron";
 
 import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
 
+import './core-api-pre'
+
 const api = 'webview-api'
 
 exposeInMainWorld(api, {})

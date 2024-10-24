@@ -1,38 +1,10 @@
-import { contextBridge, ipcMain, ipcRenderer, IpcRendererEvent, shell } from "electron";
+import { contextBridge, ipcRenderer, shell } from "electron";
 import { onUnmounted } from "vue";
 import { IpcChannelMainClass, IpcChannelRendererClass } from "../ipc/index";
-import { InstructContent } from "@main/ipc/code-manager";
-import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
+import { exposeInMainWorld } from "./ipc-wrapper";
 import './index-plugin-view'
 import './index-instruct-view'
-// const wrapper = (api: any) => {
-//   return new Proxy(api, {
-//     get(target, prop) {
-//       return (...args: any[]) => {
-//         if (isListener(args)) {
-//           bindListener(args[0],)
-//         }
-//         return target[prop](...args);  // 可以根据需求返回其他默认值
-//       };
-//     }
-//   });
-
-// }
-
-exposeInMainWorld('core-api', {
-  send: (channel, data) => ipcRenderer.send(channel, data),
-  on: (channel, listener) => {
-    if (typeof listener === 'function') {
-      // bindListener(_id_, channel, listener)
-      ipcRenderMapper.on(channel, listener);
-      onUnmounted(() => ipcRenderer.off(channel, listener))
-    } else {
-      console.error(`The callback provided to ipcRenderer.on for channel "${channel}" is not a function.`);
-    }
-  },
-  invoke: (channel, data) => ipcRenderer.invoke(channel, data),
-  //  off: ipcRenderMapper.off
-});
+import './core-api-pre'
 
 exposeInMainWorld('ipcRenderer', {});
 

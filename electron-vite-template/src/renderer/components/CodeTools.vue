@@ -150,7 +150,7 @@ const handleDebugExecute = () => {
 const executeCode = () => {
     if (isExecuting.value) {
         codeApi.invoke("codeViewApi.execute.stop", { id: props.id, executor: selected.value } as InstructContent).then(result => {
-            alert("发送信息成功")
+
         }).catch(err => {
             console.log('代码停止执行错误:', err)
         })
@@ -159,8 +159,6 @@ const executeCode = () => {
     isExecuting.value = true;
     codeApi.executeCode({ code: props.code, id: props.id, language: props.language, executor: selected.value } as InstructContent).then(result => {
         console.log('代码已执行:', props.code)
-        console.log('代码执行结果:', result)
-
     }).catch(err => {
         console.log('代码执行错误:', err)
     })

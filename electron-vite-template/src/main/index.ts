@@ -1,7 +1,7 @@
 "use strict";
 
 import { useMainDefaultIpc } from "./services/ipc-main";
-import { app, BrowserWindow, ipcMain, IpcMainEvent, session } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, session } from "electron";
 import InitWindow from "./services/window-manager";
 import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
@@ -60,6 +60,8 @@ app.whenReady().then(() => {
   ipcMain.on('error-notify', (event, message) => {
     showErrorDialog(message)
   })
+  ipcMain.handle('core-api.show-dialog', (event, opts: Electron.MessageBoxOptions) => dialog.showMessageBox(opts))
+
   startProxyServer(upstreamProxy).then(proxy => {
     onAppReady();
     ptyInit()

@@ -1,3 +1,5 @@
+import { IpcRendererEvent } from 'electron';
+import { IpcRenderer } from 'electron/renderer';
 import { v4 as uuidv4 } from 'uuid';
 function showCustomAlert(message: string) {
     const alertDiv = document.createElement('div');
@@ -44,8 +46,16 @@ class IpcApi {
     }
 }
 
+export interface DefaultApi{
+    off: (channel: string)=>void,
+    offAll: ()=>void,
+    on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void)=>IpcRenderer;
+    send:(channel: string, ...args: any[])=> void;
+    invoke:(channel: string, ...args: any[])=> Promise<any>;
+}
+
 // getIpcApi 函数，用于创建带有代理的 IpcApi 对象
-export function getIpcApi<T>(channel: string): IpcApi & T {
+export function getIpcApi<T>(channel: string): IpcApi & DefaultApi & T {
     const ipcApiInstance = new IpcApi(channel);
     const { _getIpcApi__, _getId__ } = ipcApiInstance;
 
@@ -73,7 +83,7 @@ export function getIpcApi<T>(channel: string): IpcApi & T {
                 };
             }
         }
-    }) as IpcApi & T;
+    }) as IpcApi & T & DefaultApi;
 }
 function isListener(args: any[]) {
     return args.some(arg => typeof arg === 'function');;
