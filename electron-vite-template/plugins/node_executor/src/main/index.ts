@@ -1,84 +1,239 @@
-import { AbstractPlugin, InstructContent, InstructExecutor, InstructResult, InstructResultType, pluginContext } from  'mylib/main';
-import { Pluginlifecycle } from 'mylib/main';
-import { PluginExtensionContext } from 'mylib/main';
-import { createContext, runInContext } from 'vm';
-import {stringify} from 'circular-json';
-import { rejects } from 'assert';
-import util from 'util'
-import fs from 'fs'
-import { v4 as uuidv4 } from 'uuid';
+import {
+  AbstractPlugin,
+  InstructContent,
+  InstructExecutor,
+  InstructResult,
+  InstructResultType,
+  pluginContext,
+} from "mylib/main";
+import { Pluginlifecycle } from "mylib/main";
+import { PluginExtensionContext } from "mylib/main";
+import { createContext, runInContext } from "vm";
+import { stringify } from "circular-json";
+import { rejects } from "assert";
+import util from "util";
+import fs from "fs";
+import { v4 as uuidv4 } from "uuid";
+import { ChildProcess, fork } from "child_process";
+import VirtualWindow from "./virtual-window";
+import path from "path";
 
-class NodeExecutor extends AbstractPlugin implements Pluginlifecycle, InstructExecutor {
+class ExecuteContext {
+  private _data: ((data: string) => void) | undefined;
+  private _write: ((data: string) => void) | undefined;
+  private _error: ((data: Error) => void) | undefined;
+  private _end: ((data?: string) => void) | undefined;
+  private _abort: ((message?: any) => void) | undefined;
+  private _process;
+  constructor(childProcess: ChildProcess) {
+    this._process = childProcess;
+  }
+  callData(data: string) {
+    if (!this._data) {
+      throw new Error("没有响应回调");
+    }
+    this._data(data);
+  }
+  abort(message: string) {
+    if (!this._abort) {
+      throw new Error("没有终止回调");
+    }
+    this._abort(message);
+  }
+  write(data: string) {
+    if (!this._write) {
+      throw new Error("没有发送回调");
+    }
+    this._write(data);
+  }
+  error(data: string | Error) {
+    if (!this._error) {
+      throw new Error("没有错误回调");
+    }
+    if (data instanceof Error) {
+      this._error(data);
+    } else {
+      this._error(new Error(data));
+    }
+  }
+
+  end(data?: string) {
+    if (!this._end) {
+      throw new Error("没有结束回调");
+    }
+    this._end(data);
+  }
+  onAbort(callback: (data: string) => void) {
+    this._abort = callback;
+  }
+  onWrite(callback: (data: string) => void) {
+    this._write = callback;
+  }
+  onData(callback: (data: string) => void) {
+    this._data = callback;
+  }
+
+  onError(callback: (data: Error) => void) {
+    this._error = callback;
+  }
+  onEnd(callback: () => void) {
+    this._end = callback;
+  }
+}
+
+class NodeExecutor
+  extends AbstractPlugin
+  implements Pluginlifecycle, InstructExecutor
+{
+  private executeContext: null | ExecuteContext = null;
   abort(instruct: InstructContent): Promise<InstructResult | void> {
-    throw new Error('Method not implemented.');
+    if (!this.executeContext) {
+      return Promise.reject(new Error("没有找到正在执行的指令"));
+    }
+    this.executeContext.abort("用户主动终止");
+    return Promise.resolve();
   }
   execute(instruct: InstructContent): Promise<InstructResult> {
-    const { code, language ,id} = instruct;
-    let execute_result = '';
-    // 用于捕获标准输出和错误输出
-    let stdout = '';
-    const execId = uuidv4();
-    // 创建上下文，重写 console 和 process 的输出方法
-    const vmContext = createContext({
-      console: {
-        log: (...args: any[]) => {
-          stdout += 'log:'+args.join(' ') + '\n';
-          const temp = []
-          for(let arg of args){
-              temp.push(util.inspect(arg, { depth: null, colors: true }))
-          }
-          pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`log：${temp.join(',')}\r\n`,line:code.split(/\r?\n/).length,type:InstructResultType.executing})
-        },
-        error: (...args: any[]) => {
-          stdout +=  'err:'+args.join(' ') + '\n';
-          const temp = []
-          for(let arg of args){
-              temp.push(util.inspect(arg, { depth: null, colors: true }))
-          }
-          pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`err:${temp.join(',')}\r\n`,line:code.split(/\r?\n/).length,type:InstructResultType.executing})
-        }
-      },
-      resolve: (result: any) => {
-        execute_result = result;
-      },
-      reject: (error: any) => {
-       rejects(error)
-      }, require,
-      process,
-      Buffer,
-      fs,
-      setTimeout,
-      setInterval,
-      clearTimeout,
-      clearInterval,
-    });
-
     return new Promise((resolve, reject) => {
+      if (this.executeContext) {
+        reject("一个程序正在运行中");
+      }
+      const execId = uuidv4();
+      const { code, language, id } = instruct;
+      this.executeContext = new ExecuteContext(null as any);
       try {
-        // 执行代码
-        runInContext(`(async () => { ${code} })()`, vmContext);
-        // 将输出结果序列化并返回
-        let resultString = stringify(execute_result);
-        
-        pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`结果:\r\n${resultString}`,line:code.split(/\r?\n/).length,type:InstructResultType.completed})
-        resolve({
-          id:instruct.id,
-          ret:resultString,
-          std:stdout,
-          execId,
-          type:InstructResultType.completed
+        let childProcess: ChildProcess;
+        const destory = () => {
+          this.executeContext = null;
+          childProcess?.kill();
+        };
+        this.executeContext.onError((err) => {
+          render(
+            `程序异常:${util.inspect(err, { colors: true })}`,
+            InstructResultType.completed
+          );
+          destory();
+          const output = virtualWindow.render();
+          resolve({
+            id: instruct.id,
+            std: output,
+            execId,
+            type: InstructResultType.completed,
+          });
         });
-      } catch (error:any) {
-        const errorDetails = util.inspect(error, { depth: null, colors: true });
-        const out = (stdout.trim().length>1?'控制台：\r\n'+stdout+'\r\n':'')+'执行异常:'+errorDetails;
-        // reject(`执行过程中发生错误: ${errorDetails}\n控制台输出:\n${stdout}`);
-        pluginContext.sendIpcRender('codeViewApi.insertLine',{id,code:`${out}\r\n`,line:code.split(/\r?\n/).length})
-        resolve({
-          id:instruct.id,
-          std:out,
-          execId,
-          type:InstructResultType.failed
+        const virtualWindow = new VirtualWindow();
+        const line = code.split(/\r?\n/).length;
+        const render = (data: string, type: InstructResultType) => {
+          virtualWindow.write(data);
+          const output = virtualWindow.render();
+          pluginContext.sendIpcRender("codeViewApi.insertLine", {
+            id,
+            code: output,
+            execId,
+            line,
+            type,
+          });
+        };
+        childProcess = fork(
+          path.join(__dirname, "assets/child-process-script.js"),
+          [],
+          {
+            stdio: ["pipe", "pipe", "pipe", "ipc"],
+            env: { FORCE_COLOR: "1" },
+          }
+        );
+        childProcess.stdout?.setEncoding("utf8");
+        childProcess.stdout?.on("data", (data) => {
+          render(data, InstructResultType.executing);
+          console.log(`子进程输出: ${data}`);
         });
+        childProcess.stdout?.on("error", (data) => {
+          render(
+            util.inspect(data, { colors: true }),
+            InstructResultType.executing
+          );
+          console.log(`子进程输出: ${data}`);
+        });
+        childProcess.stderr?.setEncoding("utf8");
+        childProcess.stderr?.on("data", (data) => {
+          render(data, InstructResultType.executing);
+          console.error(`子进程错误: `, data);
+        });
+        childProcess.stderr?.on("error", (data) => {
+          render(
+            util.inspect(data, { colors: true }),
+            InstructResultType.executing
+          );
+          console.log(`子进程输出: ${data}`);
+        });
+        this.executeContext.onWrite((data?: string) => {
+          render(data ? stringify(data) : "", InstructResultType.executing);
+        });
+        this.executeContext.onEnd((data?: string) => {
+          render(data ? data : "", InstructResultType.completed);
+          const output = virtualWindow.render();
+          resolve({
+            id: instruct.id,
+            std: output,
+            execId,
+            type: InstructResultType.completed,
+          });
+          destory();
+        });
+
+        this.executeContext.onAbort((err) => {
+          render(`程序终止执行:${err}`, InstructResultType.completed);
+          destory();
+          const output = virtualWindow.render();
+          resolve({
+            id: instruct.id,
+            // ret: output,
+            std: output,
+            execId,
+            type: InstructResultType.completed,
+          });
+        });
+        let isNomalExit = false;
+        // 监听子进程的消息事件，获取执行结果
+        childProcess.on("message", (message) => {
+          if (message === execId) {
+            isNomalExit = true;
+            return;
+          }
+          this.executeContext?.write(message.toString());
+        });
+        // 监听子进程的错误事件
+        childProcess.on("error", (error) => {
+          this.executeContext?.error(error);
+        });
+        childProcess.on("close", (code, signal) => {
+          this.executeContext?.write("子进程关闭！");
+        });
+        childProcess.on("disconnect", () => {
+          if (isNomalExit) {
+            return;
+          }
+          pluginContext.showDialog({
+            type: "error",
+            message: "执行子进程时出现错误，子进程断开连接!",
+          });
+          this.executeContext?.error("子进程断开连接！");
+        });
+        // 监听子进程的退出事件
+        childProcess.on("exit", (code, signal) => {
+          if (code !== null && code === 0) {
+            this.executeContext?.end(`程序执行完成！`);
+          } else {
+            this.executeContext?.end(
+              `子进程已被终止,退出码:${code},信号：${signal}`
+            );
+          }
+        });
+        // 向子进程发送用户代码
+        childProcess.send({ code, execId });
+      } catch (error: any) {
+        this.executeContext.error(error);
+        this.executeContext = null;
       }
     });
   }

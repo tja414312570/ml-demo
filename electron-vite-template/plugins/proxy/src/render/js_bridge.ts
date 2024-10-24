@@ -97,21 +97,17 @@ const js_bridge = () => {
             message: '解释器未就绪'
           };
         },
-        template: `<div id='rnm'>
-                        <div style="position: fixed; bottom: 100px; right: 20px; max-width: 300px; background-color: #ffffff; color: #333; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px; padding: 8px; display: flex; align-items: flex-start;">
-                            <div style="margin-right: 10px;">
-                                <!-- 图标 -->
-                                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 96 960 960" width="24" fill="#6200ea">
-                                    <path d="M480 936q-150-31-245-158.5T140 503q0-102 50-188.5T320 172v85q-60 40-95 105.5T190 503q0 130 81.5 226T480 860v76Zm160-23v-85q60-41 95-106t35-143q0-130-81.5-226T480 292v-76q150 31 245 158.5T820 703q0 102-50 188.5T640 913ZM480 616q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35Z"/>
-                                </svg>
-                            </div>
+        template: `
+                        <div style="position: fixed; bottom: 100px;z-index:100; right: 20px; max-width: 300px; background-color: #ffffff; color: #333; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); border-radius: 8px; padding: 8px; display: flex; align-items: flex-start;">
                             <div>
                                 <!-- 标题 -->
-                                <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #6200ea;">GPT 解释器</div>
+                                <div style="font-weight: bold; font-size: 16px; margin-bottom: 8px; color: #6200ea;">
+                                GPT 解释器
+                                </div>
                                 <!-- 消息 -->
                                 <div>{{ message }}</div>
                             </div>
-                        </div></div>
+                        </div>
                     `
       };
       // 挂载 Vue 应用到动态插入的 div 上
