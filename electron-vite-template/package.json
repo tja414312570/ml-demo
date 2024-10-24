@@ -17,7 +17,8 @@
     "pack:resources": "tsx .electron-vite/hot-updater.ts",
     "dep:upgrade": "yarn upgrade-interactive --latest",
     "postinstall": "electron-builder install-app-deps",
-    "test": "tsx .electron-vite/test-runner.ts"
+    "test": "tsx .electron-vite/test-runner.ts",
+    "plugin": "tsx .electron-vite/build-plugins.ts"
   },
   "dependencies": {
     "@babel/core": "^7.25.7",
