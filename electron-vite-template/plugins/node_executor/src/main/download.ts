@@ -1,25 +1,40 @@
 import { DownloaderHelper } from 'node-downloader-helper';
 import path from 'path';
-import fs from 'fs';
+import fs, { createReadStream, unlinkSync } from 'fs';
+import { createHash } from 'crypto';
 
-const downloadNode = async (url: string, version: string): Promise<string> => {
-  const fileName = `node-${version}.tar.gz`; // 根据需要替换文件扩展名
-  const downloadDir = path.join(__dirname, 'download');
-
-  // 如果下载目录不存在，则创建它
-  if (!fs.existsSync(downloadDir)) {
-    fs.mkdirSync(downloadDir);
+function getFileSHA256Sync(filePath:string) {
+    return new Promise((resolve, reject) => {
+      const hash = createHash('sha256');
+      const stream = createReadStream(filePath);
+      stream.on('data', (chunk) => hash.update(chunk));
+      stream.on('end', () => resolve(hash.digest('hex')));
+      stream.on('error', (err) => reject(err));
+    });
   }
 
-  const filePath = path.join(downloadDir, fileName);
+const downloadNode = async (url: string, filePath: string,hash?:string|null): Promise<string> => {
+  if(hash && fs.existsSync(filePath)){
+    const file_hash = await getFileSHA256Sync(filePath);
+    console.log('文件hash值')
+    if(hash === file_hash){
+        console.log('文件已下载:',filePath)
+        return filePath;
+    }else{
+        console.log('文件不完整，重新下载')
+        unlinkSync(filePath);
+    }
+  }
+  const fileName = path.basename(filePath);
+  const downloadDir = path.dirname(filePath);
   const dl = new DownloaderHelper(url, downloadDir, {
     fileName: fileName,
     resumeIfFileExists: true, // 如果文件存在则继续下载
-    override: false, // 默认不覆盖已有文件
+    override: true, // 默认不覆盖已有文件
   });
 
   dl.on('progress', (stats) => {
-    console.log(`\r下载进度: ${stats.progress.toFixed(2)}%`);
+     process.stdout.write(`\r下载进度: ${stats.progress.toFixed(2)}%`);
   });
 
   dl.on('end', () => {
