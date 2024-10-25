@@ -5,6 +5,7 @@ import EventEmitter from 'events';
 
 // 定义插件的接口
 export interface PluginManifest {
+    appId: string;
     name: string;
     version: string;
     description: string;
@@ -20,7 +21,8 @@ export interface PluginManifest {
 
 // 定义加载的插件结构
 export interface PluginInfo {
-    id: string
+    id: string;
+    appId: string;
     manifest: any;
     name: string;
     version: string;
@@ -41,6 +43,8 @@ export interface PluginProxy {
 
 
 export interface PluginExtensionContext {
+    _pluginPath: string;
+    workPath: string;
     /**
      * 
      * @param plugin 用于获取组件的id
@@ -57,6 +61,8 @@ export interface PluginExtensionContext {
     notifyManager: { notify: (message: string) => void, notifyError: (message: string) => void }
     ipcMain: IIpcMain;
     pty: IPty
+    appPath: string
+
     sendIpcRender: (event_: string, message: any) => void
     showDialog: (message: DialogOpt) => Promise<DialogReturnValue>
 }

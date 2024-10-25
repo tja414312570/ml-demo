@@ -107,7 +107,9 @@ class NodeExecutor
           this.executeContext = null;
           childProcess?.kill();
         };
+        let isNomalExit = false;
         this.executeContext.onError((err) => {
+          isNomalExit = true;
           render(
             `程序异常:${util.inspect(err, { colors: true })}`,
             InstructResultType.completed
@@ -124,6 +126,7 @@ class NodeExecutor
         const virtualWindow = new VirtualWindow();
         const line = code.split(/\r?\n/).length;
         const render = (data: string, type: InstructResultType) => {
+          console.log(data)
           virtualWindow.write(data);
           const output = virtualWindow.render();
           pluginContext.sendIpcRender("codeViewApi.insertLine", {
@@ -135,7 +138,7 @@ class NodeExecutor
           });
         };
         childProcess = fork(
-          path.join(__dirname, "assets/child-process-script.js"),
+          path.join(__dirname, "../lib/child-process-script.ts"),
           [],
           {
             stdio: ["pipe", "pipe", "pipe", "ipc"],
@@ -193,7 +196,7 @@ class NodeExecutor
             type: InstructResultType.completed,
           });
         });
-        let isNomalExit = false;
+     
         // 监听子进程的消息事件，获取执行结果
         childProcess.on("message", (message) => {
           if (message === execId) {
@@ -204,6 +207,7 @@ class NodeExecutor
         });
         // 监听子进程的错误事件
         childProcess.on("error", (error) => {
+          isNomalExit = true;
           this.executeContext?.error(error);
         });
         childProcess.on("close", (code, signal) => {
@@ -240,6 +244,7 @@ class NodeExecutor
 
   onMounted(ctx: PluginExtensionContext): void {
     // 插件挂载时的处理逻辑
+    console.log("插件工作目录:",pluginContext.workPath)
   }
 
   onUnmounted(ctx: PluginExtensionContext): void {

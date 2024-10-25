@@ -6,12 +6,11 @@ import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
 import init from './context-inited'
 
-const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author']
+const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author', 'appId']
 // 定义常见的特殊属性集合
 const special_key_props = new Set(["toString", "valueOf", "then", "toJSON", "onMounted", "_init__"]);
 // 插件管理类
 class PluginManager {
-
     private pluginDirs: Set<string> = new Set();           // 插件目录
     private pluginSet: Set<PluginInfo> = new Set(); // 已加载的插件列表
     private idMapping: { [key: string]: PluginInfo } = {}
@@ -123,6 +122,10 @@ class PluginManager {
         pluginInfo.module = orgin.default; // 或使用 import(pluginEntryPath) 来加载模块
         pluginInfo.proxy = this.wrapperModule(pluginInfo);
         pluginContext.register(pluginInfo);
+        pluginContext.workPath = path.join(pluginContext._pluginPath, pluginInfo.appId);
+        if (!fs.existsSync(pluginContext.workPath)) {
+            fs.mkdirSync(pluginContext.workPath)
+        }
         if ('_init__' in pluginInfo.module) {
             pluginInfo.module['_init__'](pluginContext)
         }
@@ -178,6 +181,7 @@ class PluginManager {
         assert.ok(fs.existsSync(plugin_path), `插件入口文件不存在: ${pluginMain}`)
         // 动态加载插件入口文件
         const pluginInfo: PluginInfo & PluginProxy = {
+            appId: manifest.appId,
             id: uuidv4(),
             manifest: manifest,
             name: manifest.name,

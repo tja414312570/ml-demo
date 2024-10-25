@@ -69,6 +69,9 @@
                             <v-list-item-content>版本: {{ selectedPlugin?.manifest.version }}</v-list-item-content>
                         </v-list-item>
                         <v-list-item>
+                            <v-list-item-content>AppId: {{ selectedPlugin?.manifest.appId }}</v-list-item-content>
+                        </v-list-item>
+                        <v-list-item>
                             <v-list-item-content>作者: {{ selectedPlugin?.manifest.author }}</v-list-item-content>
                         </v-list-item>
                         <v-list-item>
