@@ -14,6 +14,16 @@ const filePath = {
     development: `http://localhost:${process.env.PORT}/loader.html`,
     production: `file://${join(app.getAppPath(), "dist", "electron", 'renderer', 'loader.html')}`
   },
+  getUrl: (filename: string) => {
+    if (env === 'development') {
+      return `http://localhost:${process.env.PORT}/#/${filename}`
+    }
+    return `file://${join(app.getAppPath(), "dist", "electron", 'renderer', 'index.html/#/', filename)}`
+  },
+  settingURL: {
+    development: `http://localhost:${process.env.PORT}/setting.html`,
+    production: `file://${join(app.getAppPath(), "dist", "electron", 'renderer', 'setting.html')}`
+  },
   __static: {
     development: join(__dirname, "..", "..", "..", "src", 'renderer', "public").replace(/\\/g, '\\\\'),
     production: join(app.getAppPath(), "dist", "electron", 'renderer').replace(/\\/g, '\\\\')
@@ -22,7 +32,7 @@ const filePath = {
     if (env !== 'development') {
       return join(app.getAppPath(), "dist", "electron", "preload", `${fileName}.js`)
     }
-    return join(app.getAppPath(),'..','preload', `${fileName}.js`)
+    return join(app.getAppPath(), '..', 'preload', `${fileName}.js`)
 
   }
 }
@@ -39,6 +49,7 @@ function getAppRootPath(path: string) {
 
 export const winURL = filePath.winURL[env]
 export const loadingURL = filePath.loadingURL[env]
+export const getUrl = filePath.getUrl;
 export const lib = process.env.__lib
 export const updateFolder = process.env.__updateFolder
 export const getPreloadFile = filePath.getPreloadFile

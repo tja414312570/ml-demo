@@ -26,10 +26,10 @@ const { ipcRendererChannel } = window;
 const storeTemplate = useStoreTemplate();
 console.log(storeTemplate.$state.testData);
 
-ipcRendererChannel.SendDataTest.on((event, data) => {
-  console.log(event);
-  console.log(data);
-});
+// ipcRendererChannel.SendDataTest.on((event, data) => {
+//   console.log(event);
+//   console.log(data);
+// });
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

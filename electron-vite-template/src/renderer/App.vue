@@ -1,4 +1,5 @@
 <template>
+
   <!-- <CodeLayout /> -->
   <!-- <div>
       <button v-for="(file, index) in tsFiles" :key="index" @click="loadIframe(file)">{{ file }}</button>
@@ -7,28 +8,36 @@
       {{iframeContent}}
       <iframe :src="iframeContent"  style="height: 100vh;" width="100%" height="500px"></iframe>
     </div> -->
-  <v-theme-provider theme="dark" with-background>
-    <CodeView style="height: 100vh;" />
+  <v-theme-provider theme="dark" style="height: 100vh;display: flex;flex-direction: column;" with-background>
+    <title-bar />
+    <div style="overflow: hidden;flex: 1;">
+      <router-view v-slot="{ Component }">
+        <component :is="Component" />
+      </router-view>
+    </div>
+
+    <!-- <CodeView style="height: 100vh;" /> -->
   </v-theme-provider>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import CodeView from './CodeView.vue';
+import TitleBar from "@renderer/components/title-bar/title-bar.vue";
+// import CodeView from './CodeView.vue';
 
-const modules = import.meta.glob('./ts/*.ts');
+// const modules = import.meta.glob('./ts/*.ts');
 
-console.log(modules)
-const tsFiles = Object.keys(modules)
-for (const path in modules) {
-  console.log(path);
-}
-const iframeContent = ref("")
+// console.log(modules)
+// const tsFiles = Object.keys(modules)
+// for (const path in modules) {
+//   console.log(path);
+// }
+// const iframeContent = ref("")
 
-const loadIframe = (tsFile) => {
-  iframeContent.value = `./dockview.html?tsFile=${tsFile}`;
-}
-loadIframe(tsFiles[0])
+// const loadIframe = (tsFile) => {
+//   iframeContent.value = `./dockview.html?tsFile=${tsFile}`;
+// }
+// loadIframe(tsFiles[0])
 </script>
 <style scoped>
 .vscode-layout {

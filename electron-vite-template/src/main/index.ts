@@ -1,8 +1,11 @@
 "use strict";
-
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Promise Rejection:', reason);
+  process.exit(1); // 以非零状态码退出程序
+});
 import { useMainDefaultIpc } from "./services/ipc-main";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, session } from "electron";
-import InitWindow from "./services/window-manager";
+// import InitWindow from "./services/window-manager";
 import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
 import { useMenu } from "@main/hooks/menu-hook"
@@ -17,10 +20,14 @@ import path from "path";
 import { showErrorDialog } from "./utils/dialog";
 import './plugin/ipc-bind'
 import { init as ptyInit } from './services/pty'
+import { createWindow } from "./services/window-settings";
 const innerPluginPath = path.join(__dirname, '../../../plugins');
+import './ipc-bind/core-ipc-bind'
 console.log(`加载内置插件，位置：${innerPluginPath}`)
 pluginManager.loadPluginFromDir(innerPluginPath)
 app.setName('myApp');
+import './services/global-agents'
+import './services/service-setting'
 function onAppReady() {
   // const { disableF12 } = useDisableButton();
   // const { renderProcessGone } = useProcessException();
@@ -31,7 +38,8 @@ function onAppReady() {
   // defaultIpc();
   // creactMenu()
 
-  new InitWindow().initWindow();
+  // new InitWindow().initWindow();
+  createWindow();
   if (process.env.NODE_ENV === "development") {
     const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor");
     session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
@@ -57,18 +65,15 @@ app.whenReady().then(() => {
     protocol: 'http:',  // 上游代理协议
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
-  ipcMain.on('error-notify', (event, message) => {
-    showErrorDialog(message)
-  })
-  ipcMain.handle('core-api.show-dialog', (event, opts: Electron.MessageBoxOptions) => dialog.showMessageBox(opts))
 
-  startProxyServer(upstreamProxy).then(proxy => {
-    onAppReady();
-    ptyInit()
-    ipcMain.on('notificationAPI-ready', () => {
-      notify("gpt拦截器已初始化完成！")
-    })
-  })
+  onAppReady();
+  // startProxyServer(upstreamProxy).then(proxy => {
+  //   onAppReady();
+  //   ptyInit()
+  //   ipcMain.on('notificationAPI-ready', () => {
+  //     notify("gpt拦截器已初始化完成！")
+  //   })
+  // })
 });
 // 由于9.x版本问题，需要加入该配置关闭跨域问题
 app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");

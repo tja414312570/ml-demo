@@ -1,72 +1,84 @@
-import fs from 'fs';
-import path from 'path';
-import { extractFull } from 'node-7z'; // Importing the extract function
+import fs from "fs";
+import path from "path";
+import tar from "tar";
+import unzipper from "unzipper";
+import progress from "progress-stream";
 
-// Function to determine output directory based on file path
+// 获取解压目录
 const getOutputDir = (filePath: string): string => {
   const baseName = path.basename(filePath, path.extname(filePath));
   const dirName = path.dirname(filePath);
   return path.join(dirName, baseName);
 };
-const moveSingleSubdirectoryUp = (outputDir: string) => {
-  // 读取 outputDir 的内容
-  const items = fs.readdirSync(outputDir);
 
-  // 检查是否只有一个子目录
+// 移动单一子目录内容到上一级目录
+const moveSingleSubdirectoryUp = (outputDir: string) => {
+  const items = fs.readdirSync(outputDir);
   if (items.length === 1) {
     const singleSubDir = path.join(outputDir, items[0]);
-    
-    // 检查是否是一个目录
     if (fs.statSync(singleSubDir).isDirectory()) {
-      // 获取子目录中的所有内容
       const subDirContents = fs.readdirSync(singleSubDir);
-
-      // 将子目录中的所有内容移动到 outputDir
       subDirContents.forEach((item) => {
         const oldPath = path.join(singleSubDir, item);
         const newPath = path.join(outputDir, item);
         fs.renameSync(oldPath, newPath);
       });
-      // 删除空的单一子目录
       fs.rmdirSync(singleSubDir);
     }
   }
   return outputDir;
 };
 
-const extractNode = (filePath: string,saveDir?:string) => {
+// 解压函数，支持 .tar.gz 和 .zip
+const extractNode = (filePath: string, saveDir?: string) => {
   return new Promise<string>((resolve, reject) => {
     const outputDir = saveDir || getOutputDir(filePath);
-    // If output directory exists, remove it first
+
+    // 删除并创建输出目录
     if (fs.existsSync(outputDir)) {
       fs.rmSync(outputDir, { recursive: true, force: true });
     }
-    // Check if output directory needs to be created
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
+    fs.mkdirSync(outputDir, { recursive: true });
+
+    // 文件大小和进度流
+    const fileSize = fs.statSync(filePath).size;
+    const progressStream = progress({ length: fileSize, time: 100 });
+    progressStream.on("progress", (p) => {
+      process.stdout.write(`\r解压进度: ${p.percentage.toFixed(2)}%`);
+    });
+
+    const ext = path.extname(filePath).toLowerCase();
+
+    // 根据文件后缀选择解压方式
+    if (ext === ".zip") {
+      // 解压 .zip 文件
+      fs.createReadStream(filePath)
+        .pipe(progressStream)
+        .pipe(unzipper.Extract({ path: outputDir }))
+        .on("close", () => {
+          console.log("\n解压完成，正在优化内容...");
+          const dir = moveSingleSubdirectoryUp(outputDir);
+          resolve(dir);
+        })
+        .on("error", (error) => reject(error));
+    } else if (ext === ".gz" && filePath.endsWith(".tar.gz")) {
+      // 解压 .tar.gz 文件
+      fs.createReadStream(filePath)
+        .pipe(progressStream)
+        .pipe(
+          tar.x({
+            cwd: outputDir,
+          })
+        )
+        .on("end", () => {
+          console.log("\n解压完成，正在优化内容...");
+          const dir = moveSingleSubdirectoryUp(outputDir);
+          resolve(dir);
+        })
+        .on("error", (error) => reject(error));
+    } else {
+      reject(new Error("不支持的文件格式"));
     }
-    // Use node-7z to extract the file
-    const extraction = extractFull(filePath, outputDir, {
-      $bin: require('7zip-bin').path7za, // 7-zip binary path (default included with 7zip-bin)
-      recursive: true, // Enable recursive extraction
-      $progress: true
-    });
-
-    extraction.on('progress', (progressData: { percent: number; }) => {
-      // Calculate and display extraction progress
-      process.stdout.write(`\r解压进度: ${progressData.percent.toFixed(2)}%`);
-    });
-
-    extraction.on('end', () => {
-      console.log('正在优化解压内容');
-      const dir = moveSingleSubdirectoryUp(outputDir);
-      resolve(dir);
-      console.log('解压完成');
-    });
-
-    extraction.on('error', (err: any) => {
-      reject(err);
-    });
   });
 };
 

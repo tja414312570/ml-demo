@@ -16,6 +16,7 @@
     "@types/decompress": "^4.2.7",
     "@types/node-7z": "^2.1.10",
     "@types/progress": "^2.0.7",
+    "@types/progress-stream": "^2.0.5",
     "@types/tar": "^6.1.13",
     "@types/unzipper": "^0.10.10",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
@@ -33,13 +34,18 @@
   "dependencies": {
     "7zip-bin": "^5.2.0",
     "circular-json": "^0.5.9",
+    "compressing": "^1.10.1",
     "cross-spawn": "^7.0.3",
     "decompress": "^4.2.1",
+    "global-agent": "^3.0.0",
     "hasha": "^6.0.0",
+    "https-proxy-agent": "^7.0.5",
     "node-7z": "^3.0.0",
     "node-downloader-helper": "^2.1.9",
+    "progress-stream": "^2.0.0",
     "sudo-prompt": "^9.2.1",
     "superjson": "^2.2.1",
-    "unzipper": "^0.12.3"
+    "unzipper": "^0.12.3",
+    "vue": "^3.5.12"
   }
 }

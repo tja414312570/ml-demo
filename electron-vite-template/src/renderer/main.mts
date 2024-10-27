@@ -5,19 +5,18 @@ import "./styles/index.scss";
 import "./permission";
 import App from "./App.vue";
 import router from "./router";
-// import { errorHandler } from "./error";
+import { errorHandler } from "./error";
 import "./utils/hackIpcRenderer";
 
 // Vuetify 配置
 import 'vuetify/styles' // 引入 Vuetify 的全局样式
+import { VTreeview } from 'vuetify/labs/VTreeview'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { VIcon } from 'vuetify/components'; // 导入实际的 v-icon 组件
 import { mdiHome } from '@mdi/js';  // 或者你自定义的图标
 import '@mdi/font/css/materialdesignicons.css';
-import CodeDiff from './components/CodeDiff.vue';
-import { VTreeview } from 'vuetify/labs/VTreeview'
 
 import { install as VueMonacoEditorPlugin } from '@guolao/vue-monaco-editor'
 
@@ -37,7 +36,6 @@ const app = createApp(App);
 const store = createPinia();
 app.use(router);
 app.use(store);
-app._context.components.CodeDiff = CodeDiff;
 app.use(VueMonacoEditorPlugin, {
   paths: {
     // The recommended CDN config
@@ -45,7 +43,7 @@ app.use(VueMonacoEditorPlugin, {
   },
 })
 app.use(vuetify);
-// errorHandler(app);
+errorHandler(app);
 app.config.compilerOptions.isCustomElement = tag => tag === 'webview';
 import 'vue-code-layout/lib/vue-code-layout.css'
 import 'dockview-core/dist/styles/dockview.css';

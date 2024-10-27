@@ -116,6 +116,7 @@ export const ipcRenderMapper: IpcRendererExtended = new Proxy({
     }
   }
 }) as any;
+
 const api_wrapoer = {
   _setId_: ipcRenderMapper._setId_,
   off: ipcRenderMapper.off,

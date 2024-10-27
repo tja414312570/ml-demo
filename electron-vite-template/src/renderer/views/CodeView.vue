@@ -27,9 +27,9 @@ import { type CodeLayoutConfig, type CodeLayoutInstance, defaultCodeLayoutConfig
 import IconFile from './examples/assets/icons/IconFile.vue';
 import IconSearch from './examples/assets/icons/IconSearch.vue';
 import type { MenuOptions } from '@imengyu/vue3-context-menu';
-import { getPannel, addPannel } from './ts/pannel-manager'
+import { getPannel, addPannel } from '../ts/pannel-manager'
 import ServerList from './components/ServerList.vue';
-import { serverApi } from './api/server-api'
+import { serverApi } from '../api/server-api'
 import MainWebView from './components/MainWebView.vue';
 import CodeEdit from './components/CodeEdit.vue';
 import XtermView from './components/XtermView.vue';

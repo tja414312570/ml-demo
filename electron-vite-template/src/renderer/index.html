@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>electron-vite-template</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" href="/favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>electron-vite-template</title>
-</head>
-
-<body>
-  <div id="app" style="height: 100vh;"></div>
-  <script>window.onerror = function(message, source, lineno, colno, error) {
-    console.error('Global error caught:', message, 'at', source, 'line:', lineno);
-  };
-  </script>
-  <script type="module" src="./main.ts"></script>
-</body>
+  <body>
+    <div id="app" style="height: 100vh; width: 100vw"></div>
+    <script>
+      window.onerror = function (message, source, lineno, colno, error) {
+        console.error(
+          "Global error caught:",
+          message,
+          "at",
+          source,
+          "line:",
+          lineno
+        );
+      };
+    </script>
+    <script type="module" src="./main.ts"></script>
+  </body>
 </html>

@@ -1,12 +1,8 @@
 import config from "@config/index";
-import { BrowserWindow, dialog, session, ipcMain } from "electron";
+import { BrowserWindow, dialog, session } from "electron";
 import { winURL, loadingURL, getPreloadFile } from "../config/static-path";
 import { useProcessException } from "@main/hooks/exception-hook";
-import path from "path";
 import "./executor";
-import { bindListenerChannel, removeListenerChannel } from "./web-content-listener";
-import pluginManager from "@main/plugin/plugin-manager";
-import { Bridge, PluginType } from '@lib/main';
 
 
 class MainInit {
@@ -48,29 +44,6 @@ class MainInit {
       },
     });
     global.mainWindow = this.mainWindow;
-    ipcMain.handle('ipc-core.get-current-webcontents-id', (event, input) => {
-      return event.sender.id;
-    });
-    ipcMain.on('ipc-core.bind-channel-listener', (event, channel_info) => {
-      const { webContentId, channel } = channel_info;
-      bindListenerChannel(channel, webContentId)
-    });
-    ipcMain.on('ipc-core.remove-channel-listener', (event, channel_info) => {
-      const { webContentId, channel } = channel_info;
-      removeListenerChannel(channel, webContentId)
-    });
-
-
-    ipcMain.handle('load-script', (event, fileName) => {
-      return new Promise((resolve, reject) => {
-        pluginManager.resolvePluginModule<Bridge>(PluginType.agent).then(module => {
-          resolve(module.requireJs());
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    });
-
 
     // 加载主窗口
     this.mainWindow.loadURL(this.winURL);
