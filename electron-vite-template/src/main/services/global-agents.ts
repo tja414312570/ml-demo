@@ -1,6 +1,6 @@
 process.env.DEBUG = 'global-agent';
 import { createGlobalProxyAgent, bootstrap, ProxyAgentConfigurationType } from "global-agent";
-import { getSettingValue, registeMenu, saveSettingValue } from "./service-setting";
+import { getSettingValue, onSettingChange, registeMenu, saveSettingValue } from "./service-setting";
 import '../ipc-bind/proxy-ipc-bind'
 bootstrap();
 registeMenu({
@@ -14,8 +14,6 @@ export type Proxy = {
   type?: 'none' | 'http' | 'https' | 'socket5' | undefined,
   noProxy?: string | undefined
 }
-
-
 interface ProxySettings {
   proxyType: 'none' | 'auto' | 'manual'
   autoProxyUrl: string
@@ -56,12 +54,12 @@ function assembleProxyUrl(protocol: string, hostname: string, port: number, user
 }
 
 export const setProxy = (proxy: Proxy) => {
-  if (proxy.type === 'http') {
-    setHttpsProxy('');
+  if (proxy.http) {
+    setHttpsProxy(proxy.http);
     setHttpProxy(proxy.http)
     setNoProxy(proxy.noProxy)
-  } else if (proxy.type === 'https') {
-    setHttpProxy('');
+  } else if (proxy.https) {
+    setHttpProxy(proxy.https);
     setHttpsProxy(proxy.https)
     setNoProxy(proxy.noProxy)
   } else {
@@ -72,10 +70,15 @@ export const setProxy = (proxy: Proxy) => {
 
 (async () => {
   // await saveSettingValue('net.proxy', { http: 'http://127.0.0.1:7890', https: 'https://127.0.0.1:7890' });
-  const proxySettings = await getSettingValue('net.proxy') as ProxySettings;
+  const proxySettings = await getSettingValue('network.proxy') as ProxySettings;
   const proxy = buildProxy(proxySettings);
   setProxy(proxy)
   console.log("代理设置", proxySettings, proxy)
+  onSettingChange('network.proxy', (value: ProxySettings) => {
+    const proxy = buildProxy(value);
+    setProxy(proxy)
+    console.log("代理设置", proxySettings, proxy, getProxy())
+  })
 })();
 
 export const setHttpProxy = (proxy: String | null) => {
@@ -101,8 +104,8 @@ export const setNoProxy = (urls: String | null) => {
 }
 export const getProxy = (): Proxy => {
   return {
-    http: globalProxyAgent.HTTP_PROXY,
-    https: globalProxyAgent.HTTPS_PROXY,
-    noProxy: globalProxyAgent.NO_PROXY
+    http: (global as any).GLOBAL_AGENT.HTTP_PROXY,
+    https: (global as any).GLOBAL_AGENT.HTTPS_PROXY,
+    noProxy: (global as any).GLOBAL_AGENT.NO_PROXY
   }
 }

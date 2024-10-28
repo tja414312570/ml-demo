@@ -31,19 +31,23 @@
                     </v-breadcrumbs>
                     <v-divider></v-divider>
                     <div class="setting-area">
+                        <!-- style="height: 100%;" -->
                         <keep-alive>
-                            <component :is="currentComponent" :panel="currentProps" style="height: 100%;" />
+                            <component :is="currentComponent" v-bind="currentProps" />
+
                         </keep-alive>
                         <!-- <proxyView /> -->
                     </div>
                 </div>
             </pane>
         </splitpanes>
+        <v-divider></v-divider>
         <div class="box-buttom text-end">
             <v-btn variant="outlined" class="text-none ms-4 text-white" flat>
                 取消
             </v-btn>
-            <v-btn variant="flat" class="text-none ms-4 text-white" color="blue-darken-4" flat>
+            <v-btn variant="flat" :disabled="newSettingsValue.size == 0" class="text-none ms-4 text-white"
+                color="blue-darken-4" @click="saveSetting" flat>
                 <!-- prepend-icon="mdi-cog" -->
                 应用
             </v-btn>
@@ -57,7 +61,7 @@
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import proxyView from '../components/settings-proxy.vue';
-import { onMounted, ref, shallowRef } from 'vue';
+import { onMounted, reactive, ref, shallowRef, toRaw, watch } from 'vue';
 import { getIpcApi } from '@lib/preload';
 import { Menu } from '@main/services/service-setting';
 import { settingCompents } from '@renderer/ts/setting-compents';
@@ -111,6 +115,7 @@ settingApi.invoke('get-settings').then((data: Array<Menu>) => {
     loading.value = false;
 })
 
+const newSettingsValue = reactive(new Map<string, any>());
 const onActivated = (item: Array<Menu>) => {
     if (item.length === 0) {
         selected.value = temp.value;
@@ -122,17 +127,38 @@ const onActivated = (item: Array<Menu>) => {
             const key = current.page || current.path;
             const compent = settingCompents[key];
             console.log("加载组价", key)
+            newSettingsValue.clear()
             if (!compent) {
                 console.error("没有找到组件", new Error(`没有找到组件:${key}`))
                 alert(`没有配置设置界面[${current.name}]`)
             } else {
-                currentComponent.value = compent;
-                currentProps.value = current;
-                loading.value = false;
+                settingApi.invoke('get-setting-value', current.path).then(value => {
+                    console.log("设置值", current.path, value)
+                    currentComponent.value = compent;
+                    const wValue = reactive(value || {})
+                    currentProps.value = { menu: current, value: wValue };
+                    watch(wValue, newValue => {
+                        newSettingsValue.set(current.path, toRaw(newValue))
+                        console.log('值更新:', newSettingsValue)
+                    })
+                    loading.value = false;
+                })
             }
         }
         temp.value = selected.value = item;
     }
+}
+
+const saveSetting = () => {
+    if (newSettingsValue.size > 0) {
+        const json = Object.fromEntries(toRaw(newSettingsValue));
+        settingApi.invoke('save-setting-value', json).then(() => {
+            alert("保存成功");
+            newSettingsValue.clear()
+        }
+        );
+    }
+
 }
 
 const search = ref(null)
@@ -169,7 +195,6 @@ const filterFn = function (value: any, search, item) {
 } */
 
 .box-buttom {
-    border-top: 2px solid #FFF;
     padding: 5px;
     height: 50px;
 }
@@ -193,6 +218,6 @@ const filterFn = function (value: any, search, item) {
 .setting-area {
     padding: 8px;
     flex: 1;
-    overflow: scroll;
+    overflow: auto;
 }
 </style>

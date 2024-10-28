@@ -11,7 +11,7 @@ const removeListener = (_id_: string, channel: string) => {
   const _child = invokers.get(_id_);
   if (_child) {
     _child.delete(channel)
-    if (invokers.size === 0) {
+    if (_child.size === 0) {
       invokers.delete(_id_);
     }
   }
@@ -178,19 +178,6 @@ class IpcReanderMapper implements IpcRendererExtended {
   }
 
 }
-
-export const ipcRenderMappers: IpcRendererExtended = new Proxy({
-  _id_: undefined,
-  _web_content_id_: undefined
-}, {
-  get(target, prop) {
-    if (prop in target) {
-      return target[prop];
-    } else {
-      return (...args: any) => ipcRenderer[prop](...args)
-    }
-  }
-}) as any;
 
 export const exposeInMainWorld = (apiKey: string, api?: (ipcRenderer: IpcReanderMapper) => { [key: string]: any }) => {
   if (api && typeof api !== 'function') {

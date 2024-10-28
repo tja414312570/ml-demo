@@ -1,41 +1,42 @@
 <template>
     <v-container>
         <!-- 代理类型选择 -->
-        <v-radio-group v-model="item.proxyType" row>
+        <v-radio-group v-model="props.value.proxyType" row>
             <v-radio label="无代理" value="none" />
             <v-radio label="自动检测代理设置" value="auto" />
             <v-radio label="手动代理配置" value="manual" />
         </v-radio-group>
 
         <!-- 自动代理设置 URL -->
-        <v-text-field v-if="item.proxyType === 'auto'" v-model="item.autoProxyUrl" label="自动代理配置 URL"
+        <v-text-field v-if="props.value.proxyType === 'auto'" v-model="props.value.autoProxyUrl" label="自动代理配置 URL"
             prepend-icon="mdi-earth"></v-text-field>
 
         <!-- 手动代理配置 -->
-        <div v-if="item.proxyType === 'manual'" class="mt-4">
-            <v-radio-group v-model="item.manualProxyType" row>
+        <div v-if="props.value.proxyType === 'manual'" class="mt-4">
+            <v-radio-group v-model="props.value.manualProxyType" row>
                 <v-radio label="HTTP" value="http" />
                 <!-- <v-radio label="HTTPS" value="https" /> -->
                 <!-- <v-radio label="SOCKS" value="socks" /> -->
             </v-radio-group>
 
-            <v-text-field label="主机名 (H)" v-model="item.hostname" prepend-icon="mdi-server"></v-text-field>
+            <v-text-field label="主机名 (H)" v-model="props.value.hostname" prepend-icon="mdi-server"></v-text-field>
 
-            <v-text-field label="端口号 (N)" v-model="item.port" prepend-icon="mdi-numeric" type="number"></v-text-field>
+            <v-text-field label="端口号 (N)" v-model="props.value.port" prepend-icon="mdi-numeric"
+                type="number"></v-text-field>
 
-            <v-text-field label="不为以下项使用代理" v-model="item.noProxy" hint="示例: *.domain.com, 192.168.*"
+            <v-text-field label="不为以下项使用代理" v-model="props.value.noProxy" hint="示例: *.domain.com, 192.168.*"
                 persistent-hint></v-text-field>
 
             <!-- 代理身份验证 -->
-            <v-checkbox label="代理身份验证" v-model="item.useAuth"></v-checkbox>
+            <v-checkbox label="代理身份验证" v-model="props.value.useAuth"></v-checkbox>
 
-            <v-text-field v-if="item.useAuth" label="登录 (L)" v-model="item.username"
+            <v-text-field v-if="props.value.useAuth" label="登录 (L)" v-model="props.value.username"
                 prepend-icon="mdi-account"></v-text-field>
 
-            <v-text-field v-if="item.useAuth" label="密码 (P)" v-model="item.password" prepend-icon="mdi-lock"
-                type="password"></v-text-field>
+            <v-text-field v-if="props.value.useAuth" label="密码 (P)" v-model="props.value.password"
+                prepend-icon="mdi-lock" type="password"></v-text-field>
 
-            <v-checkbox v-if="item.useAuth" label="记住 (R)" v-model="item.remember"></v-checkbox>
+            <v-checkbox v-if="props.value.useAuth" label="记住 (R)" v-model="props.value.remember"></v-checkbox>
         </div>
 
         <!-- 检查连接按钮 -->
@@ -61,7 +62,12 @@
 
 <script lang="ts" setup>
 import { getIpcApi } from '@lib/preload';
+import { Menu } from '@main/services/service-setting';
 import { reactive, ref, toRaw } from 'vue'
+const props = defineProps<{
+    menu: Menu;
+    value: any;
+}>();
 
 interface ProxySettings {
     proxyType: 'none' | 'auto' | 'manual'
@@ -77,18 +83,32 @@ interface ProxySettings {
 }
 
 const checking = ref(false)
-const item = reactive<ProxySettings>({
-    proxyType: 'none', // 无代理、自动检测代理设置或手动代理配置
-    autoProxyUrl: '',
-    manualProxyType: 'http', // HTTP 或 SOCKS
-    hostname: '127.0.0.1',
-    port: 7890,
-    noProxy: '',
-    useAuth: false,
-    username: '',
-    password: '',
-    remember: false,
-})
+if (!props.value || Object.keys(props.value).length === 0) {
+    Object.assign(props.value, {
+        proxyType: 'none', // 无代理、自动检测代理设置或手动代理配置
+        autoProxyUrl: '',
+        manualProxyType: 'http', // HTTP 或 SOCKS
+        hostname: '127.0.0.1',
+        port: 7890,
+        noProxy: '',
+        useAuth: false,
+        username: '',
+        password: '',
+        remember: false,
+    })
+}
+// const item = reactive<ProxySettings>({
+//     proxyType: 'none', // 无代理、自动检测代理设置或手动代理配置
+//     autoProxyUrl: '',
+//     manualProxyType: 'http', // HTTP 或 SOCKS
+//     hostname: '127.0.0.1',
+//     port: 7890,
+//     noProxy: '',
+//     useAuth: false,
+//     username: '',
+//     password: '',
+//     remember: false,
+// })
 
 const dialog = ref(false);  // 控制弹窗的显示
 const testUrl = ref('https://google.com');    // 存储用户输入的测试地址
@@ -111,7 +131,7 @@ function checkConnection() {
     checking.value = true;
     let url = testUrl.value;
 
-    settingApi.invoke('proxy-test', toRaw(item), url).then(data => {
+    settingApi.invoke('proxy-test', toRaw(props.value), url).then(data => {
         console.log("结果:", data)
         if (data.error) {
             errorMessages.value = data.error

@@ -17,7 +17,7 @@
       <i id="close" class="mdi mdi-close" @click="api.invoke('close')"></i>
     </div>
   </div>
-  <div v-else-if="!IsUseSysTitle && !isNotMac" class="window-title">
+  <div v-else-if="!isNotMac" class="window-title mac">
     <div style="-webkit-app-region: drag" class="title">设置</div>
   </div>
 </template>
@@ -30,7 +30,6 @@ const isMax = ref(false)
 
 const api = getIpcApi('ipc-core.window');
 const coreApi: any = getIpcApi('ipc-core');
-const IsUseSysTitle = ref(false);
 api.invoke('isMaximized').then(result => {
   isMax.value = result;
 })
@@ -50,12 +49,16 @@ const IsWeb = ref(Boolean(false));
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+.mac.window-title {
+  -webkit-app-region: drag;
+}
+
 .window-title {
   width: 100%;
   height: 30px;
   line-height: 30px;
   display: flex;
-  // -webkit-app-region: drag;
+
   top: 0;
   z-index: 99999;
   justify-content: center;

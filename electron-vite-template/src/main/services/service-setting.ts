@@ -4,10 +4,16 @@ import { access, constants, readFile, writeFile } from "fs/promises";
 import assert from "assert";
 import _ from 'lodash';
 import '../ipc-bind/setting-ipc-bind'
+import EventEmitter from "events";
 
 const userDataPath = app.getPath('userData');
 const configPath = path.join(userDataPath, 'settings.json')
 console.log("配置地址", configPath)
+
+const eventer = new EventEmitter();
+export const onSettingChange = (path: string, callback: (value: any) => void) => {
+    eventer.on("SettingChange", callback);
+};
 const settins_menu: Array<Menu> = [
     {
         name: "通用",
@@ -112,11 +118,32 @@ export const getSettingValue = async (key: string) => {
     const value = _.get(config, key)
     return value;
 }
-export const saveSettingValue = async (key: string, value: any) => {
+export const saveSettingValue = async (key: string | object, value?: any) => {
     const config = await getSettingConfig();
-    const old = { ...config };
-    _.set(config, key, value);
-    writeFile(configPath, JSON.stringify(config), 'utf8')
+    if (typeof key === 'string') {
+        const currentValue = _.get(config, key);
+        if (_.isEqual(currentValue, value)) { // 值相同时跳过写入
+            return;
+        }
+        _.set(config, key, value);
+        eventer.emit("SettingChange", value);
+    } else {
+        let hasNews = false;
+        for (const path in key) {
+            const currentValue = _.get(config, path);
+            value = key[path];
+            if (!_.isEqual(currentValue, value)) { // 值相同时跳过写入
+                _.set(config, path, value);
+                eventer.emit("SettingChange", value);
+                hasNews = true;
+            }
+        }
+        if (!hasNews) {
+            return;
+        }
+    }
+    console.log("写入设置:", JSON.stringify(config))
+    await writeFile(configPath, JSON.stringify(config), 'utf8');
 }
 export const getSettingConfig = async () => {
     // 先检查文件是否存在
