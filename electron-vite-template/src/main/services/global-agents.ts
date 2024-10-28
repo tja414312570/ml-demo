@@ -77,7 +77,7 @@ export const setProxy = (proxy: Proxy) => {
   onSettingChange('network.proxy', (value: ProxySettings) => {
     const proxy = buildProxy(value);
     setProxy(proxy)
-    console.log("代理设置", proxySettings, proxy, getProxy())
+    console.log("代理设置", value, proxy, getProxy())
   })
 })();
 
