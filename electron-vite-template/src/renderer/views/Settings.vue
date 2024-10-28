@@ -105,7 +105,7 @@ const findPath = (targetKey, path = [], nodes = settingMenus.value) => {
 const settingMenus = ref<Array<Menu>>([])
 const settingApi = getIpcApi('ipc-settings');
 loading.value = true;
-settingApi.invoke('ipc-setting.get-settings').then((data: Array<Menu>) => {
+settingApi.invoke('get-settings').then((data: Array<Menu>) => {
     console.log("获取到菜单:", data)
     settingMenus.value = data;
     loading.value = false;

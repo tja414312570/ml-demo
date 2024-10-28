@@ -5,7 +5,7 @@ import { ipcMain } from "electron";
 import { HttpProxyAgent } from 'http-proxy-agent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
-ipcMain.handle('ipc-setting.proxy.test', async (event, proxyInfo, url) => {
+ipcMain.handle('ipc-settings.proxy-test', async (event, proxyInfo, url) => {
     const oldProxy = getProxy()
     delete process.env.npm_config_proxy;
     delete process.env.npm_config_https_proxy;

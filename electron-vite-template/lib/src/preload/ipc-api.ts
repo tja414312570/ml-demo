@@ -27,7 +27,7 @@ class IpcApi {
         this.channel = channel;  // 初始化 channel
         if (!_win[channel]) {
             const message = `IPC-API错误，没有找到渠道:${channel} `
-            _win['core-api'].send('error-notify', message)
+            _win['ipc-core'].send('error-notify', message)
             showCustomAlert(message)
             throw new Error(message)
         }
@@ -53,6 +53,11 @@ export interface DefaultApi {
     send: (channel: string, ...args: any[]) => void;
     invoke: (channel: string, ...args: any[]) => Promise<any>;
 }
+const notifyError = (message: string) => {
+    console.error(new Error(message))
+    _win['ipc-core'].send('error-notify', message)
+    showCustomAlert(message)
+}
 
 // getIpcApi 函数，用于创建带有代理的 IpcApi 对象
 export function getIpcApi<T>(channel: string): IpcApi & DefaultApi & T {
@@ -67,22 +72,26 @@ export function getIpcApi<T>(channel: string): IpcApi & DefaultApi & T {
                 return (target as any)[prop];
             } else {
                 // 如果方法不存在，输出调用的方法名并返回一个默认值
-                return (...args: any[]) => {
-                    try {
-                        // const _channel = channel + '.' + args[0];
-                        // const _args = args.slice(1);
-                        _getIpcApi__()._setId_(_getId__());
-                        const result = _getIpcApi__()[prop](...args);  // 可以根据需求返回其他默认值
-                        return result;
-                    } catch (err) {
-                        const message = `ipc通信异常:${String(err)},目标:${channel}.${String(prop)}`
-                        _win['core-api'].send('error-notify', message)
-                        showCustomAlert(message)
-                        throw new Error(message, { cause: err })
-                    } finally {
-                        _getIpcApi__()._setId_(undefined);
-                    }
-                };
+                if (prop in _getIpcApi__()) {
+                    const apiProp = _getIpcApi__()[prop]
+                    return typeof apiProp !== 'function' ? apiProp : (...args: any[]) => {
+                        try {
+                            _getIpcApi__()._setId_(_getId__());
+                            return _getIpcApi__()[prop](...args);
+                        } catch (err) {
+                            const message = `ipc通信异常:${String(err)},api:${channel}.${String(prop)}`
+                            notifyError(message)
+                            throw new Error(message, { cause: err })
+                        } finally {
+                            _getIpcApi__()._setId_(undefined);
+                        }
+                    };
+                } else {
+                    const message = `ipc通信异常,api:${channel}.${String(prop)}不存在！`;
+                    notifyError(message);
+                    throw new Error(message)
+                }
+
             }
         }
     }) as IpcApi & T & DefaultApi;

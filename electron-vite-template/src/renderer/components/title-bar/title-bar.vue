@@ -1,5 +1,5 @@
 <template>
-  <div class="window-title" v-if="!IsUseSysTitle && isNotMac && !IsWeb">
+  <div class="window-title" v-if="isNotMac">
     <!-- 软件logo预留位置 -->
     <div style="-webkit-app-region: drag" class="logo">
       <img src="@renderer/assets/icons/svg/electron-logo.svg" class="icon-logo" />
@@ -10,7 +10,10 @@
     <div style="-webkit-app-region: drag" class="title">设置</div>
     <div class="window-controls">
       <i id="minimize" class="mdi mdi-window-minimize" @click="api.invoke('minimize')"></i>
-      <i id="maximize" class="mdi mdi-window-maximize" @click="api.invoke('maximize')"></i>
+      <i id="maximize" class="mdi mdi-window-maximize" v-show="!isMax"
+        @click="api.invoke('maximize') && (isMax = true)"></i>
+      <i id="restore" class="mdi mdi-window-restore" v-show="isMax"
+        @click="api.invoke('restore') && (isMax = false)"></i>
       <i id="close" class="mdi mdi-close" @click="api.invoke('close')"></i>
     </div>
   </div>
@@ -22,14 +25,20 @@
 <script setup lang="ts">
 import { getIpcApi } from "@lib/preload";
 import { ref } from "vue";
-const { ipcRendererChannel, systemInfo } = window;
+import { tr } from "vuetify/locale";
+const isMax = ref(false)
 
-const api = getIpcApi('core-api.window');
-api.invoke('maximize')
+const api = getIpcApi('ipc-core.window');
+const coreApi: any = getIpcApi('ipc-core');
 const IsUseSysTitle = ref(false);
+api.invoke('isMaximized').then(result => {
+  isMax.value = result;
+})
 const mix = ref(false);
 // const isNotMac = ref(false);
-const isNotMac = ref(true);
+
+console.log(coreApi.platform)
+const isNotMac = ref(coreApi.platform !== 'darwin');
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
 

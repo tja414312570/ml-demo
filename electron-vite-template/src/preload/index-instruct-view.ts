@@ -1,12 +1,12 @@
 import { InstructContent } from "@main/ipc/code-manager";
-import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
+import { exposeInMainWorld } from "./ipc-wrapper";
 
-exposeInMainWorld('code-view-api', {
-    onCode: (callback: Function) => ipcRenderMapper.on('codeViewApi.code', (event, notifyData) => {
+exposeInMainWorld('code-view-api', ipcRenderer => ({
+    onCode: (callback: Function) => ipcRenderer.on('code', (event, notifyData) => {
         callback(notifyData);
     }),
-    executeCode: (code: InstructContent) => ipcRenderMapper.invoke("codeViewApi.execute", code),
-    onCodeExecuted: (callback: Function) => ipcRenderMapper.on('codeViewApi.code.executed', (event, notifyData) => {
+    executeCode: (code: InstructContent) => ipcRenderer.invoke("execute", code),
+    onCodeExecuted: (callback: Function) => ipcRenderer.on('code.executed', (event, notifyData) => {
         callback(notifyData);
     }),
-});
+}));

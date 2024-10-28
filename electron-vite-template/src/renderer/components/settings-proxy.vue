@@ -15,7 +15,7 @@
         <div v-if="item.proxyType === 'manual'" class="mt-4">
             <v-radio-group v-model="item.manualProxyType" row>
                 <v-radio label="HTTP" value="http" />
-                <v-radio label="HTTPS" value="https" />
+                <!-- <v-radio label="HTTPS" value="https" /> -->
                 <!-- <v-radio label="SOCKS" value="socks" /> -->
             </v-radio-group>
 
@@ -52,7 +52,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-btn color="primary" @click="checkConnection" :disabled="checking">开始检查</v-btn>
-                    <v-btn text @click="dialog = false">取消</v-btn>
+                    <v-btn @click="dialog = false">取消</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -111,7 +111,7 @@ function checkConnection() {
     checking.value = true;
     let url = testUrl.value;
 
-    settingApi.invoke('ipc-setting.proxy.test', toRaw(item), url).then(data => {
+    settingApi.invoke('proxy-test', toRaw(item), url).then(data => {
         console.log("结果:", data)
         if (data.error) {
             errorMessages.value = data.error

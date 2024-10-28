@@ -1,12 +1,12 @@
 import { ipcRenderer } from "electron";
 
-import { exposeInMainWorld, ipcRenderMapper } from "./ipc-wrapper";
+import { exposeInMainWorld } from "./ipc-wrapper";
 
 import './core-api-pre'
 
 const api = 'webview-api'
 
-exposeInMainWorld(api, {})
+exposeInMainWorld(api)
 
 window.addEventListener('DOMContentLoaded', () => {
   console.log('DOM 已经加载完成');
