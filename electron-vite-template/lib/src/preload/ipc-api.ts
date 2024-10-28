@@ -15,7 +15,7 @@ function showCustomAlert(message: string) {
     document.body.appendChild(alertDiv);
 }
 
-const _win:{[key:string]:any} = (window as any);
+const _win: { [key: string]: any } = (window as any);
 
 class IpcApi {
     private uuid: string;
@@ -46,12 +46,12 @@ class IpcApi {
     }
 }
 
-export interface DefaultApi{
-    off: (channel: string)=>void,
-    offAll: ()=>void,
-    on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void)=>IpcRenderer;
-    send:(channel: string, ...args: any[])=> void;
-    invoke:(channel: string, ...args: any[])=> Promise<any>;
+export interface DefaultApi {
+    off: (channel: string) => void,
+    offAll: () => void,
+    on: (channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) => IpcRenderer;
+    send: (channel: string, ...args: any[]) => void;
+    invoke: (channel: string, ...args: any[]) => Promise<any>;
 }
 
 // getIpcApi 函数，用于创建带有代理的 IpcApi 对象
@@ -69,6 +69,8 @@ export function getIpcApi<T>(channel: string): IpcApi & DefaultApi & T {
                 // 如果方法不存在，输出调用的方法名并返回一个默认值
                 return (...args: any[]) => {
                     try {
+                        // const _channel = channel + '.' + args[0];
+                        // const _args = args.slice(1);
                         _getIpcApi__()._setId_(_getId__());
                         const result = _getIpcApi__()[prop](...args);  // 可以根据需求返回其他默认值
                         return result;

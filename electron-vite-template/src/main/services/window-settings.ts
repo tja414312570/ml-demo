@@ -4,15 +4,12 @@ import { BrowserWindow } from "electron";
 export const createWindow = () => {
     const settingURL = getUrl('setting');
     const mainWindow = new BrowserWindow({
-        titleBarOverlay: {
-            color: "#fff",
-        },
-
         titleBarStyle: 'hidden',
         title: "设置",
         height: 720,
         useContentSize: true,
         width: 960,
+        frame: false,
         minWidth: 720,
         show: false,
         webPreferences: {

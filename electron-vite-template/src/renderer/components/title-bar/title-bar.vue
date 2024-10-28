@@ -8,6 +8,11 @@
     <div></div>
     <!-- 中间标题位置 -->
     <div style="-webkit-app-region: drag" class="title">设置</div>
+    <div class="window-controls">
+      <i id="minimize" class="mdi mdi-window-minimize" @click="api.invoke('minimize')"></i>
+      <i id="maximize" class="mdi mdi-window-maximize" @click="api.invoke('maximize')"></i>
+      <i id="close" class="mdi mdi-close" @click="api.invoke('close')"></i>
+    </div>
   </div>
   <div v-else-if="!IsUseSysTitle && !isNotMac" class="window-title">
     <div style="-webkit-app-region: drag" class="title">设置</div>
@@ -15,13 +20,16 @@
 </template>
 
 <script setup lang="ts">
+import { getIpcApi } from "@lib/preload";
 import { ref } from "vue";
 const { ipcRendererChannel, systemInfo } = window;
 
+const api = getIpcApi('core-api.window');
+api.invoke('maximize')
 const IsUseSysTitle = ref(false);
 const mix = ref(false);
 // const isNotMac = ref(false);
-const isNotMac = ref(false);
+const isNotMac = ref(true);
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
 
@@ -38,7 +46,7 @@ const IsWeb = ref(Boolean(false));
   height: 30px;
   line-height: 30px;
   display: flex;
-  -webkit-app-region: drag;
+  // -webkit-app-region: drag;
   top: 0;
   z-index: 99999;
   justify-content: center;
@@ -99,5 +107,24 @@ const IsWeb = ref(Boolean(false));
       color: #fff;
     }
   }
+}
+
+.window-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 10px;
+}
+
+.window-controls i {
+  font-size: 24px;
+  /* 图标大小 */
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.window-controls i:hover {
+  color: #f00;
+  /* 鼠标悬停时的颜色 */
 }
 </style>
