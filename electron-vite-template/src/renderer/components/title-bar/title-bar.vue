@@ -194,6 +194,12 @@ const menuData: MenuBarOptions = {
   }
 }
 
+
+.mx-menu-bar.dark {
+  //在这里覆盖默认css变量的值
+  --mx-menu-backgroud: rgba(0, 0, 0, 0);
+}
+
 .window-controls {
   display: flex;
   justify-content: flex-end;
@@ -211,22 +217,31 @@ const menuData: MenuBarOptions = {
   /* 图标大小 */
   cursor: pointer;
   margin: 0 10px;
+  color: #bbb;
 
 }
 
 .window-controls i:hover {
-  color: #f00;
+  color: #fff;
   /* 鼠标悬停时的颜色 */
 }
 
 :deep(.mx-menu-bar) {
-  background: none !important;
+  background: none;
   padding: 0 !important;
 }
 
 :deep(.mx-menu-bar) * {
-  background: none !important;
+  background: none;
 }
+
+// /* 覆盖伪类 */
+// :deep(.mx-menu-bar):hover,
+// :deep(.mx-menu-bar):active,
+// :deep(.mx-menu-bar) *:hover,
+// :deep(.mx-menu-bar) *:active {
+//   background: inherit !important;
+// }
 
 :deep(.mx-menu-bar .mx-menu-bar-item) {
   font-size: 14px;
