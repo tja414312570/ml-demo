@@ -5,14 +5,15 @@ function showCustomAlert(message: string) {
     const alertDiv = document.createElement('div');
     alertDiv.innerText = message;
     alertDiv.style.position = 'fixed';
-    alertDiv.style.top = '10px';
+    alertDiv.style.top = '50px';
     alertDiv.style.left = '50%';
     alertDiv.style.transform = 'translateX(-50%)';
     alertDiv.style.backgroundColor = 'white';
     alertDiv.style.padding = '10px';
     alertDiv.style.border = '1px solid black';
     alertDiv.style.zIndex = '1000';
-    document.body.appendChild(alertDiv);
+    const doms = document.body || document.querySelector('#app-body-container')
+    doms.appendChild(alertDiv);
 }
 
 const _win: { [key: string]: any } = (window as any);

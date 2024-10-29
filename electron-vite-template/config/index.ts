@@ -1,5 +1,5 @@
 export default {
-build: {
+  build: {
     hotPublishUrl: "",
     hotPublishConfigName: "update-config",
   },
@@ -11,5 +11,5 @@ build: {
   DllFolder: "",
   HotUpdateFolder: "update",
   UseStartupChart: true,
-  IsUseSysTitle: true,
+  IsUseSysTitle: false,
 };

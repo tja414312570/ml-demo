@@ -10,7 +10,7 @@
     </div> -->
   <v-theme-provider theme="dark" style="height: 100vh;display: flex;flex-direction: column;" with-background>
     <title-bar />
-    <div style="overflow: hidden;flex: 1;">
+    <div id="app-body-container" style="overflow: hidden;flex: 1;position: relative;">
       <router-view v-slot="{ Component }">
         <component :is="Component" />
       </router-view>

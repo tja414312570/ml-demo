@@ -22,9 +22,6 @@ class MainInit {
   createMainWindow() {
     console.log('预加载路径:' + getPreloadFile("index"))
     this.mainWindow = new BrowserWindow({
-      titleBarOverlay: {
-        color: "#fff",
-      },
       titleBarStyle: config.IsUseSysTitle ? "default" : "hidden",
       height: 800,
       useContentSize: true,

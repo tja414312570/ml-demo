@@ -1,5 +1,5 @@
 <template>
-  <CodeLayout ref="codeLayout" :layout-config="config" style="height: 400px" :mainMenuConfig="menuData">
+  <CodeLayout ref="codeLayout" :layout-config="config" :mainMenuConfig="menuData">
     <template #panelRender="{ panel }">
       <!--
           每个面板都会调用此插槽来渲染，你可以根据 
@@ -24,18 +24,18 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, nextTick, h } from 'vue';
 import { type CodeLayoutConfig, type CodeLayoutInstance, defaultCodeLayoutConfig } from 'vue-code-layout';
-import IconFile from './examples/assets/icons/IconFile.vue';
-import IconSearch from './examples/assets/icons/IconSearch.vue';
+import IconFile from '../examples/assets/icons/IconFile.vue';
+import IconSearch from '../examples/assets/icons/IconSearch.vue';
 import type { MenuOptions } from '@imengyu/vue3-context-menu';
 import { getPannel, addPannel } from '../ts/pannel-manager'
-import ServerList from './components/ServerList.vue';
+import ServerList from '../components/ServerList.vue';
 import { serverApi } from '../api/server-api'
-import MainWebView from './components/MainWebView.vue';
-import CodeEdit from './components/CodeEdit.vue';
-import XtermView from './components/XtermView.vue';
-import StatusBar from './components/StatusBar.vue';
-import CodeOutput from './components/CodeOutput.vue';
-import PluginView from './components/PluginView.vue';
+import MainWebView from '../components/MainWebView.vue';
+import CodeEdit from '../components/CodeEdit.vue';
+import XtermView from '../components/XtermView.vue';
+import StatusBar from '../components/StatusBar.vue';
+import CodeOutput from '../components/CodeOutput.vue';
+import PluginView from '../components/PluginView.vue';
 const MONACO_EDITOR_OPTIONS = {
   automaticLayout: true,
   formatOnType: true,

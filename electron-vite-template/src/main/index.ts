@@ -5,7 +5,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 import { useMainDefaultIpc } from "./services/ipc-main";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, session } from "electron";
-// import InitWindow from "./services/window-manager";
+import InitWindow from "./services/window-manager";
 import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
 import { useMenu } from "@main/hooks/menu-hook"
@@ -38,8 +38,8 @@ function onAppReady() {
   // defaultIpc();
   // creactMenu()
 
-  // new InitWindow().initWindow();
-  createWindow();
+  new InitWindow().initWindow();
+  // createWindow();
   if (process.env.NODE_ENV === "development") {
     const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor");
     session.defaultSession.loadExtension(VUEJS_DEVTOOLS, {
@@ -69,7 +69,7 @@ app.whenReady().then(() => {
   onAppReady();
   // startProxyServer(upstreamProxy).then(proxy => {
   //   onAppReady();
-  //   ptyInit()
+  ptyInit()
   //   ipcMain.on('notificationAPI-ready', () => {
   //     notify("gpt拦截器已初始化完成！")
   //   })

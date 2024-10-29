@@ -27,7 +27,7 @@ let resizeObserver = null;
 //   terminalApi.send('terminal-input', data + ' ; echo ' + end_tag + '\n');
 // };
 
-const terminalApi: any = getIpcApi("ipcRenderer")
+const terminalApi: any = getIpcApi("pty")
 onMounted(async () => {
   // 等待 DOM 更新完成
   console.log("初始化终端:", terminalWrapper)

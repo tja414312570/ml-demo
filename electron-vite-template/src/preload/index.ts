@@ -6,7 +6,7 @@ import './index-plugin-view'
 import './index-instruct-view'
 import './core-api-pre'
 
-exposeInMainWorld('ipcRenderer');
+exposeInMainWorld('pty');
 
 
 contextBridge.exposeInMainWorld('notificationAPI', {

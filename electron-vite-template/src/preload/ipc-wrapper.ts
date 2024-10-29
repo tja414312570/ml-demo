@@ -62,11 +62,17 @@ class IpcReanderMapper implements IpcRendererExtended {
       } catch (error) {
         console.error(`监听器 '${channel}' 执行出错:`, error);
         alert(`监听器 '${channel}' 执行出错:${String(error)}`)
+        throw error;
       }
     };
     bindListener(this._id_, channel, wrappedListener)
     ipcRenderer.send('ipc-core.bind-channel-listener', { webContentId: _web_content_id_, channel })
-    target(channel, wrappedListener);
+    try {
+      target.bind(ipcRenderer)(channel, wrappedListener);
+    } catch (error) {
+      console.error(`监听器 '${channel}' 绑定出错:`, error);
+      throw error
+    }
   }
   on(channel: string, listener: (event: IpcRendererEvent, ...args: any[]) => void) {
     this._bind(channel, ipcRenderer.on, listener)
