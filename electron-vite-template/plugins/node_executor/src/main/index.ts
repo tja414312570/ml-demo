@@ -83,8 +83,7 @@ class ExecuteContext {
 
 class NodeExecutor
   extends AbstractPlugin
-  implements Pluginlifecycle, InstructExecutor
-{
+  implements Pluginlifecycle, InstructExecutor {
   private executeContext: null | ExecuteContext = null;
   abort(instruct: InstructContent): Promise<InstructResult | void> {
     if (!this.executeContext) {
@@ -129,7 +128,7 @@ class NodeExecutor
           console.log(data)
           virtualWindow.write(data);
           const output = virtualWindow.render();
-          pluginContext.sendIpcRender("codeViewApi.insertLine", {
+          pluginContext.sendIpcRender("code-view-api.insertLine", {
             id,
             code: output,
             execId,
@@ -196,7 +195,7 @@ class NodeExecutor
             type: InstructResultType.completed,
           });
         });
-     
+
         // 监听子进程的消息事件，获取执行结果
         childProcess.on("message", (message) => {
           if (message === execId) {
@@ -244,7 +243,7 @@ class NodeExecutor
 
   onMounted(ctx: PluginExtensionContext): void {
     // 插件挂载时的处理逻辑
-    console.log("插件工作目录:",pluginContext.workPath)
+    console.log("插件工作目录:", pluginContext.workPath)
   }
 
   onUnmounted(ctx: PluginExtensionContext): void {

@@ -1,5 +1,5 @@
 <template>
-  <CodeLayout ref="codeLayout" :layout-config="config" :mainMenuConfig="menuData">
+  <CodeLayout ref="codeLayout" :layout-config="config">
     <template #panelRender="{ panel }">
       <!--
           每个面板都会调用此插槽来渲染，你可以根据 
@@ -71,7 +71,7 @@ const config = reactive<CodeLayoutConfig>({
   primarySideBar: false,
   bottomPanel: true,
   statusBar: true,
-  menuBar: false,
+  menuBar: true,
   bottomPanelMaximize: false,
   secondarySideBar: true,
   secondarySideBarWidth: 50,
@@ -297,3 +297,9 @@ const menuData: MenuOptions = {
   minWidth: 230,
 };
 </script>
+
+<style lang="css" scoped>
+:deep(.code-layout-split-dragger) {
+  z-index: 10;
+}
+</style>

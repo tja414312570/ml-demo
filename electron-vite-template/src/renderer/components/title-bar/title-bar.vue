@@ -1,14 +1,16 @@
 <template>
   <div class="window-title" v-if="isNotMac">
     <!-- 软件logo预留位置 -->
+
     <div class="region-area window-title">
-      <div style="-webkit-app-region: drag" class="logo">
+      <!-- 中间标题位置 -->
+      <div class="title region-area">设置</div>
+    </div>
+    <div class="menu">
+      <div class="logo">
         <img src="@renderer/assets/icons/svg/electron-logo.svg" class="icon-logo" />
       </div>
-      <!-- 菜单栏位置 -->
-      <div></div>
-      <!-- 中间标题位置 -->
-      <div style="-webkit-app-region: drag" class="title">设置</div>
+      <MenuBar :options="menuData" />
     </div>
     <div class="window-controls">
       <i id="minimize" class="mdi mdi-window-minimize" @click="api.invoke('minimize')"></i>
@@ -25,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { MenuBarOptions, MenuBar } from "@imengyu/vue3-context-menu";
 import { getIpcApi } from "@lib/preload";
 import { ref } from "vue";
 import { tr } from "vuetify/locale";
@@ -35,11 +38,16 @@ const coreApi: any = getIpcApi('ipc-core');
 api.invoke('isMaximized').then(result => {
   isMax.value = result;
 })
+window.onresize = () => {
+  api.invoke('isMaximized').then(result => {
+    isMax.value = result;
+  })
+}
 const mix = ref(false);
 // const isNotMac = ref(false);
 
 console.log(coreApi.platform)
-const isNotMac = ref(coreApi.platform !== 'darwin');
+const isNotMac = ref(coreApi.platform === 'darwin');
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
 
@@ -48,6 +56,68 @@ const IsWeb = ref(Boolean(false));
 // ipcRendererChannel.IsUseSysTitle.invoke().then((res) => {
 //   IsUseSysTitle.value = res;
 // });
+
+
+
+
+const menuData: MenuBarOptions = {
+  theme: "flat dark",
+  xOffset: -10,
+  yOffset: -20,
+  items: [
+    {
+      label: "File",
+      children: [
+        { label: "New" },
+        { label: "Open" },
+        {
+          label: "Open recent",
+          children: [
+            { label: "File 1...." },
+            { label: "File 2...." },
+            { label: "File 3...." },
+            { label: "File 4...." },
+            { label: "File 5...." },
+          ],
+        },
+        { label: "Save", divided: true },
+        { label: "Save as..." },
+        { label: "Close" },
+        { label: "Exit" },
+      ],
+    },
+    {
+      label: "Edit",
+      children: [
+        { label: "Undo" },
+        { label: "Redo" },
+        { label: "Cut", divided: true },
+        { label: "Copy" },
+        { label: "Find", divided: true },
+        { label: "Replace" },
+      ],
+    },
+    {
+      label: "View",
+      children: [
+        { label: "Zoom in" },
+        { label: "Zoom out" },
+        { label: "Reset zoom" },
+        { label: "Full screent", divided: true },
+        { label: "Find", divided: true },
+        { label: "Replace" },
+      ],
+    },
+    {
+      label: "Help",
+      children: [
+        { label: "About" },
+      ],
+    },
+  ],
+  zIndex: 100000,
+  minWidth: 230,
+};
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
@@ -62,7 +132,7 @@ const IsWeb = ref(Boolean(false));
   display: flex;
   cursor: pointer;
   top: 0;
-  z-index: 99999;
+  z-index: 9999;
   justify-content: center;
   align-items: center;
 
@@ -147,5 +217,28 @@ const IsWeb = ref(Boolean(false));
 .window-controls i:hover {
   color: #f00;
   /* 鼠标悬停时的颜色 */
+}
+
+:deep(.mx-menu-bar) {
+  background: none !important;
+  padding: 0 !important;
+}
+
+:deep(.mx-menu-bar) * {
+  background: none !important;
+}
+
+:deep(.mx-menu-bar .mx-menu-bar-item) {
+  font-size: 14px;
+  padding: 0 8px;
+}
+
+.menu {
+  position: absolute;
+  z-index: 99999;
+  left: 0;
+  top: 0;
+  display: flex;
+  -webkit-app-region: none;
 }
 </style>

@@ -185,10 +185,7 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
 }
 
 let t = 0;
-window.test = () => {
-  insertVueInlineDiff(editor.value, 1, 'testtest_' + (t++) + '\r\n', '12345')
-}
-codeApi.on('codeViewApi.code', (event: any, code_content: InstructContent) => {
+codeApi.on('code', (event: any, code_content: InstructContent) => {
   console.log('指令信息:', code_content)
   code_content = code_content[0]
   code.value = code_content.code;
@@ -201,7 +198,7 @@ codeApi.on('codeViewApi.code', (event: any, code_content: InstructContent) => {
   removeInlineDiff(editor.value)
 })
 
-codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number, execId: string }) => {
+codeApi.on('insertLine', (event: any, lineDiff: { code: string, line: number, execId: string }) => {
   const { code, line, execId } = lineDiff;
   console.log("执行完毕", JSON.stringify(lineDiff))
   try {

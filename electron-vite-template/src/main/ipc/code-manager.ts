@@ -16,9 +16,9 @@ export const wrapperInstruct = (instruction: string, content: string): InstructC
 }
 export const previewCode = (code: Array<InstructContent>) => {
     console.error("执行错误:", new Error())
-    send_ipc_render('codeViewApi.code', code)
+    send_ipc_render('code-view-api.code', code)
 }
 
 export const executeCodeCompleted = (code: ExecuteResult) => {
-    send_ipc_render('codeViewApi.code.executed', code)
+    send_ipc_render('code-view-api.code.executed', code)
 }

@@ -116,7 +116,7 @@ class SshExecutor extends AbstractPlugin implements InstructExecutor, Pluginlife
       const render = (data: string, type: InstructResultType) => {
         virtualWindow.write(data);
         const output = virtualWindow.render();
-        pluginContext.sendIpcRender('codeViewApi.insertLine', {
+        pluginContext.sendIpcRender('code-view-api.insertLine', {
           id,
           code: output,
           execId,
@@ -127,7 +127,7 @@ class SshExecutor extends AbstractPlugin implements InstructExecutor, Pluginlife
 
       this.cache.set(id, executeContext);
       executeContext.onWrite(data => pluginContext.pty.write(data));
-      const disable = pluginContext.pty.onData((data:string) => {
+      const disable = pluginContext.pty.onData((data: string) => {
         render(data, InstructResultType.executing)
         executeContext.callData(data)
       })

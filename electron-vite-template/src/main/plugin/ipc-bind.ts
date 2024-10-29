@@ -44,11 +44,11 @@ const copy = (pluginList: undefined | null | PluginInfo | Set<PluginInfo>) => {
     return list;
 };
 
-ipcMain.handle('get-plugin-list', (event, args) => {
+ipcMain.handle('plugin-view-api.get-plugin-list', (event, args) => {
     const cloneObj = copy(pluginManager.filtePlugins(args));
     return cloneObj;
 })
 
-ipcMain.handle('plugin-reload', (event, id: string) => {
+ipcMain.handle('plugin-view-api.plugin-reload', (event, id: string) => {
     return copy(pluginManager.reload(pluginManager.getPluginFromId(id)));
 })

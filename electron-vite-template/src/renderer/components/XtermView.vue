@@ -78,7 +78,7 @@ onMounted(async () => {
   // 调整终端大小
   fitAddon.fit();
   terminalApi.on('terminal-output', (event, data) => {
-    console.log('从终端收到数据:', terminalRef);  // 调试终
+    console.log('从终端收到数据:', terminalRef, data);  // 调试终
     terminal.write(data);
 
   });
@@ -99,7 +99,7 @@ onMounted(async () => {
     terminalApi.send('terminal-into', '\r');
   };
   terminal.clear()
-  terminal.writeln('Welcome to SvelteStorm 5.0');
+  terminal.writeln('Welcome to chat interpter');
   // ipcRenderer.send("terminal-into", "ls -ila\r");
 
   terminal.prompt();

@@ -121,7 +121,7 @@ const toggleAutoSend = () => {
     isAutoSend.value = !isAutoSend.value;
 };
 let result = [];
-codeApi.on('codeViewApi.insertLine', (event: any, lineDiff: { code: string, line: number, type: InstructResultType }) => {
+codeApi.on('code-view-api.insertLine', (event: any, lineDiff: { code: string, line: number, type: InstructResultType }) => {
     const { code, line, type } = lineDiff;
     console.log("执行完毕", JSON.stringify(lineDiff))
     try {
@@ -149,7 +149,7 @@ const handleDebugExecute = () => {
 // 模拟的代码执行函数
 const executeCode = () => {
     if (isExecuting.value) {
-        codeApi.invoke("codeViewApi.execute.stop", { id: props.id, executor: selected.value } as InstructContent).then(result => {
+        codeApi.invoke("code-view-api.execute.stop", { id: props.id, executor: selected.value } as InstructContent).then(result => {
 
         }).catch(err => {
             console.log('代码停止执行错误:', err)

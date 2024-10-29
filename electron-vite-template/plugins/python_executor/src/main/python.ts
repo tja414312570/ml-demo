@@ -11,7 +11,7 @@ export const runPythonCode = async (id: string, code: string, execId: string): P
     // 获取 Python 脚本的输出
     pythonProcess.stdout.on('data', (data) => {
       output += data.toString();
-      pluginContext.sendIpcRender('codeViewApi.insertLine',
+      pluginContext.sendIpcRender('code-view-api.insertLine',
         {
           id,
           code: `${data.toString()}\r\n`,
@@ -26,7 +26,7 @@ export const runPythonCode = async (id: string, code: string, execId: string): P
       console.error(`错误: ${data}`);
       // reject(data.toString());
       output += data.toString()
-      pluginContext.sendIpcRender('codeViewApi.insertLine', {
+      pluginContext.sendIpcRender('code-view-api.insertLine', {
         id,
         code: `err:${data.toString()}\r\n`,
         line: code.split(/\r?\n/).length,
@@ -38,7 +38,7 @@ export const runPythonCode = async (id: string, code: string, execId: string): P
     // Python 执行结束时
     pythonProcess.on('close', (exit) => {
       if (exit === 0) {
-        pluginContext.sendIpcRender('codeViewApi.insertLine', {
+        pluginContext.sendIpcRender('code-view-api.insertLine', {
           id,
           code: `\r\nPython 进程正常退出，退出码: ${exit}`,
           line: code.split(/\r?\n/).length,
@@ -47,7 +47,7 @@ export const runPythonCode = async (id: string, code: string, execId: string): P
         })
         resolve(output);
       } else {
-        pluginContext.sendIpcRender('codeViewApi.insertLine', {
+        pluginContext.sendIpcRender('code-view-api.insertLine', {
           id,
           code: `\r\nPython 进程异常退出，退出码: ${exit}`,
           line: code.split(/\r?\n/).length,

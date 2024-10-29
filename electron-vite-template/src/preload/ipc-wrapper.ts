@@ -88,13 +88,19 @@ class IpcReanderMapper implements IpcRendererExtended {
     const temp: Map<string, (event: any, data: any) => void> = invokers.get(this._id_);
     if (temp) {
       for (const [channel] of temp) { // 使用 for...of 遍历 Map 的键值对
-        this.off(channel); // 这里的 channel 是 Map 的键
+        this._off(channel); // 这里的 channel 是 Map 的键
       }
     }
   }
   _off(channel: string) {
-    console.log("注销监听:", this._id_)
-    const listener = invokers[this._id_][channel];
+    console.log("注销监听:", channel, this._id_)
+    const listener = invokers.get(this._id_)?.get(channel);
+    if (!listener) {
+      alert("没有找到监听器")
+      const error = new Error(`没有找到监听器${this._id_}::${channel}`);
+      console.error(error)
+      throw error;
+    }
     ipcRenderer.off(channel, listener);
     removeListener(this._id_, channel)
     ipcRenderer.send('ipc-core.remove-channel-listener', { webContentId: _web_content_id_, channel })
@@ -102,7 +108,7 @@ class IpcReanderMapper implements IpcRendererExtended {
     return this;
   }
   off(channel: string) {
-    if (channel) {
+    if (!channel) {
       alert("注销监听器失败，请传入要解绑的渠道")
       console.error(new Error("注销监听器失败，请使用代理，并传递参数"))
       return;

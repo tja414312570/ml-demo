@@ -37,10 +37,10 @@ ipcMain.on('send_execute-result', (event, input) => {
 //     executeCodeCompleted(input)
 // });
 
-ipcMain.handle('codeViewApi.execute', (event, code: InstructContent) => {
+ipcMain.handle('code-view-api.execute', (event, code: InstructContent) => {
     return executeCode(code)
 })
-ipcMain.handle('codeViewApi.execute.stop', (event, code: InstructContent) => {
+ipcMain.handle('code-view-api.execute.stop', (event, code: InstructContent) => {
     return stopExecute(code)
 })
 export const stopExecute = async (code_body: InstructContent) => {
