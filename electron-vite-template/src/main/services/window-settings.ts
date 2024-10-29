@@ -13,14 +13,14 @@ export const createWindow = () => {
         minWidth: 720,
         show: false,
         webPreferences: {
-            webSecurity: false,
+            // webSecurity: false,
             webviewTag: true,
             // 如果是开发模式可以使用devTools
             devTools: process.env.NODE_ENV === "development",
             // 在macos中启用橡皮动画
             scrollBounce: process.platform === "darwin",
             preload: getPreloadFile("setting-ipc"),
-            allowRunningInsecureContent: true // 允许不安全内容
+            // allowRunningInsecureContent: true // 允许不安全内容
         },
     });
     mainWindow.loadURL(settingURL);

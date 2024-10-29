@@ -63,7 +63,7 @@
 <script lang="ts" setup>
 import { getIpcApi } from '@lib/preload';
 import { Menu } from '@main/services/service-setting';
-import { reactive, ref, toRaw } from 'vue'
+import { reactive, ref, toRaw, watch } from 'vue'
 const props = defineProps<{
     menu: Menu;
     value: any;
@@ -83,20 +83,26 @@ interface ProxySettings {
 }
 
 const checking = ref(false)
-if (!props.value || Object.keys(props.value).length === 0) {
-    Object.assign(props.value, {
-        proxyType: 'none', // 无代理、自动检测代理设置或手动代理配置
-        autoProxyUrl: '',
-        manualProxyType: 'http', // HTTP 或 SOCKS
-        hostname: '127.0.0.1',
-        port: 7890,
-        noProxy: '',
-        useAuth: false,
-        username: '',
-        password: '',
-        remember: false,
-    })
+const initial = () => {
+    if (!props.value || Object.keys(props.value).length === 0) {
+        Object.assign(props.value, {
+            proxyType: 'none', // 无代理、自动检测代理设置或手动代理配置
+            autoProxyUrl: '',
+            manualProxyType: 'http', // HTTP 或 SOCKS
+            hostname: '127.0.0.1',
+            port: 7890,
+            noProxy: '',
+            useAuth: false,
+            username: '',
+            password: '',
+            remember: false,
+        })
+    }
+    console.log("初始化:", props.value)
 }
+initial()
+watch(props.value, initial)
+console.log("代理数据:", props.value)
 // const item = reactive<ProxySettings>({
 //     proxyType: 'none', // 无代理、自动检测代理设置或手动代理配置
 //     autoProxyUrl: '',

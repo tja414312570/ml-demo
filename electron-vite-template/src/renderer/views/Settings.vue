@@ -43,7 +43,7 @@
         </splitpanes>
         <v-divider></v-divider>
         <div class="box-buttom text-end">
-            <v-btn variant="outlined" class="text-none ms-4 text-white" flat>
+            <v-btn variant="outlined" class="text-none ms-4 text-white" @click="close" flat>
                 取消
             </v-btn>
             <v-btn variant="flat" :disabled="newSettingsValue.size == 0" class="text-none ms-4 text-white"
@@ -53,18 +53,17 @@
             </v-btn>
         </div>
     </div>
-
-
 </template>
 
 <script lang="ts" setup>
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 import proxyView from '../components/settings-proxy.vue';
-import { onMounted, reactive, ref, shallowRef, toRaw, watch } from 'vue';
+import { onMounted, reactive, ref, shallowRef, toRaw, watch, WatchHandle } from 'vue';
 import { getIpcApi } from '@lib/preload';
 import { Menu } from '@main/services/service-setting';
 import { settingCompents } from '@renderer/ts/setting-compents';
+const coreApi = getIpcApi('ipc-core.window');
 const selected = ref([
 ])
 const loading = ref(false)
@@ -114,8 +113,17 @@ settingApi.invoke('get-settings').then((data: Array<Menu>) => {
     settingMenus.value = data;
     loading.value = false;
 })
-
+const close = () => {
+    if (newSettingsValue.size > 0) {
+        const result = confirm("当前设置尚未应用，是否确认退出!");
+        if (result) {
+            coreApi.invoke('close');
+        }
+    }
+}
 const newSettingsValue = reactive(new Map<string, any>());
+let unwatch: WatchHandle;
+const watchValue = new Map<string, any>();
 const onActivated = (item: Array<Menu>) => {
     if (item.length === 0) {
         selected.value = temp.value;
@@ -126,20 +134,35 @@ const onActivated = (item: Array<Menu>) => {
             activatedPath.value = foundSetting(item[0].path);
             const key = current.page || current.path;
             const compent = settingCompents[key];
-            console.log("加载组价", key)
+            if (newSettingsValue.size > 0) {
+                const result = confirm("当前设置尚未应用，是否确认保存当前更改!");
+                if (result) {
+                    saveSetting();
+                }
+            }
             newSettingsValue.clear()
             if (!compent) {
                 console.error("没有找到组件", new Error(`没有找到组件:${key}`))
                 alert(`没有配置设置界面[${current.name}]`)
             } else {
                 settingApi.invoke('get-setting-value', current.path).then(value => {
-                    console.log("设置值", current.path, value)
                     currentComponent.value = compent;
-                    const wValue = reactive(value || {})
+                    let wValue = watchValue.get(current.path);
+                    if (!wValue) {
+                        wValue = reactive(value || {});
+                        watchValue.set(current.path, wValue);
+                    } else {
+                        Object.keys(wValue).forEach(key => {
+                            delete wValue[key];
+                        });
+                        Object.assign(wValue, value || {})
+                    }
                     currentProps.value = { menu: current, value: wValue };
-                    watch(wValue, newValue => {
+                    if (unwatch) {
+                        unwatch();
+                    }
+                    unwatch = watch(wValue, newValue => {
                         newSettingsValue.set(current.path, toRaw(newValue))
-                        console.log('值更新:', newSettingsValue)
                     })
                     loading.value = false;
                 })

@@ -21,6 +21,7 @@ class IpcApi {
     private uuid: string;
     private channel: string;
     private ipcApi: any;
+    __v_isRef = false;
 
     constructor(channel: string) {
         this.uuid = uuidv4();  // 生成 UUID

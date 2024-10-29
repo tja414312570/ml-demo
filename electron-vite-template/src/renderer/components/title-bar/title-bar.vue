@@ -1,13 +1,15 @@
 <template>
   <div class="window-title" v-if="isNotMac">
     <!-- 软件logo预留位置 -->
-    <div style="-webkit-app-region: drag" class="logo">
-      <img src="@renderer/assets/icons/svg/electron-logo.svg" class="icon-logo" />
+    <div class="region-area window-title">
+      <div style="-webkit-app-region: drag" class="logo">
+        <img src="@renderer/assets/icons/svg/electron-logo.svg" class="icon-logo" />
+      </div>
+      <!-- 菜单栏位置 -->
+      <div></div>
+      <!-- 中间标题位置 -->
+      <div style="-webkit-app-region: drag" class="title">设置</div>
     </div>
-    <!-- 菜单栏位置 -->
-    <div></div>
-    <!-- 中间标题位置 -->
-    <div style="-webkit-app-region: drag" class="title">设置</div>
     <div class="window-controls">
       <i id="minimize" class="mdi mdi-window-minimize" @click="api.invoke('minimize')"></i>
       <i id="maximize" class="mdi mdi-window-maximize" v-show="!isMax"
@@ -17,7 +19,7 @@
       <i id="close" class="mdi mdi-close" @click="api.invoke('close')"></i>
     </div>
   </div>
-  <div v-else-if="!isNotMac" class="window-title mac">
+  <div v-else-if="!isNotMac" class="window-title region-area">
     <div style="-webkit-app-region: drag" class="title">设置</div>
   </div>
 </template>
@@ -49,7 +51,7 @@ const IsWeb = ref(Boolean(false));
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-.mac.window-title {
+.region-area {
   -webkit-app-region: drag;
 }
 
@@ -58,7 +60,7 @@ const IsWeb = ref(Boolean(false));
   height: 30px;
   line-height: 30px;
   display: flex;
-
+  cursor: pointer;
   top: 0;
   z-index: 99999;
   justify-content: center;
@@ -75,6 +77,7 @@ const IsWeb = ref(Boolean(false));
   .title {
     text-align: center;
     color: #9d9d9d;
+    flex: 1;
   }
 
   .logo {
@@ -125,14 +128,20 @@ const IsWeb = ref(Boolean(false));
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 10px;
+  position: absolute;
+  -webkit-app-region: none;
+  right: 0;
+  top: 0;
+  z-index: 100000;
+  pointer-events: auto;
 }
 
 .window-controls i {
-  font-size: 24px;
+  font-size: 18px;
   /* 图标大小 */
   cursor: pointer;
   margin: 0 10px;
+
 }
 
 .window-controls i:hover {
