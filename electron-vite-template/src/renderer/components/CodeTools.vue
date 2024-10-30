@@ -149,7 +149,7 @@ const handleDebugExecute = () => {
 // 模拟的代码执行函数
 const executeCode = () => {
     if (isExecuting.value) {
-        codeApi.invoke("code-view-api.execute.stop", { id: props.id, executor: selected.value } as InstructContent).then(result => {
+        codeApi.invoke("execute.stop", { id: props.id, executor: selected.value } as InstructContent).then(result => {
 
         }).catch(err => {
             console.log('代码停止执行错误:', err)

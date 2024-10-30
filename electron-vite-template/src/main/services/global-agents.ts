@@ -1,9 +1,9 @@
 process.env.DEBUG = 'global-agent';
 import { createGlobalProxyAgent, bootstrap, ProxyAgentConfigurationType } from "global-agent";
-import { getSettingValue, onSettingChange, registeMenu, saveSettingValue } from "./service-setting";
+import { getSettingValue, onSettingChange, registeSetting, saveSettingValue } from "./service-setting";
 import '../ipc-bind/proxy-ipc-bind'
 bootstrap();
-registeMenu({
+registeSetting({
   name: "代理设置",
   key: "proxy",
 }, 'network')

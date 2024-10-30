@@ -7,17 +7,21 @@ import { version } from "../../../package.json";
 const menu: Array<(MenuItemConstructorOptions) | (MenuItem)> = [
     {
         label: "设置",
-        submenu: [
-            {
-                label: "快速重启",
-                accelerator: "F5",
-                role: "reload",
-            },
-            {
-                label: "退出",
-                accelerator: "CmdOrCtrl+F4",
-                role: "close",
-            },
+        submenu: [{
+            label: "偏好设置",
+            accelerator: "F5",
+            role: "reload",
+        },
+        {
+            label: "快速重启",
+            accelerator: "F5",
+            role: "reload",
+        },
+        {
+            label: "退出",
+            accelerator: "CmdOrCtrl+F4",
+            role: "close",
+        },
         ],
     },
     {

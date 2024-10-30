@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import { MenuBarOptions, MenuBar } from "@imengyu/vue3-context-menu";
+import MenuBar from "./menu/MenuBar.vue";
 import { getIpcApi } from "@lib/preload";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 import { tr } from "vuetify/locale";
 const isMax = ref(false)
 
@@ -47,7 +47,7 @@ const mix = ref(false);
 // const isNotMac = ref(false);
 
 console.log(coreApi.platform)
-const isNotMac = ref(coreApi.platform !== 'darwin');
+const isNotMac = ref(coreApi.platform === 'darwin');
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
 
@@ -57,10 +57,15 @@ const IsWeb = ref(Boolean(false));
 //   IsUseSysTitle.value = res;
 // });
 
+coreApi.invoke('get-menus').then((result: Array<any>) => {
+  console.log("获取菜单:", result)
+  menuData.items.length = 0;
+  menuData.items.push(...result);
+})
 
+// const menuData: MenuBarOptions = reactive({ items: [], zIndex: 100000, minWidth: 230, })
 
-
-const menuData: MenuBarOptions = {
+const menuData: MenuBarOptions = reactive({
   theme: "flat dark",
   xOffset: -10,
   yOffset: -20,
@@ -117,7 +122,7 @@ const menuData: MenuBarOptions = {
   ],
   zIndex: 100000,
   minWidth: 230,
-};
+});
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>

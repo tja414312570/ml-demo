@@ -24,6 +24,8 @@
 </template>
 
 <script lang="ts" setup>
+import { getIpcApi } from '@lib/preload';
+import { IpcEventHandler } from '@renderer/ts/default-ipc';
 import { onMounted, ref, watch } from 'vue';
 // 源代码
 const sourceCode = ref(`console.log('Hello, world!');`);
@@ -32,9 +34,9 @@ const codeType = ref('javascript');
 // 输出结果列表
 const output = ref<{ message: string; type: string }[]>([]);
 
-
+const codeApi = getIpcApi<IpcEventHandler>('code-view-api');
 onMounted(() => {
-    window.codeViewApi.onCodeExecuted(result => {
+    codeApi.onCodeExecuted(result => {
         console.log("搜到代码执行结果:", result)
         sourceCode.value = result.code;
         codeType.value = result.language;

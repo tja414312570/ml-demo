@@ -23,11 +23,11 @@ import './plugin/ipc-bind'
 import { createWindow } from "./services/window-settings";
 const innerPluginPath = path.join(__dirname, '../../../plugins');
 import './ipc-bind/core-ipc-bind'
-console.log(`加载内置插件，位置：${innerPluginPath}`)
-
 app.setName('myApp');
 import './services/global-agents'
 import './services/service-setting'
+import './services/service-menu'
+import "./services/window-settings";
 function onAppReady() {
   // const { disableF12 } = useDisableButton();
   // const { renderProcessGone } = useProcessException();

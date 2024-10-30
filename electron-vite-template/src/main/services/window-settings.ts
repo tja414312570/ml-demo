@@ -1,5 +1,6 @@
 import { getPreloadFile, getUrl } from "@main/config/static-path";
 import { BrowserWindow } from "electron";
+import { registeMenu } from "./service-menu";
 
 export const createWindow = () => {
     const settingURL = getUrl('setting');
@@ -35,3 +36,11 @@ export const createWindow = () => {
     })
     mainWindow.show()
 }
+
+registeMenu({
+    label: '设置',
+    key: 'setting',
+    click: () => {
+        createWindow();
+    }
+}, "general")

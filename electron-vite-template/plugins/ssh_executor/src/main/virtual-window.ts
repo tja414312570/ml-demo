@@ -51,7 +51,7 @@ class VirtualWindow {
                     remainingText = remainingText.substring(seq.fullLength - 1);
                     continue; // 确保处理过的控制字符不被保留
                 } else {
-                    console.log(`未识别的控制序列1: ${debug(seq ? seq.text : '?' + char + remainingText)}`);
+                    // console.log(`未识别的控制序列1: ${debug(seq ? seq.text : '?' + char + remainingText)}`);
                     this.addCharToBuffer(char);
                 }
             } else if (char === '\x07') {

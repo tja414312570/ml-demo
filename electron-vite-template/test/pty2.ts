@@ -1,5 +1,4 @@
 import * as pty from 'node-pty';
-const shell = process.platform === 'win32' ? 'powershell.exe' : 'zsh';
 import fs from 'fs'
 import VirtualWindow from '../plugins/ssh_executor/src/main/virtual-window'
 import path from 'path';
@@ -21,16 +20,18 @@ let frame = 0;
 const path_ = path.join(__dirname, 'frames.txt')
 
 const data = fs.readFileSync(path_, 'utf-8');
-const lines = data.split(/\r\n/);
+const lines = data.split(/\r?\n/);
 
 let lineCount = 0;
 for (const line of lines) {
     lineCount += 1;
     if (lineCount % 4 === 2) {
         // 恢复转义字符并输出原始帧内容
-        const restoredLine = line;
-        virtualWindow.write(restoredData(restoredLine))
+        const restoredLine = restoredData(line);
+        // console.log(line)
+        // console.log("=========----------------======")
+        virtualWindow.write(restoredLine)
         console.log(virtualWindow.render())
-        console.log("===============")
+        // console.log("===============")
     }
 }

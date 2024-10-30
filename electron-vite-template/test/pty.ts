@@ -42,17 +42,17 @@ ptyProcess.on('data', (data) => {
     virtualWindow.write(data); // 将数据写入虚拟窗口
     // console.clear()
     i++;
-    // console.log("----------------------------原始帧数据:" + i)
-    // console.log(debug(data))
+    console.log("----------------------------原始帧数据:" + i)
+    console.log(debug(data))
     const output = virtualWindow.render();
-    // console.log("=============================虚拟窗口状态:" + i)
+    console.log("=============================虚拟窗口状态:" + i)
     // console.log(output)
-    // console.log(debug(output).replace(/\\x0a/g, '\n'))
-    // console.log('\n')
-    fs.appendFileSync(path_, "\r\n=========================原始帧【" + (++frame) + '\r\n')
-    fs.appendFileSync(path_, debug(data), 'utf-8')
-    fs.appendFileSync(path_, "\r\n-------------------------渲染帧【" + (frame) + '\r\n')
-    fs.appendFileSync(path_, debug(output), 'utf-8')
+    console.log(debug(output).replace(/\\x0a/g, '\n'))
+    console.log('\n')
+    //     fs.appendFileSync(path_, "\r\n=========================原始帧【" + (++frame) + '\r\n')
+    //     fs.appendFileSync(path_, debug(data), 'utf-8')
+    //     fs.appendFileSync(path_, "\r\n-------------------------渲染帧【" + (frame) + '\r\n')
+    //     fs.appendFileSync(path_, debug(output), 'utf-8')
 });
 
 ptyProcess.on('error', (error) => {
@@ -64,8 +64,8 @@ ptyProcess.on('exit', (code, signal) => {
     console.log(`Process exited with code: ${code}, signal: ${signal}`);
 });
 // ptyProcess.write('clear\r'); // 发送隐藏光标序列
-// ptyProcess.write('$max=3;for($i=0;$i-le $max;$i++){$p=($i/$max)*100;Write-Progress -Activity "正在处理数据..." -Status "$i% 完成" -PercentComplete $p;Start-Sleep -Milliseconds 100}\n');
-
-ptyProcess.write('try { $max=1;for($i=0;$i-le $max;$i++){$p=($i/$max)*100;Write-Progress -Activity "正在处理数据..." -Status "$i% 完成" -PercentComplete $p;Start-Sleep -Milliseconds 100} } catch { Write-Error $_.Exception.Message ;$_.ErrorRecord } finally {Write-Progress -Activity " " -Status " " -Completed; Write-Host "_57780437-7654-4a53-9bab-b91f9efe991a_$?" }\r')
+ptyProcess.write('$max=3;for($i=0;$i-le $max;$i++){$p=($i/$max)*100;Write-Progress -Activity "正在处理数据..." -Status "$i% 完成" -PercentComplete $p;Start-Sleep -Milliseconds 100} ; echo "_5c784b30-58df-4cd7-9a8c-5308607f8b6a_$?"');
+ptyProcess.write('\r')
+// ptyProcess.write('try { $max=1;for($i=0;$i-le $max;$i++){$p=($i/$max)*100;Write-Progress -Activity "正在处理数据..." -Status "$i% 完成" -PercentComplete $p;Start-Sleep -Milliseconds 100} } catch { Write-Error $_.Exception.Message ;$_.ErrorRecord } finally {Write-Progress -Activity " " -Status " " -Completed; Write-Host "_57780437-7654-4a53-9bab-b91f9efe991a_$?" }\r')
 // ptyProcess.write('ls ;for i in {1..100}; do printf "\\rProgress: %d%%" "$i"; sleep 0.1; done; echo "done";clear\n');
 // ptyProcess.write('$max=3;for($i=0;$i-le $max;$i++){$p=($i/$max)*100;Write-Progress -Activity "正在处理数据..." -Status "$i% 完成" -PercentComplete $p;Start-Sleep -Milliseconds 500}\r');

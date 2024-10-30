@@ -14,7 +14,7 @@ const eventer = new EventEmitter();
 export const onSettingChange = (path: string, callback: (value: any) => void) => {
     eventer.on("SettingChange", callback);
 };
-const settins_menu: Array<Menu> = [
+const settins_menu: Array<Setting> = [
     {
         name: "通用",
         key: "general",
@@ -38,19 +38,19 @@ const settins_menu: Array<Menu> = [
         key: "plugins",
     }
 ];
-export type Menu = {
+export type Setting = {
     name: string,
     key: string,
     page?: string,
     path?: string,
-    subs?: Array<Menu> | null;
+    subs?: Array<Setting> | null;
 }
 /**
  * 为菜单项生成路径
  * @param menu - 单个菜单项或菜单项数组
  * @param parentPath - 可选的父路径，如果没有传入则默认空字符串
  */
-function generateMenuPath(menu: Menu | Menu[], parentPath?: string): void {
+function generateMenuPath(menu: Setting | Setting[], parentPath?: string): void {
     if (Array.isArray(menu)) {
         // 如果是数组，递归处理每个子菜单
         menu.forEach((item) => generateMenuPath(item, parentPath));
@@ -64,7 +64,7 @@ function generateMenuPath(menu: Menu | Menu[], parentPath?: string): void {
     }
 }
 generateMenuPath(settins_menu);
-function foundSetting(target: string, _menus = settins_menu): Menu | null {
+function foundSetting(target: string, _menus = settins_menu): Setting | null {
     const index = target.indexOf(".");
     const current = target.substring(0, index > 1 ? index : target.length);
     const remain = index > 1 ? target.substring(index + 1, target.length) : null;
@@ -81,11 +81,11 @@ function foundSetting(target: string, _menus = settins_menu): Menu | null {
     }
     return null;
 }
-const checkMenu = (menu: Menu) => {
+const checkMenu = (menu: Setting) => {
 
 }
 
-export const registeMenu = (menus: Menu | Array<Menu>, path?: string) => {
+export const registeSetting = (menus: Setting | Array<Setting>, path_?: string) => {
     if (!menus || (Array.isArray(menus) && menus.length === 0)) {
         throw new Error("空菜单项")
     }
@@ -93,10 +93,10 @@ export const registeMenu = (menus: Menu | Array<Menu>, path?: string) => {
         menus = [menus];
     }
     let _target_menus = settins_menu;
-    let foundMenu: Menu;
-    if (path) {
-        foundMenu = foundSetting(path);
-        assert.ok(foundMenu, `菜单路径[${path}]没有找到`)
+    let foundMenu: Setting;
+    if (path_) {
+        foundMenu = foundSetting(path_);
+        assert.ok(foundMenu, `菜单路径[${path_}]没有找到`)
         if (!foundMenu.subs) {
             foundMenu.subs = [];
         }
