@@ -2,7 +2,7 @@
   "name": "node(内置)",
   "version": "1.0.0",
   "description": "A Node.js plugin project using TypeScript and Webpack",
-  "main": "dist/bundle.js",
+  "main": "dist/main.js",
   "scripts": {
     "lint": "eslint 'src/**/*.{ts,js}' --fix",
     "build": "webpack --config webpack.config.js && webpack --config webpack.zip.js",

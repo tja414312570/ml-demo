@@ -47,7 +47,7 @@ const mix = ref(false);
 // const isNotMac = ref(false);
 
 console.log(coreApi.platform)
-const isNotMac = ref(coreApi.platform === 'darwin');
+const isNotMac = ref(coreApi.platform !== 'darwin');
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
 

@@ -12,6 +12,7 @@ import { useMenu } from "@main/hooks/menu-hook"
 import { startProxyServer } from "./services/proxy";
 
 import fs, { glob } from "fs"
+import { init as ptyInit } from './services/pty'
 import { notify } from "./ipc/notify-manager";
 import { listeners } from "process";
 import pluginContext from '../../lib/src/main/plugin-context'
@@ -19,12 +20,11 @@ import pluginManager from "./plugin/plugin-manager";
 import path from "path";
 import { showErrorDialog } from "./utils/dialog";
 import './plugin/ipc-bind'
-import { init as ptyInit } from './services/pty'
 import { createWindow } from "./services/window-settings";
 const innerPluginPath = path.join(__dirname, '../../../plugins');
 import './ipc-bind/core-ipc-bind'
 console.log(`加载内置插件，位置：${innerPluginPath}`)
-pluginManager.loadPluginFromDir(innerPluginPath)
+
 app.setName('myApp');
 import './services/global-agents'
 import './services/service-setting'
@@ -70,6 +70,7 @@ app.whenReady().then(() => {
   // startProxyServer(upstreamProxy).then(proxy => {
   //   onAppReady();
   ptyInit()
+  pluginManager.loadPluginFromDir(innerPluginPath)
   //   ipcMain.on('notificationAPI-ready', () => {
   //     notify("gpt拦截器已初始化完成！")
   //   })
