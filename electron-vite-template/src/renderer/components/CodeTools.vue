@@ -121,9 +121,9 @@ const toggleAutoSend = () => {
     isAutoSend.value = !isAutoSend.value;
 };
 let result = [];
-codeApi.on('code-view-api.insertLine', (event: any, lineDiff: { code: string, line: number, type: InstructResultType }) => {
+codeApi.on('insertLine', (event: any, lineDiff: { code: string, line: number, type: InstructResultType }) => {
     const { code, line, type } = lineDiff;
-    console.log("执行完毕", JSON.stringify(lineDiff))
+    console.log("执行完毕", JSON.stringify(lineDiff), type, InstructResultType.completed, (type === InstructResultType.completed || type === InstructResultType.failed))
     try {
         result.push(code)
         if (type === InstructResultType.completed || type === InstructResultType.failed) {

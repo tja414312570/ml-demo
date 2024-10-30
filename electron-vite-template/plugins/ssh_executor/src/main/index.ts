@@ -3,6 +3,8 @@ import { Pluginlifecycle } from 'mylib/main'
 import { PluginExtensionContext } from 'mylib/main';
 import { v4 as uuidv4 } from 'uuid';
 import VirtualWindow from './virtual-window'
+import fs from 'fs'
+import path from 'path';
 
 const removeInvisibleChars = (str: string) => {
   // 移除 ANSI 转义序列 (\u001b 是转义字符, \[\d*(;\d*)*m 匹配 ANSI 的样式)
@@ -28,6 +30,8 @@ function equalsAny(value: any, ...candidates: any[]) {
 }
 
 function isCommandSuccessful(exitCode: string | number) {
+  console.log("===========================================:",exitCode)
+  console.log("执行状态:",exitCode)
   return equalsAny(exitCode, 0, '0', true, 'True', 'true');
 }
 class ExecuteContext {
@@ -88,6 +92,26 @@ class ExecuteContext {
     this._end = callback;
   }
 }
+const isDebug= true;
+// export function debug(data: string) {
+//   return isDebug ? data.replace(/[\x00-\x1F\x7F]/g, (char) => {
+//       switch (char) {
+//           case '\n': return '\\n';
+//           case '\r': return '\\r';
+//           case '\t': return '\\t';
+//           default:
+//               const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
+//               return `\\x${hex}`;
+//       }
+//   }) : data;
+// }
+
+export function debug(data: string) {
+  return isDebug ? data.replace(/[\x00-\x1F\x7F]/g, (char) => {
+      const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
+      return `\\x${hex}`;
+  }) : data;
+}
 
 class SshExecutor extends AbstractPlugin implements InstructExecutor, Pluginlifecycle {
   private cache: Map<String, ExecuteContext> = new Map();
@@ -127,9 +151,16 @@ class SshExecutor extends AbstractPlugin implements InstructExecutor, Pluginlife
 
       this.cache.set(id, executeContext);
       executeContext.onWrite(data => pluginContext.pty.write(data));
+      const  path_ = path.join(__dirname,"frames.txt");
+      let frame = 0;
       const disable = pluginContext.pty.onData((data: string) => {
         render(data, InstructResultType.executing)
-        executeContext.callData(data)
+        const output = virtualWindow.render();
+        fs.appendFileSync(path_,"\r\n=========================原始帧【"+(frame++)+'\r\n')
+        fs.appendFileSync(path_,debug(data),'utf-8')
+        fs.appendFileSync(path_,"\r\n-------------------------渲染帧【"+(frame++)+'\r\n')
+        fs.appendFileSync(path_,debug(output).replace(/\x0a/g,'\r\n'),'utf-8')
+        executeContext.callData(output)
       })
       const destory = () => {
         disable.dispose()
@@ -207,13 +238,16 @@ class SshExecutor extends AbstractPlugin implements InstructExecutor, Pluginlife
     pluginContext.notifyManager.notify(msg)
     return new Promise(resolve => {
       // 将 PTY 输出发送到前端
-      let remainingText = '';
+      let remainingText;
       executeContext.onData((data: string) => {
-        remainingText += data;
+        remainingText = data;
         let index;
         while ((index = remainingText.indexOf('\n')) > -1) {
           const _line = remainingText.substring(0, index);
           const lineTrim = removeInvisibleChars(_line);
+          console.log("============================================")
+          console.log("_line:",debug(_line),"\nlineTrim：",lineTrim,"\nend_tag:",end_tag)
+          console.log("============================================")
           if (lineTrim.length > 1 && lineTrim.startsWith(end_tag)) {
             executeing = false;
             const exitCode = lineTrim.substring(end_tag.length);
