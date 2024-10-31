@@ -8,6 +8,7 @@ import '../ipc-bind/menus-ipc-bind'
 
 import { type, arch, release } from "os";
 import { version } from "../../../package.json";
+import { pluginContext } from "@lib/main";
 const eventer = new EventEmitter();
 export const onSettingChange = (path: string, callback: (value: any) => void) => {
     eventer.on("SettingChange", callback);
@@ -19,9 +20,9 @@ const settins_menu: Array<MenuDesc> = [
         submenu: [
             {
                 label: "退出",
-                key: "exit",
-                accelerator: "CmdOrCtrl+F4",
-                role: "close",
+                key: "quit",
+                accelerator: "CmdOrCtrl+q",
+                role: "quit",
             },
         ]
     },
@@ -46,7 +47,8 @@ const settins_menu: Array<MenuDesc> = [
                         type: "info",
                         message: "electron-Vue框架",
                         detail: `版本信息：${version}\n引擎版本：${process.versions.v8
-                            }\n当前系统：${type()} ${arch()} ${release()}`,
+                            }\n当前系统：${type()} ${arch()} ${release()}
+                            \n应用路径：${pluginContext.appPath}`,
                         noLink: true,
                         buttons: ["查看github", "确定"],
                     });

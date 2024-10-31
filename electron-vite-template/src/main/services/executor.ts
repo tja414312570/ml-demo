@@ -28,7 +28,7 @@ import { showErrorDialog } from "@main/utils/dialog";
 //     console.log(`load-module: ${file},${module.support}`);
 // }).catch(console.error);
 
-ipcMain.on('send_execute-result', (event, input) => {
+ipcMain.on('code-view-api.send_execute-result', (event, input) => {
     console.log("发送消息到webview", input)
     sendMessage(input)
 });

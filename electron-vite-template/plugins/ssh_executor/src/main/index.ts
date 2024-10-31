@@ -36,8 +36,6 @@ function equalsAny(value: any, ...candidates: any[]) {
 }
 
 function isCommandSuccessful(exitCode: string | number) {
-  console.log("===========================================:", exitCode);
-  console.log("执行状态:", exitCode);
   return equalsAny(exitCode, 0, "0", true, "True", "true");
 }
 class ExecuteContext {
@@ -99,18 +97,6 @@ class ExecuteContext {
   }
 }
 const isDebug = true;
-// export function debug(data: string) {
-//   return isDebug ? data.replace(/[\x00-\x1F\x7F]/g, (char) => {
-//       switch (char) {
-//           case '\n': return '\\n';
-//           case '\r': return '\\r';
-//           case '\t': return '\\t';
-//           default:
-//               const hex = char.charCodeAt(0).toString(16).padStart(2, '0');
-//               return `\\x${hex}`;
-//       }
-//   }) : data;
-// }
 
 export function debug(data: string) {
   return isDebug
@@ -257,7 +243,6 @@ class SshExecutor
         ? `try { ${instruct} } catch { Write-Error $_.Exception.Message ;$_.ErrorRecord } finally { Write-Host "${end_tag}$?" }` //ps
         : `${instruct} ; echo "${end_tag}$?"`; //ssh
     const msg = `命令[${instruct}]开始执行,执行id[${end_tag}],命令：${cmd}`;
-    console.log(msg);
     pluginContext.notifyManager.notify(msg);
     return new Promise((resolve) => {
       // 将 PTY 输出发送到前端

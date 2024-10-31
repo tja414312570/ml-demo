@@ -1,7 +1,8 @@
 import { spawn } from "child_process";
 import { InstructResultType, pluginContext } from "mylib/main";
-
+import VirtualWindow from '../../../ssh_executor/src/main/virtual-window'
 export const runPythonCode = async (id: string, code: string, execId: string): Promise<string> => {
+
   return new Promise((resolve, reject) => {
     // 通过 `python -c` 运行传递的 Python 代码
     const pythonProcess = spawn('python', ['-c', code]);
@@ -9,6 +10,7 @@ export const runPythonCode = async (id: string, code: string, execId: string): P
     let output = '';
 
     // 获取 Python 脚本的输出
+    pythonProcess.stdout.setEncoding('utf-8')
     pythonProcess.stdout.on('data', (data) => {
       output += data.toString();
       pluginContext.sendIpcRender('code-view-api.insertLine',

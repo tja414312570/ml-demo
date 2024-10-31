@@ -23,31 +23,24 @@ function init() {
             cwd: process.env.HOME,
             env: process.env,
         });
-
-        console.log('PTY Process created:', ptyProcess.pid);
-
         pluginContext.pty = wrapper<IPty>(ptyProcess);
         (pluginContext.pty as any).type = shell;
         // 监听输入事件
         ipcMain.on('pty.terminal-input', (event, input) => {
-            console.log('Received terminal input:', input);
             ptyProcess.write(input);
         });
 
         // 监听终端数据输出
         ptyProcess.onData((data) => {
-            console.log('PTY output data:', data);
             send_ipc_render('pty.terminal-output', data);
         });
 
         ipcMain.on('pty.terminal-into', (event, data) => {
-            console.log('Received terminal into:', data);
             ptyProcess.write(data);
         });
 
         // 调整终端大小
         ipcMain.on('pty.terminal-resize', (event, cols, rows) => {
-            console.log('Resizing terminal to:', cols, rows);
             if (cols > 0 && rows > 0) {
                 ptyProcess.resize(cols, rows);
             } else {

@@ -14,13 +14,20 @@
                 </template>
                 <span>删除</span>
             </v-tooltip>
+            <v-tooltip bottom>
+                <template v-slot:activator="{ props }">
+                    <v-icon small v-bind="props" @click="copy" color="blue">mdi-content-copy</v-icon>
+                </template>
+                <span>复制</span>
+            </v-tooltip>
+
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { AnsiUp } from 'ansi-up';
-import { defineProps, ref, Ref, watch } from 'vue';
+import { defineProps, ref, Ref, toRaw, watch } from 'vue';
 
 
 
@@ -30,6 +37,16 @@ interface Props {
     send: () => void;
 }
 
+const copy = () => {
+    const textToCopy = props.content.value; // 美化格式
+    console.error('复制内容:', textToCopy)
+    // 使用 Clipboard API 复制内容
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert('已复制内容: ' + textToCopy);
+    }).catch(err => {
+        console.error('复制失败:', err);
+    });
+}
 
 const onMessage = (message) => {
     console.log("删除", message)

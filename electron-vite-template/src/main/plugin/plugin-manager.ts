@@ -1,10 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { PluginExtensionContext, PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType, pluginContext } from '@lib/main';
+import { PluginInfo, PluginManifest, PluginProxy, PluginStatus, PluginType, pluginContext } from '@lib/main';
 import { v4 as uuidv4 } from 'uuid';
 import { MapSet } from '../utils/MapSet';
 import assert from 'assert';
 import init from './context-inited'
+import '../ipc-bind/plugin-ipc-bind'
 
 const manifest_keys: Array<string> = ['name', 'main', 'version', 'description', 'author', 'appId']
 // 定义常见的特殊属性集合

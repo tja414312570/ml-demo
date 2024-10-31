@@ -66,15 +66,15 @@ app.whenReady().then(() => {
     auth: ''            // 如果上游代理需要认证，配置用户名和密码
   };
 
-  onAppReady();
-  // startProxyServer(upstreamProxy).then(proxy => {
-  //   onAppReady();
-  ptyInit()
-  pluginManager.loadPluginFromDir(innerPluginPath)
-  //   ipcMain.on('notificationAPI-ready', () => {
-  //     notify("gpt拦截器已初始化完成！")
-  //   })
-  // })
+  // onAppReady();
+  startProxyServer(upstreamProxy).then(proxy => {
+    onAppReady();
+    ptyInit()
+    pluginManager.loadPluginFromDir(innerPluginPath)
+    ipcMain.on('notificationAPI-ready', () => {
+      notify("gpt拦截器已初始化完成！")
+    })
+  })
 });
 // 由于9.x版本问题，需要加入该配置关闭跨域问题
 app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");

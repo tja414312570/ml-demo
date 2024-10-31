@@ -150,6 +150,7 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
         editor.changeViewZones((accessor) => { accessor.removeZone(viewZoneId) })
         viewZones.delete(execId);
       }, send: () => {
+        console.log("点击发送按钮:", prop)
         codeApi.send('send_execute-result', prop.content.value)
       }, ref: $ref
     };

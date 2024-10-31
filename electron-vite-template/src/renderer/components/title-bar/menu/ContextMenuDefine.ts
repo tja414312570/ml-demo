@@ -24,7 +24,7 @@ export interface ContextMenuInstance {
    * Close this menu.
    * @param fromItem The last clicked menu item, will pass to `MenuOptions.onClose` callback, if user does not click any item, can be `undefined`.
    */
-  closeMenu(fromItem?: MenuItem|undefined): void;
+  closeMenu(fromItem?: MenuItem | undefined): void;
   /**
    * Check if the menu is currently closed.
    */
@@ -33,7 +33,7 @@ export interface ContextMenuInstance {
    * Get current Menu root instance.
    * @returns Return ContextSubMenuInstance of root, return undefined if menu is not showing.
    */
-  getMenuRef(): ContextSubMenuInstance|undefined;
+  getMenuRef(): ContextSubMenuInstance | undefined;
   /**
    * Get root menu size.
    * @returns Return root menu size in pixel, return all zero if menu is not showing.
@@ -46,8 +46,7 @@ export interface ContextMenuInstance {
  * 
  * Can get by `ContextMenuInstance.getMenuRef`.
  */
-export interface ContextSubMenuInstance 
-{
+export interface ContextSubMenuInstance {
   /**
    * Get Root element of this submenu
    */
@@ -102,8 +101,7 @@ export interface ContextSubMenuInstance
 /**
  * Ref define of ContextMenuGroup
  */
-export interface ContextMenuGroupRef
-{
+export interface ContextMenuGroupRef {
   /**
    * Get ContextSubMenuInstance of this group
    */
@@ -122,7 +120,7 @@ export interface MenuItemContext {
    * Get current showing submenu instance.
    * @returns Return ContextSubMenuInstance of current submenu, return undefined if menu is not showing.
    */
-  getSubMenuInstance: () => ContextSubMenuInstance|undefined;
+  getSubMenuInstance: () => ContextSubMenuInstance | undefined;
   /**
    * Show submenu of this item.
    * @returns 
@@ -135,7 +133,7 @@ export interface MenuItemContext {
   /**
    * Get html Element of this item.
    */
-  getElement: () => HTMLElement|undefined,
+  getElement: () => HTMLElement | undefined,
   /**
    * Check is this item disabled or hidden.
    * @returns 
@@ -144,10 +142,10 @@ export interface MenuItemContext {
 
   focus: () => void,
   blur: () => void,
-  click: (e: MouseEvent|KeyboardEvent) => void,
+  click: (e: MouseEvent | KeyboardEvent) => void,
 }
 
-export type MenuPopDirection = 'br'|'b'|'bl'|'tr'|'t'|'tl'|'l'|'r';
+export type MenuPopDirection = 'br' | 'b' | 'bl' | 'tr' | 't' | 'tl' | 'l' | 'r';
 export type MenuChildren = MenuItem[];
 
 
@@ -155,7 +153,7 @@ export interface MenuOptions {
   /**
    * The items for this menu.
    */
-  items	?:	MenuItem[];
+  items?: MenuItem[];
   /**
    * Menu display x position.
    */
@@ -167,11 +165,11 @@ export interface MenuOptions {
   /**
   * X-coordinate offset of submenu and parent menu.
   */
-  xOffset	?: number;
+  xOffset?: number;
   /**
   * Y-coordinate offset of submenu and parent menu.
   */
-  yOffset ?: number;
+  yOffset?: number;
   /**
    * Set the mian menu pop-up direction relative to coordinates.
    *
@@ -180,25 +178,25 @@ export interface MenuOptions {
    *
    * @default 'br'
    */
-  direction ?: MenuPopDirection,
+  direction?: MenuPopDirection,
   /**
    * The z-index of this menu.
    */
-  zIndex ?: number;
+  zIndex?: number;
   /**
    * The zoom of this menu.
    */
-  zoom ?: number;
+  zoom?: number;
   /**
    * Custom menu class.
    */
-  customClass	?:	string;
+  customClass?: string;
   /**
    * Set whether users can use the mouse scroll wheel to scroll through long menus in the menu area.
    *
    * @default false
    */
-  mouseScroll ?: boolean;
+  mouseScroll?: boolean;
   /**
    * Determine whether the up/down buttons in the menu item require space holder.
    * The purpose of this variable is because some menu themes add blank padding above and below the menu,
@@ -246,7 +244,7 @@ export interface MenuOptions {
     }
    * ```
    */
-  theme	?: string;
+  theme?: string;
   /**
    * If your element in menu item has this className, click it will ignore event.
    */
@@ -256,7 +254,7 @@ export interface MenuOptions {
    *
    * @default true
    */
-  clickCloseOnOutside ?: boolean;
+  clickCloseOnOutside?: boolean;
   /**
    * If your element in menu item has this className, click it will ignore event and close hole menu.
    */
@@ -266,12 +264,12 @@ export interface MenuOptions {
    *
    * Only for css font icon, If you use the svg icon, you do not need to use this.
    */
-  iconFontClass ?:	string;
+  iconFontClass?: string;
   /**
    * The Vue Transition props used when menu show or hide.
    * @default undefined
    */
-  menuTransitionProps ?: TransitionProps;
+  menuTransitionProps?: TransitionProps;
   /**
    * Should a fixed-width icon area be reserved for menu items without icon. (global)
    *
@@ -279,7 +277,7 @@ export interface MenuOptions {
    *
    * The width of icon area can be override with css var `--mx-menu-placeholder-width`.
    */
-  preserveIconWidth ?: boolean;
+  preserveIconWidth?: boolean;
   /**
    * Set whether the user can use keyboard keys to control the current menu.
    *
@@ -295,23 +293,23 @@ export interface MenuOptions {
    * * Home : Select the first menu item
    * * End : Select the last menu item
    */
-  keyboardControl ?: boolean;
+  keyboardControl?: boolean;
   /**
    * Maximum width of main menu (in pixels)
    */
-  maxWidth ?: number;
+  maxWidth?: number;
   /**
    * Minimum width of main menu (pixels)
    */
-  minWidth ?: number;
+  minWidth?: number;
   /**
    * Close when user scroll mouse ? Default is true.
    */
-  closeWhenScroll ?: boolean;
+  closeWhenScroll?: boolean;
   /**
    * Padding for submenu position adjust. Default is `{ x：0, y: 10 }`.
    */
-  adjustPadding?: { x: number, y: number }|number,
+  adjustPadding?: { x: number, y: number } | number,
   /**
    * By default, the menu will automatically adjust its position to prevent it overflow the container.
    *
@@ -343,25 +341,25 @@ export interface MenuOptions {
     }
    * ```
    */
-  getContainer ?: HTMLElement | (() => HTMLElement);
+  getContainer?: HTMLElement | (() => HTMLElement);
 
   /**
    * This event emit when this menu is closing. (Usually used in function mode)
    * @param lastClickItem The last clicked menu item, if user does not click any item, it is `undefined`. This param only valid in function mode.
    */
-  onClose ?: ((lastClickItem: MenuItem|undefined) => void) | undefined;
+  onClose?: ((lastClickItem: MenuItem | undefined) => void) | undefined;
   /**
    * When `clickCloseOnOutside` is set to `false`, and user click on other places will emit this event.
    */
-  onClickOnOutside ?: (e: MouseEvent) => void;
+  onClickOnOutside?: (e: MouseEvent) => void;
   /**
    * Event for MenuBar component
    */
-  onKeyFocusMoveLeft ?:  (() => void) | undefined;
+  onKeyFocusMoveLeft?: (() => void) | undefined;
   /**
    * Event for MenuBar component
    */
-  onKeyFocusMoveRight ?:  (() => void) | undefined;
+  onKeyFocusMoveRight?: (() => void) | undefined;
 }
 export interface MenuItem {
   /**
@@ -380,17 +378,17 @@ export interface MenuItem {
    * },
    * ```
    */
-  label ?: string|VNode|((label: string) => VNode),
+  label?: string | VNode | ((label: string) => VNode),
   /**
    * The icon for this menu item.
    */
-  icon ?: string|VNode|((icon: string) => VNode),
+  icon?: string | VNode | ((icon: string) => VNode),
   /**
    * Custom icon library font class name.
    *
    * Only for css font icon, If you use the svg icon, you do not need to use this.
    */
-  iconFontClass ?: string,
+  iconFontClass?: string,
   /**
    * Should a fixed-width icon area be reserved for menu items without icon. (this item)
    *
@@ -398,35 +396,35 @@ export interface MenuItem {
    *
    * The width of icon area can be override with css var `--mx-menu-placeholder-width`.
    */
-  preserveIconWidth ?: boolean;
+  preserveIconWidth?: boolean;
   /**
    * Display icons use svg symbol (`<use xlink:href="#icon-symbol-name">`) ， only valid when icon attribute is empty.
    */
-  svgIcon ?: string,
+  svgIcon?: string,
   /**
    * The user-defined attribute of the svg tag, which is valid when using `svgIcon`.
    */
-  svgProps ?: SVGAttributes,
+  svgProps?: SVGAttributes,
   /**
    * Disable menu item?
    */
-  disabled ?: boolean|ComputedRef<boolean>,
+  disabled?: boolean | ComputedRef<boolean>,
   /**
    * Hide menu item?
    */
-  hidden ?: boolean|ComputedRef<boolean>,
+  hidden?: boolean | ComputedRef<boolean>,
   /**
    * Is this menu item checked?
    *
    * The check mark are displayed on the left side of the icon, so it is not recommended to display the icon at the same time.
    */
-  checked ?: boolean|ComputedRef<boolean>,
+  checked?: boolean | ComputedRef<boolean>,
   /**
    * Shortcut key text display on the right.
    *
    * The shortcut keys here are only for display. You need to handle the key events by yourself.
    */
-  shortcut ?: string,
+  shortcut?: string,
   /**
    * Set the submenu pop-up direction relative to coordinates.
    *
@@ -434,7 +432,7 @@ export interface MenuItem {
    * the pop-up direction based on its distance from the screen edge.
    *
    */
-  direction ?: MenuPopDirection,
+  direction?: MenuPopDirection,
   /**
    * By default, the submenu will automatically adjust its position to prevent it overflow the container.
    *
@@ -442,15 +440,15 @@ export interface MenuItem {
    *
    * Default is inherit from `MenuOptions.adjustPosition`.
    */
-  adjustSubMenuPosition ?: boolean,
+  adjustSubMenuPosition?: boolean,
   /**
    * When there are subitems in this item, is it allowed to trigger its own click event? Default is false
    */
-  clickableWhenHasChildren ?: boolean,
+  clickableWhenHasChildren?: boolean,
   /**
    * Should close menu when Click this menu item ?
    */
-  clickClose ?: boolean,
+  clickClose?: boolean,
   /**
    * Is this menu item separated from the menu item?
    *
@@ -459,42 +457,42 @@ export interface MenuItem {
    * * `'self'`: Mark this item is a Separator.
    * * `false`: No Separator.
    */
-  divided ?: boolean|'up'|'down'|'self',
+  divided?: boolean | 'up' | 'down' | 'self',
   /**
    * Custom css class for submenu
    */
-  customClass ?: string,
+  customClass?: string,
   /**
    * Submenu maximum width (in pixels).
    */
-  maxWidth ?: number|string,
+  maxWidth?: number | string,
   /**
    * Submenu minimum width (in pixels).
    */
-  minWidth ?: number|string,
+  minWidth?: number | string,
   /**
    * Menu item click event handler.
    *
    * @param e The current event of `click` or `keydown` (when user use keyboard press this menu)
    */
-  onClick ?: (e?: MouseEvent|KeyboardEvent) => void,
+  onClick?: (e?: MouseEvent | KeyboardEvent) => void,
   /**
    * This event emit when submenu of this item is closing.
    */
-  onSubMenuClose ?: ((itemInstance: MenuItemContext) => void) | undefined;
+  onSubMenuClose?: ((itemInstance: MenuItemContext) => void) | undefined;
   /**
    * This event emit when submenu of this item is showing.
    */
-  onSubMenuOpen ?: ((itemInstance: MenuItemContext) => void) | undefined;
+  onSubMenuOpen?: ((itemInstance: MenuItemContext) => void) | undefined;
   /**
    * A custom render callback that allows you to customize the rendering
    *  of the current item.
    */
-  customRender ?: VNode|((item: MenuItem) => VNode),
+  customRender?: VNode | ((item: MenuItem) => VNode),
   /**
    * Child menu items (Valid in function mode).
    */
-  children ?: MenuChildren,
+  submenu?: MenuChildren,
 }
 
 export interface ContextMenuPositionData {
@@ -502,11 +500,11 @@ export interface ContextMenuPositionData {
   y: number;
 }
 
-export declare interface MenuItemRenderData extends Omit<MenuItem, 'children'|'customRender'|'onClick'> {
+export declare interface MenuItemRenderData extends Omit<MenuItem, 'children' | 'customRender' | 'onClick'> {
   /**
    * Global theme
    */
-  theme: 'light'|'dark',
+  theme: 'light' | 'dark',
   /**
    * This value indicates whether the current menu submenu is open
    */

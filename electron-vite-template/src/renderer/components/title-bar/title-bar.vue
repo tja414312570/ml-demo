@@ -29,8 +29,10 @@
 <script setup lang="ts">
 import MenuBar from "./menu/MenuBar.vue";
 import { getIpcApi } from "@lib/preload";
+import { MenuDesc } from "@main/services/service-menu";
 import { reactive, ref } from "vue";
-import { tr } from "vuetify/locale";
+import { MenuItem } from "./menu/ContextMenuDefine";
+import { MenuBarOptions } from "./menu";
 const isMax = ref(false)
 
 const api = getIpcApi('ipc-core.window');
@@ -47,7 +49,7 @@ const mix = ref(false);
 // const isNotMac = ref(false);
 
 console.log(coreApi.platform)
-const isNotMac = ref(coreApi.platform === 'darwin');
+const isNotMac = ref(coreApi.platform !== 'darwin');
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
 
@@ -56,8 +58,29 @@ const IsWeb = ref(Boolean(false));
 // ipcRendererChannel.IsUseSysTitle.invoke().then((res) => {
 //   IsUseSysTitle.value = res;
 // });
-
-coreApi.invoke('get-menus').then((result: Array<any>) => {
+/**
+ * 为菜单项生成路径
+ * @param menu - 单个菜单项或菜单项数组
+ * @param parentPath - 可选的父路径，如果没有传入则默认空字符串
+ */
+function wrapperMenu(menu: MenuItem | MenuItem[]): void {
+  if (Array.isArray(menu)) {
+    // 如果是数组，递归处理每个子菜单
+    menu.forEach((item) => wrapperMenu(item));
+  } else {
+    // 如果有子菜单，递归处理子菜单
+    if (menu.submenu && menu.submenu.length > 0) {
+      wrapperMenu(menu.submenu);
+    } else {
+      menu.onClick || (menu.onClick = () => {
+        console.log("点击", menu)
+        coreApi.invoke('click-menu', menu.id)
+      });
+    }
+  }
+}
+coreApi.invoke('get-menus').then((result: Array<MenuDesc>) => {
+  wrapperMenu(result)
   console.log("获取菜单:", result)
   menuData.items.length = 0;
   menuData.items.push(...result);
@@ -65,61 +88,11 @@ coreApi.invoke('get-menus').then((result: Array<any>) => {
 
 // const menuData: MenuBarOptions = reactive({ items: [], zIndex: 100000, minWidth: 230, })
 
-const menuData: MenuBarOptions = reactive({
+const menuData: MenuBarOptions = reactive<MenuBarOptions>({
   theme: "flat dark",
   xOffset: -10,
   yOffset: -20,
-  items: [
-    {
-      label: "File",
-      children: [
-        { label: "New" },
-        { label: "Open" },
-        {
-          label: "Open recent",
-          children: [
-            { label: "File 1...." },
-            { label: "File 2...." },
-            { label: "File 3...." },
-            { label: "File 4...." },
-            { label: "File 5...." },
-          ],
-        },
-        { label: "Save", divided: true },
-        { label: "Save as..." },
-        { label: "Close" },
-        { label: "Exit" },
-      ],
-    },
-    {
-      label: "Edit",
-      children: [
-        { label: "Undo" },
-        { label: "Redo" },
-        { label: "Cut", divided: true },
-        { label: "Copy" },
-        { label: "Find", divided: true },
-        { label: "Replace" },
-      ],
-    },
-    {
-      label: "View",
-      children: [
-        { label: "Zoom in" },
-        { label: "Zoom out" },
-        { label: "Reset zoom" },
-        { label: "Full screent", divided: true },
-        { label: "Find", divided: true },
-        { label: "Replace" },
-      ],
-    },
-    {
-      label: "Help",
-      children: [
-        { label: "About" },
-      ],
-    },
-  ],
+  items: [],
   zIndex: 100000,
   minWidth: 230,
 });
@@ -132,8 +105,8 @@ const menuData: MenuBarOptions = reactive({
 
 .window-title {
   width: 100%;
-  height: 30px;
-  line-height: 30px;
+  height: 34px;
+  line-height: 34px;
   display: flex;
   cursor: pointer;
   top: 0;

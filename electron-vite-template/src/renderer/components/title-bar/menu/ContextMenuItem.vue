@@ -1,59 +1,61 @@
 <template>
   <div v-if="!hidden" class="mx-context-menu-item-wrapper" ref="menuItemRef" data-type="ContextMenuItem">
     <!--Custom render-->
-    <VNodeRender v-if="globalHasSlot('itemRender')" :vnode="() => globalRenderSlot('itemRender', getItemDataForChildren())" />
+    <VNodeRender v-if="globalHasSlot('itemRender')"
+      :vnode="() => globalRenderSlot('itemRender', getItemDataForChildren())" />
     <VNodeRender v-else-if="customRender" :vnode="customRender" :data="getItemDataForChildren()" />
     <!--Default item-->
-    <div 
-      v-else
-      :class="[
-        'mx-context-menu-item',
-        (disabled ? 'disabled' : ''),
-        (keyBoardFocusMenu ? 'keyboard-focus' : ''),
-        (customClass ? (' ' + customClass) : ''),
-        (showSubMenu ? 'open' : ''),
-      ]"
-      @click="onClick"
-      @mouseenter="onMouseEnter"
-    >
+    <div v-else :class="[
+      'mx-context-menu-item',
+      (disabled ? 'disabled' : ''),
+      (keyBoardFocusMenu ? 'keyboard-focus' : ''),
+      (customClass ? (' ' + customClass) : ''),
+      (showSubMenu ? 'open' : ''),
+    ]" @click="onClick" @mouseenter="onMouseEnter">
       <slot>
         <div class="mx-item-row">
           <div :class="[
             'mx-icon-placeholder',
-            preserveIconWidth ? 'preserve-width': '',
+            preserveIconWidth ? 'preserve-width' : '',
           ]">
             <slot name="icon">
-              <VNodeRender v-if="globalHasSlot('itemIconRender')" :vnode="() => globalRenderSlot('itemIconRender', getItemDataForChildren())" />
+              <VNodeRender v-if="globalHasSlot('itemIconRender')"
+                :vnode="() => globalRenderSlot('itemIconRender', getItemDataForChildren())" />
               <svg v-else-if="typeof svgIcon === 'string' && svgIcon" class="icon svg" v-bind="svgProps">
                 <use :xlink:href="svgIcon"></use>
               </svg>
               <VNodeRender v-else-if="(typeof icon !== 'string')" :vnode="icon" :data="icon" />
-              <i v-else-if="typeof icon === 'string' && icon !== ''" :class="icon + ' icon '+ iconFontClass + ' ' + options.iconFontClass"></i>
+              <i v-else-if="typeof icon === 'string' && icon !== ''"
+                :class="icon + ' icon ' + iconFontClass + ' ' + options.iconFontClass"></i>
             </slot>
             <slot v-if="checked" name="check">
-              <VNodeRender v-if="globalHasSlot('itemCheckRender')" :vnode="() => globalRenderSlot('itemCheckRender', getItemDataForChildren())" />
+              <VNodeRender v-if="globalHasSlot('itemCheckRender')"
+                :vnode="() => globalRenderSlot('itemCheckRender', getItemDataForChildren())" />
               <ContextMenuIconCheck />
             </slot>
           </div>
           <slot name="label">
-            <VNodeRender v-if="globalHasSlot('itemLabelRender')" :vnode="() => globalRenderSlot('itemLabelRender', getItemDataForChildren())" />
+            <VNodeRender v-if="globalHasSlot('itemLabelRender')"
+              :vnode="() => globalRenderSlot('itemLabelRender', getItemDataForChildren())" />
             <span class="label" v-else-if="typeof label === 'string'">{{ label }}</span>
             <VNodeRender v-else :vnode="label" :data="label" />
           </slot>
         </div>
         <div class="mx-item-row">
-          <slot v-if="shortcut" name="shortcut">
-            <VNodeRender v-if="globalHasSlot('itemShortcutRender')" :vnode="() => globalRenderSlot('itemShortcutRender', getItemDataForChildren())" />
-            <span class="mx-shortcut">{{ shortcut }}</span>
+          <slot v-if="accelerator" name="accelerator">
+            <VNodeRender v-if="globalHasSlot('itemShortcutRender')"
+              :vnode="() => globalRenderSlot('itemShortcutRender', getItemDataForChildren())" />
+            <span class="mx-shortcut">{{ accelerator }}</span>
           </slot>
           <slot v-if="showRightArrow" name="rightArrow">
-            <VNodeRender v-if="globalHasSlot('itemRightArrowRender')" :vnode="() => globalRenderSlot('itemRightArrowRender', getItemDataForChildren())" />
+            <VNodeRender v-if="globalHasSlot('itemRightArrowRender')"
+              :vnode="() => globalRenderSlot('itemRightArrowRender', getItemDataForChildren())" />
             <ContextMenuIconRight />
           </slot>
         </div>
       </slot>
     </div>
-    
+
     <!--Sub menu render-->
     <Transition v-if="options.menuTransitionProps" v-bind="options.menuTransitionProps">
       <slot v-if="showSubMenu" name="submenu"></slot>
@@ -102,7 +104,7 @@ const props = defineProps({
     default: ''
   },
   clickHandler: {
-    type: Function as PropType<(e: MouseEvent|KeyboardEvent) => void>,
+    type: Function as PropType<(e: MouseEvent | KeyboardEvent) => void>,
     default: null
   },
   /**
@@ -142,7 +144,7 @@ const props = defineProps({
    * 
    * The shortcut keys here are only for display. You need to handle the key events by yourself.
    */
-  shortcut: {
+  accelerator: {
     type: String,
     default: ''
   },
@@ -207,10 +209,10 @@ const emit = defineEmits([
   'subMenuClose',
 ])
 
-const { 
+const {
   clickHandler, clickClose, clickableWhenHasChildren, disabled, hidden,
   label, icon, iconFontClass,
-  showRightArrow, shortcut,
+  showRightArrow, accelerator,
   hasChildren,
 } = toRefs(props);
 const showSubMenu = ref(false);
@@ -221,12 +223,12 @@ const menuItemRef = ref<HTMLElement>();
 const options = inject('globalOptions') as Ref<MenuOptions>;
 const globalHasSlot = inject('globalHasSlot') as GlobalHasSlot;
 const globalRenderSlot = inject('globalRenderSlot') as GlobalRenderSlot;
-const globalCloseMenu = inject('globalCloseMenu') as (fromItem: MenuItem|undefined) => void;
+const globalCloseMenu = inject('globalCloseMenu') as (fromItem: MenuItem | undefined) => void;
 
 const menuContext = inject('menuContext') as SubMenuParentContext;
 
 //Instance Contet for keyboadr control
-const menuItemInstance : MenuItemContext = {
+const menuItemInstance: MenuItemContext = {
   getSubMenuInstance: () => undefined,
   showSubMenu: () => {
     if (showSubMenu.value) {
@@ -287,7 +289,7 @@ onBeforeUnmount(() => {
 });
 
 //Click handler
-function onClick(e: MouseEvent|KeyboardEvent) {
+function onClick(e: MouseEvent | KeyboardEvent) {
   //Ignore clicking when disabled
   if (disabled.value)
     return;
@@ -315,7 +317,7 @@ function onClick(e: MouseEvent|KeyboardEvent) {
       onMouseEnter();
   } else {
     //Call hander from options
-    if (typeof clickHandler.value === 'function') 
+    if (typeof clickHandler.value === 'function')
       clickHandler.value(e);
     emit('click', e);
     if (clickClose.value) {
@@ -348,8 +350,7 @@ function onMouseEnter(e?: MouseEvent) {
     }
   }
 }
-function closeSubMenu() 
-{
+function closeSubMenu() {
   keyBoardFocusMenu.value = false;
   showSubMenu.value = false;
   emit('subMenuClose', menuItemInstance);
@@ -364,7 +365,7 @@ function getItemDataForChildren() {
     showRightArrow: showRightArrow.value,
     clickClose: clickClose.value,
     clickableWhenHasChildren: clickableWhenHasChildren.value,
-    shortcut: shortcut.value,
+    shortcut: accelerator.value,
     theme: options.value.theme,
     isOpen: showSubMenu,
     hasChildren: hasChildren,
@@ -377,5 +378,4 @@ function getItemDataForChildren() {
 defineExpose(menuItemInstance);
 </script>
 
-<style>
-</style>
+<style></style>
