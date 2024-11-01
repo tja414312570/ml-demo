@@ -118,25 +118,28 @@ class ChatGptBridge extends AbstractPlugin implements Bridge, Pluginlifecycle {
   }
   onMounted(ctx: PluginExtensionContext): void {
     console.log("proxy代理已挂载");
-    pluginContext.ipcMain.handle("webview.agent.ready", (event, urlString) => {
-      console.log("请求地址:", urlString);
-      const path = this.getPathFromUrl(urlString);
-      if (path?.trim() === "/") {
-        this.send2webview(props);
+    pluginContext.ipcMain.handle(
+      "webview-api.webview.agent.ready",
+      (event, urlString) => {
+        console.log("请求地址:", urlString);
+        const path = this.getPathFromUrl(urlString);
+        if (path?.trim() === "/") {
+          this.send2webview(props);
+        }
+        console.log(`插件已就绪:[${path}]`);
+        // pluginContext.showDialog({
+        //   message: '插件已就绪！'
+        // }).then(result=>{
+        //   console.log("对话框点击")
+        // })
       }
-      console.log(`插件已就绪:[${path}]`);
-      // pluginContext.showDialog({
-      //   message: '插件已就绪！'
-      // }).then(result=>{
-      //   console.log("对话框点击")
-      // })
-    });
+    );
   }
   send2webview(props: string) {
-    pluginContext.sendIpcRender("webviewApi.send-content", props);
+    pluginContext.sendIpcRender("webview-api.send-content", props);
   }
   onUnmounted(ctx: PluginExtensionContext): void {
-    pluginContext.ipcMain.removeHandler("webview.agent.ready");
+    pluginContext.ipcMain.removeHandler("webview-api.webview.agent.ready");
   }
 }
 export default new ChatGptBridge();

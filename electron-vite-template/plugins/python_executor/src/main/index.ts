@@ -1,12 +1,19 @@
-import { AbstractPlugin, InstructContent, InstructExecutor, InstructResult, InstructResultType, pluginContext } from 'mylib/main'
-import { Pluginlifecycle } from 'mylib/main'
-import { PluginExtensionContext } from 'mylib/main'
-import { v4 as uuidv4 } from 'uuid';
-import { runPythonCode } from './python';
+import {
+  AbstractPlugin,
+  InstructContent,
+  InstructExecutor,
+  InstructResult,
+  InstructResultType,
+  pluginContext,
+} from "mylib/main";
+import { Pluginlifecycle } from "mylib/main";
+import { PluginExtensionContext } from "mylib/main";
+import { v4 as uuidv4 } from "uuid";
+import { runPythonCode } from "./python";
 import { stringify } from "circular-json";
-import util from 'util'
-import VirtualWindow from '../../../ssh_executor/src/main/virtual-window';
-import { ChildProcess, spawn } from 'child_process';
+import util from "util";
+import VirtualWindow from "../../../ssh_executor/src/main/virtual-window";
+import { ChildProcess, spawn } from "child_process";
 
 class ExecuteContext {
   private _data: ((data: string) => void) | undefined;
@@ -71,7 +78,10 @@ class ExecuteContext {
   }
 }
 
-class PythonExecutor extends AbstractPlugin implements InstructExecutor, Pluginlifecycle {
+class PythonExecutor
+  extends AbstractPlugin
+  implements InstructExecutor, Pluginlifecycle
+{
   private executeContext: null | ExecuteContext = null;
 
   abort(instruct: InstructContent): Promise<InstructResult | void> {
@@ -114,7 +124,7 @@ class PythonExecutor extends AbstractPlugin implements InstructExecutor, Pluginl
         const virtualWindow = new VirtualWindow();
         const line = code.split(/\r?\n/).length;
         const render = (data: string, type: InstructResultType) => {
-          console.log(data)
+          console.log(data);
           virtualWindow.write(data);
           const output = virtualWindow.render();
           pluginContext.sendIpcRender("code-view-api.insertLine", {
@@ -125,7 +135,7 @@ class PythonExecutor extends AbstractPlugin implements InstructExecutor, Pluginl
             type,
           });
         };
-        childProcess = spawn('python', ['-c', code], {
+        childProcess = spawn("python", ["-c", code], {
           stdio: ["pipe", "pipe", "pipe", "ipc"],
           env: { FORCE_COLOR: "1" },
         });
@@ -226,11 +236,7 @@ class PythonExecutor extends AbstractPlugin implements InstructExecutor, Pluginl
     });
   }
 
-  onMounted(ctx: PluginExtensionContext): void {
-  }
-  onUnmounted(ctx: PluginExtensionContext): void {
-  }
-
-
+  onMounted(ctx: PluginExtensionContext): void {}
+  onUnmounted(ctx: PluginExtensionContext): void {}
 }
 export default new PythonExecutor();

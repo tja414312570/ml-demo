@@ -5,7 +5,7 @@ import './overwrite-matches'
 const _doc = document as any;
 
 const webviewApi: DefaultApi = getIpcApi('webview-api')
-webviewApi.on("webviewApi.send-content", (event: any, message: any) => {
+webviewApi.on("send-content", (event: any, message: any) => {
   console.log("搜到webview消息：", event, message)
   _doc.myApp.send(message)
 });
@@ -38,7 +38,7 @@ const js_bridge = () => {
     },
     send: function (message: string) {
       if (!myApp.ready) {
-        showDialog({message:'("桥接未就绪"'})
+        showDialog({ message: '("桥接未就绪"' })
         return;
       }
       // 清空 textarea 的内容并填写新内容
@@ -71,7 +71,7 @@ const js_bridge = () => {
       var loopBtn = () => {
         const sendBtn = document.querySelector('button[data-testid]') as HTMLElement;
         if (sendBtn) {
-          if(!sendBtn.hasAttribute('disabled')){
+          if (!sendBtn.hasAttribute('disabled')) {
             sendBtn.click();
             return;
           }

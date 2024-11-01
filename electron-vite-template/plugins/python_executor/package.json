@@ -11,6 +11,7 @@
     "zip": "npm run clean && npm run build"
   },
   "devDependencies": {
+    "@types/circular-json": "^0.4.0",
     "@types/pbf": "^3.0.5",
     "@types/protocol-buffers-schema": "^3.4.3",
     "@typescript-eslint/eslint-plugin": "^8.8.0",
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "@protobuf-ts/plugin": "^2.9.4",
+    "circular-json": "^0.5.9",
     "google-protobuf": "^3.21.4",
     "pbf": "^4.0.1",
     "pbjs": "^0.0.14",
