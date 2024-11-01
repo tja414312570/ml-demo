@@ -15,6 +15,11 @@ export class SseHandler {
     private currentEncoding: string = '';
     private error: ((data: any) => void) | undefined;
     private isEnd = false;
+    constructor() {
+        this.parser = createParser((event) => {
+            this.handleServerEvent(event);
+        });
+    }
     onMessage(callback: (data: any) => void) {
         this.message = callback;
         return this;
@@ -68,7 +73,7 @@ export class SseHandler {
         try {
             this.resetTimer();
             // 将接收到的数据传递给流追踪器
-            if(this.isEnd){
+            if (this.isEnd) {
                 return;
             }
             event = event as ParsedEvent;
@@ -82,16 +87,16 @@ export class SseHandler {
             if (event.event !== "ping") {
                 // 处理 "delta_encoding" 事件
                 if (event.event === "pb") {
-                   const pushEvent =  PushEvent.fromBinary(protoBase64.dec(event.data));
-                   if(pushEvent){
-                    const finished = pushEvent.message?.ext?.is_finish;
-                    if(finished === '1'){
-                        this.parsedData = pushEvent;
-                        this.triggerEnd(this.parsedData)
-                    }else{
-                        this.triggerEvent(pushEvent);
+                    const pushEvent = PushEvent.fromBinary(protoBase64.dec(event.data));
+                    if (pushEvent) {
+                        const finished = pushEvent.message?.ext?.is_finish;
+                        if (finished === '1') {
+                            this.parsedData = pushEvent;
+                            this.triggerEnd(this.parsedData)
+                        } else {
+                            this.triggerEvent(pushEvent);
+                        }
                     }
-                   }
                 } else {
                     this.triggerEvent(event);
                 }
@@ -100,11 +105,8 @@ export class SseHandler {
             throw new Error(`处理数据失败,${util.inspect(event)}`, { cause: err })
         }
     }
-    handler(data: string) {
+    feed(data: string) {
         try {
-            this.parser = createParser((event) => {
-                this.handleServerEvent(event);
-            });
             this.parser.feed(data)
         } catch (error) {
             this.triggerError(error)

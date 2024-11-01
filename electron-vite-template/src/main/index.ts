@@ -59,11 +59,9 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
   callback(true);  // 忽略证书错误
 });
 app.whenReady().then(() => {
-
-  // onAppReady();
   startProxyServer().then(proxy => {
     onAppReady();
-    // ptyInit()
+    ptyInit()
     pluginManager.loadPluginFromDir(innerPluginPath)
     ipcMain.on('notificationAPI-ready', () => {
       notify("gpt拦截器已初始化完成！")

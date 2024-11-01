@@ -4,6 +4,7 @@ import util from 'util';
 import { IncomingHttpHeaders } from 'http';
 import { SseHandler } from './doubao';
 import { pluginContext } from 'mylib/main';
+import { IContext } from 'http-mitm-proxy';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
 // 使用 promisify 将子进程命令转换为 Promise
@@ -98,66 +99,8 @@ async function decodeResult(resultString:string) {
         return null;
     }
 }
-// async function dispatcherResult(param, isDecodeResult = false) {
-//     if (!isDecodeResult) {
-//         const uploadFiles = await decodeResult(param);
-//         if (uploadFiles && uploadFiles.length > 0) {
-//             await uploadFile(uploadFiles);
-//         }
-//     }
-//     sendApp(param)
-// }
-
-
-
-// const decodeEventStream = (ctx:IContext, data:string) => {
-//     // 将事件流根据两个换行符进行分割
-//     const events = data.split('\n\n');
-
-//     events.forEach(event => {
-//         if (event.startsWith('data:')) {
-//             const eventData = event.slice(5).trim();  // 去除前面的 'data:' 并移除空白字符
-//             try {
-//                 console.log('Received Event:', eventData);
-//                 // 如果事件流发送 '[DONE]'，处理最终的响应数据
-//                 if (eventData === '[DONE]') {
-//                     processResponse(ctx?.serverToProxyResponse?.headers, currentData);
-//                 }
-//                 // 检查数据中是否包含特定标志 '"finished_successfully"'
-//                 else if (eventData.includes('"finished_successfully"')) {
-//                     currentData = eventData;
-//                 }
-//             } catch (error) {
-//                 console.error(`Failed to parse event data: ${eventData}`, error);
-//             }
-//         }
-//     });
-// }
-
-const processResponse = async (headers:IncomingHttpHeaders|undefined, body:string):Promise<string|void> => {
-    const contentType = headers?.['content-type'] || '';
-    return new Promise<string | void>((resolve,reject)=>{
-        // 检查是否为 SSE (text/event-stream)
-        if (!contentType.includes('text/event-stream')) {
-            resolve()
-            return;
-        }
-        const sseData = body;
-        // 将 SSE 数据根据事件分隔符 \n\n 进行分割
-        //处理delta编码
-        const start = performance.now();
-   
-
-        new SseHandler().onMessage((data:any)=>{
-
-        }).onError(err=>{
-            reject(err)
-        }).onEnd((data:any)=>{
-            const end = performance.now();
-            console.log(`dubo解析数据耗时： ${(end - start).toFixed(2)} ms\r\n${data}\r\n`);
-            resolve(data.message?.ttsContent);
-        }).handler(sseData)
-    })
+const processResponse = async (headers:IncomingHttpHeaders|undefined,ctx:IContext):Promise<string|void> => {
+    
 }
 
 

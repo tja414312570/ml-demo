@@ -45,8 +45,8 @@ class MainInit {
     // 加载主窗口
     this.mainWindow.loadURL(this.winURL);
     this.mainWindow.webContents.on('will-attach-webview', (e, webPreferences) => {
-      webPreferences.webSecurity = false
-      webPreferences.allowRunningInsecureContent = true
+      // webPreferences.webSecurity = false
+      // webPreferences.allowRunningInsecureContent = true
       webPreferences.preload = getPreloadFile('webview')
     })
 
