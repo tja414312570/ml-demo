@@ -57,7 +57,7 @@ const js_bridge = () => {
         return;
       }
       if (textarea.tagName.toLowerCase() === "textarea") {
-        textarea.value = message; // 对 textarea 赋值
+        textarea.textContent = message; // 对 textarea 赋值
       }
       // 判断是否为 contenteditable 的 div
       else if (textarea.getAttribute("contenteditable") === "true") {

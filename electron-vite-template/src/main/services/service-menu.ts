@@ -5,6 +5,7 @@ import _ from 'lodash';
 import '../ipc-bind/setting-ipc-bind'
 import EventEmitter from "events";
 import '../ipc-bind/menus-ipc-bind'
+import { v4 as uuidv4 } from 'uuid'
 
 import { type, arch, release } from "os";
 import { version } from "../../../package.json";
@@ -13,6 +14,7 @@ const eventer = new EventEmitter();
 export const onSettingChange = (path: string, callback: (value: any) => void) => {
     eventer.on("SettingChange", callback);
 };
+const isMac = process.platform === 'darwin'
 const settins_menu: Array<MenuDesc> = [
     {
         label: "通用",
@@ -27,13 +29,124 @@ const settins_menu: Array<MenuDesc> = [
         ]
     },
     {
-        label: "网络",
-        key: "network",
+        label: "编辑",
+        key: "edit",
+        submenu: [
+            {
+                role: 'undo', // 撤销操作
+                label: "撤销",
+                key: "undo"
+            },
+            {
+                role: 'redo',
+                label: "重做",
+                key: "redo"
+            },
+            { label: "", key: uuidv4(), type: 'separator' }, // 分隔符
+            {
+                role: 'cut',
+                label: "剪切",
+                key: "cut"
+            },
+            {
+                role: 'copy',
+                label: "复制",
+                key: "copy"
+            },
+            {
+                role: 'paste',
+                label: "粘贴",
+                key: "paste"
+            },
+            ...(isMac
+                ? [
+                    {
+                        role: 'pasteAndMatchStyle',
+                        label: "粘贴并匹配样式",
+                        key: "pasteAndMatchStyle"
+                    },
+                    {
+                        role: 'delete',
+                        label: "删除",
+                        key: "delete"
+                    },
+                    {
+                        role: 'selectAll',
+                        label: "全选",
+                        key: "selectAll"
+                    },
+                    { label: "", key: uuidv4(), type: 'separator' }, // 分隔符
+                    {
+                        label: 'Speech', // 语音相关功能
+                        key: "speech",
+                        submenu: [
+                            {
+                                role: 'startSpeaking',
+                                label: "开始朗读",
+                                key: "startSpeaking"
+                            },
+                            {
+                                role: 'stopSpeaking',
+                                label: "停止朗读",
+                                key: "stopSpeaking"
+                            }
+                        ]
+                    }
+                ]
+                : [
+                    {
+                        role: 'delete',
+                        label: "删除",
+                        key: "delete"
+                    },
+                    { label: "", key: uuidv4(), type: 'separator' }, // 分隔符
+                    {
+                        role: 'selectAll',
+                        label: "全选",
+                        key: "selectAll"
+                    }
+                ]) as MenuDesc[]
+        ]
     },
     {
-        label: "外观",
-        key: "appearance",
-    },
+        label: '窗口',
+        key: 'window',
+        submenu: [
+            {
+                role: 'minimize',
+                label: '最小化',
+                key: 'minimize'
+            },
+            {
+                role: 'zoom',
+                label: '缩放',
+                key: 'zoom'
+            },
+            ...(isMac
+                ? [
+                    { type: 'separator' },
+                    {
+                        role: 'front',
+                        label: '显示在前',
+                        key: 'front'
+                    },
+                    { type: 'separator' },
+                    {
+                        role: 'window',
+                        label: '窗口',
+                        key: 'window'
+                    }
+                ]
+                : [
+                    {
+                        role: 'close',
+                        label: '关闭',
+                        key: 'close'
+                    }
+                ]) as MenuDesc[]
+        ]
+    }
+    ,
     {
         label: "帮助",
         key: "help",

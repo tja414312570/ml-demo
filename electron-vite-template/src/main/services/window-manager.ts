@@ -20,7 +20,6 @@ class MainInit {
   }
   // 主窗口函数
   createMainWindow() {
-    console.log('预加载路径:' + getPreloadFile("index"))
     this.mainWindow = new BrowserWindow({
       titleBarStyle: config.IsUseSysTitle ? "default" : "hidden",
       height: 800,
@@ -37,6 +36,8 @@ class MainInit {
         // 在macos中启用橡皮动画
         scrollBounce: process.platform === "darwin",
         preload: getPreloadFile("index"),
+        contextIsolation: true,
+        nodeIntegration: false,
         // allowRunningInsecureContent: true // 允许不安全内容
       },
     });
