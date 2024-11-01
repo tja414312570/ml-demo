@@ -13,12 +13,35 @@ function isUrlMatched(url, patterns) {
     return regex.test(url);
   });
 }
-
+const map = new Map<String, Bridge>()
 // 使用函数检查
+export const getAgent = (domain: string) => {
+  let module: Bridge = map.get(domain)
+  if (!module) {
+    const pluginsOfType = pluginManager.getPluginsFromType(PluginType.agent);
+    for (const plugin of pluginsOfType) {
+      const isMatch = isUrlMatched(domain, plugin.match);
+      if (isMatch) {
+        module = pluginManager.getModule(plugin as any);
+        map.set(domain, module as any);
+        break;
+      }
+    }
+  }
+  return module;
+}
+export const getAgentFromUrl = (url: string) => {
+  const index = url.indexOf('://') + 3;
+  const pathIndex = url.indexOf('/', index);
+  let domain = url;
+  if (pathIndex > -1) {
+    domain = url.substring(0, pathIndex + 1)
+  }
+  return getAgent(domain);
+}
 
 export async function startProxyServer() {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
-  const map = new Map<String, Bridge>()
 
   // 拦截 HTTP 请求
   proxy.onRequest((ctx, callback) => {
@@ -31,18 +54,7 @@ export async function startProxyServer() {
       const protocol = ctx.isSSL ? 'https' : 'http';
       domain = `${protocol}://${host}/`;
     }
-    let module: Bridge = map.get(domain)
-    if (!module) {
-      const pluginsOfType = pluginManager.getPluginsFromType(PluginType.agent);
-      for (const plugin of pluginsOfType) {
-        const isMatch = isUrlMatched(domain, plugin.match);
-        if (isMatch) {
-          module = pluginManager.getModule(plugin as any);
-          map.set(domain, module as any);
-          break;
-        }
-      }
-    }
+    const module = getAgent(domain);
     if (module) {
       ctx['agent'] = module
       // 根据请求的协议构建完整的 URL

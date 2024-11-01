@@ -1,8 +1,8 @@
 "use strict";
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Promise Rejection:', reason);
-  process.exit(1); // 以非零状态码退出程序
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//   console.error('Unhandled Promise Rejection:', reason);
+//   process.exit(1); // 以非零状态码退出程序
+// });
 import { useMainDefaultIpc } from "./services/ipc-main";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, session } from "electron";
 import InitWindow from "./services/window-manager";
@@ -19,7 +19,6 @@ import pluginContext from '../../lib/src/main/plugin-context'
 import pluginManager from "./plugin/plugin-manager";
 import path from "path";
 import { showErrorDialog } from "./utils/dialog";
-import './plugin/ipc-bind'
 import { createWindow } from "./services/window-settings";
 const innerPluginPath = path.join(__dirname, '../../../plugins');
 import './ipc-bind/core-ipc-bind'
