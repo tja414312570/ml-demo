@@ -1,6 +1,4 @@
 import { IProxyOptions, Proxy } from 'http-mitm-proxy'; // 导入 CommonJS 模块
-import { HttpProxyAgent } from 'http-proxy-agent';
-import { HttpsProxyAgent } from 'https-proxy-agent';
 
 import { info } from '../utils/logger'
 import pluginManager from '@main/plugin/plugin-manager';
@@ -20,66 +18,51 @@ function isUrlMatched(url, patterns) {
 
 export async function startProxyServer() {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
+  const map = new Map<String, Bridge>()
 
   // 拦截 HTTP 请求
   proxy.onRequest((ctx, callback) => {
-    const requestPath = ctx.clientToProxyRequest.url; // 获取请求路径
-    const host = ctx.clientToProxyRequest.headers.host; // 获取主机名
-
-    // 根据请求的协议构建完整的 URL
-    const protocol = ctx.isSSL ? 'https' : 'http';
-    const requestUrl = `${protocol}://${host}${requestPath}`;
-    console.log("服务器请求", ctx)
-    pluginManager.resolvePluginModule<Bridge>(PluginType.agent, (pluginsOfType => {
+    let domain: string;
+    const origin = ctx.proxyToServerRequestOptions.headers['origin'];
+    if (origin) {
+      domain = origin + '/'; // 如果没有路径，直接使用整个 referer
+    } else {
+      const host = ctx.clientToProxyRequest.headers.host; // 获取主机名
+      const protocol = ctx.isSSL ? 'https' : 'http';
+      domain = `${protocol}://${host}/`;
+    }
+    let module: Bridge = map.get(domain)
+    if (!module) {
+      const pluginsOfType = pluginManager.getPluginsFromType(PluginType.agent);
       for (const plugin of pluginsOfType) {
-        const isMatch = isUrlMatched(requestUrl, plugin.match);
+        const isMatch = isUrlMatched(domain, plugin.match);
         if (isMatch) {
-          return plugin;
+          module = pluginManager.getModule(plugin as any);
+          map.set(domain, module as any);
+          break;
         }
       }
-      return null;
-    }))
-      .then(module => {
-        module.onRequest(ctx);
-        callback(); // 继续请求
-      }).catch(err => {
-        console.error(err);
-        notifyError(`处理请求出现错误:${String(err)}`)
-        callback(err)
-      })
+    }
+    if (module) {
+      ctx['agent'] = module
+      // 根据请求的协议构建完整的 URL
+      module.onRequest(ctx);
+    }
+    callback(); // 继续请求
   });
 
   // 拦截 HTTP 响应
   proxy.onResponse((ctx, callback) => {
-    const requestPath = ctx.clientToProxyRequest.url; // 获取请求路径
-    const host = ctx.clientToProxyRequest.headers.host; // 获取主机名
-
-    // 根据请求的协议构建完整的 URL
-    const protocol = ctx.isSSL ? 'https' : 'http';
-    const requestUrl = `${protocol}://${host}${requestPath}`;
-    console.log("服务器响应", ctx.serverToProxyResponse.headers)
-    pluginManager.resolvePluginModule<Bridge>(PluginType.agent, (pluginsOfType => {
-      for (const plugin of pluginsOfType) {
-        const isMatch = isUrlMatched(requestUrl, plugin.match);
-        if (isMatch) {
-          return plugin;
+    const module = ctx['agent'];
+    if (module) {
+      module.onResponse(ctx).then((body: string) => {
+        if (body) {
+          console.log("解析出数据：" + body)
+          dispatch(ctx.serverToProxyResponse.headers, body);
         }
-      }
-      return null;
-    }))
-      .then(module => {
-        module.onResponse(ctx).then((body: string) => {
-          if (body) {
-            console.log("解析出数据：" + body)
-            dispatch(ctx.serverToProxyResponse.headers, body);
-          }
-        });
-        callback(); // 继续请求
-      }).catch(err => {
-        console.error("处理响应异常", err);
-        notifyError(`处理请求出现错误:${String(err)}`)
-        callback(err)
-      })
+      });
+    }
+    callback(); // 继续请求
   })
 
 
@@ -102,10 +85,10 @@ export async function startProxyServer() {
   //   // Here you have the last chance to provide certificate files data
   //   // A tipical use case would be creating them on the fly
   //   //
-  //   return callback(null, {
-  //     key: keyFileData,
-  //     cert: certFileData
-  //   });
+  //   // return callback(null, {
+  //   //   key: keyFileData,
+  //   //   cert: certFileData
+  //   // });
   // };
 
   proxy.onError((ctx, err) => {
@@ -120,14 +103,14 @@ export async function startProxyServer() {
   //   options.httpAgent = new HttpProxyAgent(proxyUrl);
   //   options.httpsAgent = new HttpsProxyAgent(proxyUrl);
   // }
-  // (proxy as any)._onError_bak_ = proxy._onError;
-  // proxy._onError = (kind, ctx, err) => {
-  //   if ((err as any).code === 'ERR_SSL_SSLV3_ALERT_CERTIFICATE_UNKNOWN') {
-  //     // console.log(`忽略 SSL 错误: ${ctx.clientToProxyRequest.url}`);
-  //     return;
-  //   }
-  //   (proxy as any)._onError_bak_(kind, ctx, err)
-  // }
+  (proxy as any)._onError_bak_ = proxy._onError;
+  proxy._onError = (kind, ctx, err) => {
+    if ((err as any).code === 'ERR_SSL_SSLV3_ALERT_CERTIFICATE_UNKNOWN') {
+      // console.log(`忽略 SSL 错误: ${ctx.clientToProxyRequest.url}`);
+      return;
+    }
+    (proxy as any)._onError_bak_(kind, ctx, err)
+  }
   // 启动代理服务器
 
   return new Promise((resolve, reject) => {

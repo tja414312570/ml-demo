@@ -160,7 +160,7 @@ class PluginManager {
         // pluginInfo.onUnloadCallback.forEach(callbackfn => callbackfn())
         return pluginInfo;
     }
-    private getModule(pluginInfo: PluginInfo & PluginProxy): any {
+    public getModule(pluginInfo: PluginInfo & PluginProxy): any {
         if (!pluginInfo.module) {
             this.load(pluginInfo)
         }

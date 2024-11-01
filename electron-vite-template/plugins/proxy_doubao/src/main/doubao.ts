@@ -68,8 +68,6 @@ export class SseHandler {
         try {
             this.resetTimer();
             // 将接收到的数据传递给流追踪器
-            // 如果事件流已结束（收到 "[DONE]"）
-            console.log(`处理:`, util.inspect(event))
             if(this.isEnd){
                 return;
             }
@@ -88,7 +86,7 @@ export class SseHandler {
                    if(pushEvent){
                     const finished = pushEvent.message?.ext?.is_finish;
                     if(finished === '1'){
-                        this.parsedData = pushEvent.message?.ttsContent;
+                        this.parsedData = pushEvent;
                         this.triggerEnd(this.parsedData)
                     }else{
                         this.triggerEvent(pushEvent);

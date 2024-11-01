@@ -155,7 +155,7 @@ const processResponse = async (headers:IncomingHttpHeaders|undefined, body:strin
         }).onEnd((data:any)=>{
             const end = performance.now();
             console.log(`dubo解析数据耗时： ${(end - start).toFixed(2)} ms\r\n${data}\r\n`);
-            resolve(data.message.content.parts[0]);
+            resolve(data.message?.ttsContent);
         }).handler(sseData)
     })
 }
