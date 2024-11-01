@@ -1,11 +1,11 @@
 "use strict";
-// process.on('unhandledRejection', (reason, promise) => {
-//   console.error('Unhandled Promise Rejection:', reason);
-//   process.exit(1); // 以非零状态码退出程序
-// });
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Promise Rejection:', reason);
+  process.exit(1); // 以非零状态码退出程序
+});
 import { useMainDefaultIpc } from "./services/ipc-main";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, session } from "electron";
-import InitWindow from "./services/window-manager";
+import { MainInit } from "./services/window-manager";
 import { useDisableButton } from "./hooks/disable-button-hook";
 import { useProcessException } from "@main/hooks/exception-hook";
 import { useMenu } from "@main/hooks/menu-hook"
@@ -27,6 +27,7 @@ import './services/global-agents'
 import './services/service-setting'
 import './services/service-menu'
 import "./services/window-settings";
+import { handleChannelEvent } from "./services/web-content-listener";
 function onAppReady() {
   // const { disableF12 } = useDisableButton();
   // const { renderProcessGone } = useProcessException();
@@ -37,7 +38,7 @@ function onAppReady() {
   // defaultIpc();
   // creactMenu()
 
-  new InitWindow().initWindow();
+  new MainInit().initWindow();
   // createWindow();
   if (process.env.NODE_ENV === "development") {
     const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor");
@@ -57,19 +58,26 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
   event.preventDefault(); // 阻止默认行为
   callback(true);  // 忽略证书错误
 });
+//当终端ui就绪时
+handleChannelEvent('pty.terminal-output', {
+  onBind: function (webId: number): void {
+    ptyInit()
+  }
+})
+//当通知ui就绪时
+handleChannelEvent('ipc-notify.show-notification', {
+  onBind: (webId: number): void => {
+    notify("gpt拦截器已初始化完成！")
+  }
+})
 app.whenReady().then(() => {
   startProxyServer().then(proxy => {
     onAppReady();
-    ptyInit()
     pluginManager.loadPluginFromDir(innerPluginPath)
-    ipcMain.on('notificationAPI-ready', () => {
-      notify("gpt拦截器已初始化完成！")
-    })
   })
 });
 // 由于9.x版本问题，需要加入该配置关闭跨域问题
 app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
-
 app.on("window-all-closed", () => {
   // 所有平台均为所有窗口关闭就退出软件
   app.quit();

@@ -22,30 +22,31 @@
 </template>
 
 <script lang="ts" setup>
+import { getIpcApi } from '@lib/preload';
 import { ref, onMounted, onUnmounted } from 'vue';
 
 // 使用 ref 定义响应式数据
 const editor_status = ref('编辑器状态信息');
 const notification = ref<{ message: string; is_error: boolean } | null>(null);
-
+const api = getIpcApi('ipc-notify') as any;
 // 监听来自预加载脚本的通知
 onMounted(() => {
     // 监听通知事件
-    window.notificationAPI.onReady();
-    window.notificationAPI.onNotify((notifyData) => {
+    api.onReady();
+    api.onNotify((notifyData) => {
         console.log(`收到通知：${notifyData}`)
         notification.value = notifyData;
     });
 
     // 监听清理通知事件
-    window.notificationAPI.onClearNotification(() => {
+    api.onClearNotification(() => {
         notification.value = null;
     });
 });
 
 // 清除通知方法
 const clearNotification = () => {
-    window.notificationAPI.clearNotification();
+    api.clearNotification();
 };
 </script>
 

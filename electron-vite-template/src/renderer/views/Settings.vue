@@ -61,7 +61,7 @@ import 'splitpanes/dist/splitpanes.css'
 import proxyView from '../components/settings-proxy.vue';
 import { onMounted, reactive, ref, shallowRef, toRaw, watch, WatchHandle } from 'vue';
 import { getIpcApi } from '@lib/preload';
-import { Menu } from '@main/services/service-setting';
+import { Setting } from '@main/services/service-setting';
 import { settingCompents } from '@renderer/ts/setting-compents';
 const coreApi = getIpcApi('ipc-core.window');
 const selected = ref([
@@ -72,7 +72,7 @@ const temp = ref([]);
 const activatedPath = ref<Array<any>>([]);
 const currentComponent = shallowRef();
 const currentProps = ref();
-function foundSetting(target: string, path = [], _menus = settingMenus.value): Menu[] | null {
+function foundSetting(target: string, path = [], _menus = settingMenus.value): Setting[] | null {
     const index = target.indexOf(".");
     const current = target.substring(0, index > 1 ? index : target.length);
     const remain = index > 1 ? target.substring(index + 1, target.length) : null;
@@ -105,11 +105,25 @@ const findPath = (targetKey, path = [], nodes = settingMenus.value) => {
     }
     return [];
 }
-const settingMenus = ref<Array<Menu>>([])
+const settingMenus = ref<Array<Setting>>([])
 const settingApi = getIpcApi('ipc-settings');
 loading.value = true;
-settingApi.invoke('get-settings').then((data: Array<Menu>) => {
-    settingMenus.value = data;
+const filterItems = (items: Setting[]): Setting[] => {
+    return items
+        .map(item => {
+            // 只保留匹配的节点
+            if (item.hide === true) {
+                if (item.subs) {
+                    item.subs = filterItems(item.subs);
+                }
+                return item;
+            }
+        })
+        .filter(Boolean) as Setting[]; // 过滤掉 undefined
+};
+
+settingApi.invoke('get-settings').then((data: Array<Setting>) => {
+    settingMenus.value = filterItems(data);
     loading.value = false;
 })
 const close = () => {
@@ -125,7 +139,7 @@ const close = () => {
 const newSettingsValue = reactive(new Map<string, any>());
 let unwatch: WatchHandle;
 const watchValue = new Map<string, any>();
-const onActivated = (item: Array<Menu>) => {
+const onActivated = (item: Array<Setting>) => {
     if (item.length === 0) {
         selected.value = temp.value;
     } else {

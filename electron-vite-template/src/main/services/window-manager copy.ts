@@ -1,53 +1,8 @@
 import config from "@config/index";
-import { BrowserWindow, BrowserWindowConstructorOptions, dialog, session } from "electron";
+import { BrowserWindow, dialog, session } from "electron";
 import { winURL, loadingURL, getPreloadFile } from "../config/static-path";
 import { useProcessException } from "@main/hooks/exception-hook";
 import "./executor";
-import _ from "lodash";
-import { registeMenu } from "./service-menu";
-import { showErrorDialog } from "@main/utils/dialog";
-
-export const DefaultWindowId = {
-  LOADING: 'DEFAULT_WINDOW',
-  MAIN: 'DEFAULT_MAIN',
-}
-
-class WindowManager {
-  private windowMap: Map<string, BrowserWindow>
-  constructor() {
-    this.windowMap = new Map();
-  }
-  createWindow(windowId: string, options?: BrowserWindowConstructorOptions) {
-    let window = this.windowMap.get(windowId);
-    if (!window) {
-      const mergedOptions = _.merge({}, options, {
-        titleBarStyle: "hidden",
-        frame: false,
-        webPreferences: {
-          webSecurity: true,
-          scrollBounce: process.platform === "darwin",
-          contextIsolation: true,
-          nodeIntegration: false,
-          allowRunningInsecureContent: false,
-        }
-      });
-      window = new BrowserWindow(mergedOptions)
-      this.windowMap.set(windowId, window)
-      window.on('closed', () => {
-        console.log('主窗口已被销毁');
-        this.windowMap.delete(windowId)
-      });
-    }
-    window.show();
-    window.focus(); // 使窗口获取焦点
-    return window;
-  }
-  getWindow(windowId: string) {
-    return this.windowMap.get(windowId);
-  }
-}
-const windowManager = new WindowManager();
-export default windowManager;
 
 
 class MainInit {
@@ -65,7 +20,7 @@ class MainInit {
   }
   // 主窗口函数
   createMainWindow() {
-    this.mainWindow = windowManager.createWindow(DefaultWindowId.MAIN, {
+    this.mainWindow = new BrowserWindow({
       title: '开放解释器',
       titleBarStyle: "hidden",
       height: 800,
@@ -87,31 +42,30 @@ class MainInit {
         // allowRunningInsecureContent: true // 允许不安全内容
       },
     });
+    global.mainWindow = this.mainWindow;
+
     // 加载主窗口
     this.mainWindow.loadURL(this.winURL);
     this.mainWindow.webContents.on('will-attach-webview', (e, webPreferences) => {
+      // webPreferences.webSecurity = false
+      // webPreferences.allowRunningInsecureContent = true
       webPreferences.preload = getPreloadFile('webview')
     })
-    const ses = session.fromPartition('persist:your-partition');
-    registeMenu({
-      label: '清理缓存',
-      key: 'clean',
-      click: () => {
-        // 清理所有存储数据，包括缓存、Cookies、LocalStorage 等
-        ses.clearStorageData({
-          storages: ["filesystem", "indexdb", "localstorage", "shadercache", "websql", "serviceworkers", "cachestorage"]
-        }).then(() => {
-          dialog.showMessageBox({
-            message: '清理完成'
-          });
-        }).catch(err => {
-          showErrorDialog({
-            message: `清理缓存失败${String(err)}`
-          })
-        });
-      }
-    }, 'general')
 
+    const ses = session.fromPartition('persist:your-partition');
+    // // 清理所有存储数据，包括缓存、Cookies、LocalStorage 等
+    // ses.clearStorageData({
+    //   storages: ["filesystem", "indexdb", "localstorage", "shadercache", "websql", "serviceworkers", "cachestorage"]
+    // }).then(() => {
+    //   console.log('所有存储数据已清理');
+    // });
+    // ses.cookies.set({
+    //   url: 'https://chatgpt.com',
+    //   name: 'cf_clearance',
+    //   value: 'L_v9JpEHQIqc_67rTr3.6I3WjXQhCbX0Ry8CEhEO_4I-1728131342-1.2.1.1-4nuPoUfRrJV9c2wMNH61FVQu1p40XeOECzf8KgZXDyfmmwXfIhdyfV53_UGAPw_ft1uss8ptzgvRedtgK._wM3I6KFOdK894fUxech.JCDlNaOV2L.4N7aUvyymdDNoRdc7twfs3yFzvPgOTanaEaZQ2RCxW7dwpamI.lX5R9t3_QTa6Ah1EYDobucTx8fwiFLRJVLnd5KwKR6w3pgg72vhuVMN0UoJaykWAj2aGC6DzZKxlXQRe_5bouBjnpltDweRo1OxMt7wqWg9whoFgz2Uz4ggrqzkjZLv3hFOYQ2FtgaHYoRVTr7R6yz82Er7H2g.qOncbQQnGb5Zurf_k5P_NU2MYQUW_3_M5fDqm3YDdNbN9J9FPXB4W8UpoTIbEvsyqnp9SUYB4wirHGkMrqkXadXmfSQuAYY.MN9uHXmzxFwlsu3E9djx7hrCSr9Ve' // 将浏览器中的有效 cf_clearance Cookie 值填入
+    // }).then(() => {
+    //   console.log('Cloudflare clearance cookie 已设置');
+    // });
 
     ses.webRequest.onHeadersReceived((details, callback) => {
       delete details.responseHeaders['content-security-policy']
@@ -162,12 +116,11 @@ class MainInit {
     this.childProcessGone(this.mainWindow);
     this.mainWindow.on("closed", () => {
       this.mainWindow = null;
-      process.exit()
     });
   }
   // 加载窗口函数
   loadingWindow(loadingURL: string) {
-    this.loadWindow = windowManager.createWindow(DefaultWindowId.LOADING, {
+    this.loadWindow = new BrowserWindow({
       width: 400,
       height: 600,
       frame: false,
@@ -194,4 +147,4 @@ class MainInit {
     }
   }
 }
-export { MainInit }
+export default MainInit;

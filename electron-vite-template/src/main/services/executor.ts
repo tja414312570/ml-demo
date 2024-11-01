@@ -8,34 +8,11 @@ import pluginManager from "@main/plugin/plugin-manager";
 import { PluginInfo, PluginType } from '@lib/main';
 import { InstructExecutor, InstructResult } from '@lib/main';
 import { showErrorDialog } from "@main/utils/dialog";
-// loadModules('../executor', (file, module) => {
-//     if (!module.execute) {
-//         throw new Error(` “${file}“ executor not implements execute function`);
-//     }
-//     // 检查 executor.execute 是否是函数
-//     if (typeof module.execute !== 'function') {
-//         throw new Error(` “${file}“ executor executor.execute is not a function`);
-//     }
-//     if (Array.isArray(module.support)) {
-//         // 如果 `support` 是数组，将数组中的每个元素都作为键赋值给 `executors`
-//         module.support.forEach((supportKey: string) => {
-//             executors[supportKey] = module;
-//         });
-//     } else {
-//         // 如果 `support` 是字符串，直接作为键赋值给 `executors`
-//         executors[module.support as string] = module;
-//     }
-//     console.log(`load-module: ${file},${module.support}`);
-// }).catch(console.error);
 
 ipcMain.on('code-view-api.send_execute-result', (event, input) => {
     console.log("发送消息到webview", input)
     sendMessage(input)
 });
-// ipcMain.on('terminal-execute-completed', (event, input) => {
-//     console.log("搜到执行结果", input)
-//     executeCodeCompleted(input)
-// });
 
 ipcMain.handle('code-view-api.execute', (event, code: InstructContent) => {
     return executeCode(code)

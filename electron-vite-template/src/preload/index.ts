@@ -9,18 +9,17 @@ import './core-api-pre'
 exposeInMainWorld('pty');
 
 
-contextBridge.exposeInMainWorld('notificationAPI', {
-  onReady: () => ipcRenderer.send('notificationAPI-ready'),
+exposeInMainWorld('ipc-notify', ipcRenderer => ({
+  onReady: () => ipcRenderer.send('ready'),
   sendNotification: (message, isError = false) => ipcRenderer.send('notify', { message, isError }),
   clearNotification: () => ipcRenderer.send('clear-notification'),
   // 监听通知事件
   onNotify: (callback) => ipcRenderer.on('show-notification', (event, notifyData) => {
     callback(notifyData);
   }),
-
   // 监听清理通知事件
   onClearNotification: (callback) => ipcRenderer.on('clear-notification', callback),
-});
+}));
 
 function getIpcRenderer() {
   const IpcRenderer = {};

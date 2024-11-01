@@ -1,7 +1,7 @@
 import { send_ipc_render } from "./send_ipc";
 
 const _notify_app = (message: string, is_error: boolean) => {
-    send_ipc_render('show-notification', { message, is_error });
+    send_ipc_render('ipc-notify.show-notification', { message, is_error });
 };
 // 通知应用的函数
 const notify = (message: string) => {

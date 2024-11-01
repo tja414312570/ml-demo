@@ -1,6 +1,6 @@
 import { bindListenerChannel, removeListenerChannel } from "@main/services/web-content-listener";
 import { showErrorDialog } from "@main/utils/dialog";
-import { BrowserWindow, dialog, ipcMain } from "electron";
+import { dialog, ipcMain } from "electron";
 import './core-ipc-window-bind'
 
 ipcMain.handle('ipc-core.get-current-webcontents-id', (event, input) => {

@@ -80,7 +80,6 @@ onMounted(async () => {
   terminalApi.on('terminal-output', (event, data) => {
     console.log('从终端收到数据:', terminalRef, data);  // 调试终
     terminal.write(data);
-
   });
 
   // 监听终端输入并发送到主进程

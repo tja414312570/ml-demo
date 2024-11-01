@@ -22,6 +22,7 @@ const settins_menu: Array<Setting> = [
             {
                 name: "测试",
                 key: "test",
+                hide: true,
             }
         ]
     },
@@ -43,6 +44,7 @@ export type Setting = {
     key: string,
     page?: string,
     path?: string,
+    hide?: boolean,
     subs?: Array<Setting> | null;
 }
 /**
