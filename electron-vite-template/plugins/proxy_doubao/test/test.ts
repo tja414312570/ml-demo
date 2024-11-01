@@ -19,3 +19,13 @@ for (const line of splits) {
   }
   i++;
 }
+i = 0;
+for (const line of splits) {
+  if (i % 4 === 2) {
+    const m64 = protoBase64.dec(line.substring(5));
+    const msg = PushEvent.fromBinary(m64);
+    console.log("================================");
+    console.log(msg);
+  }
+  i++;
+}

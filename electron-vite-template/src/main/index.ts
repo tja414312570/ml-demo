@@ -59,17 +59,11 @@ app.on('certificate-error', (event, webContents, url, error, certificate, callba
   callback(true);  // 忽略证书错误
 });
 app.whenReady().then(() => {
-  const upstreamProxy = {
-    host: '127.0.0.1',  // 上游代理服务器的地址
-    port: 7890,         // 上游代理服务器的端口
-    protocol: 'http:',  // 上游代理协议
-    auth: ''            // 如果上游代理需要认证，配置用户名和密码
-  };
 
   // onAppReady();
-  startProxyServer(upstreamProxy).then(proxy => {
+  startProxyServer().then(proxy => {
     onAppReady();
-    ptyInit()
+    // ptyInit()
     pluginManager.loadPluginFromDir(innerPluginPath)
     ipcMain.on('notificationAPI-ready', () => {
       notify("gpt拦截器已初始化完成！")

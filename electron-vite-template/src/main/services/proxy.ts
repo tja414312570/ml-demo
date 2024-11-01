@@ -8,13 +8,37 @@ import { PluginType } from '@lib/main';
 import { Bridge } from '@lib/main';
 import { notifyError } from '@main/ipc/notify-manager';
 import { dispatch } from './dispatcher';
+function isUrlMatched(url, patterns) {
+  return patterns.some(pattern => {
+    const regexPattern = pattern.replace(/\*/g, '.*').replace(/([.+?^${}()|[\]\\])/g, '\\$1');
+    const regex = new RegExp('^' + regexPattern + '$');
+    return regex.test(url);
+  });
+}
 
-export async function startProxyServer(upstreamProxy) {
+// 使用函数检查
+
+export async function startProxyServer() {
   const proxy = new Proxy(); // 使用 http-mitm-proxy 创建代理实例
 
   // 拦截 HTTP 请求
   proxy.onRequest((ctx, callback) => {
-    pluginManager.resolvePluginModule<Bridge>(PluginType.agent)
+    const requestPath = ctx.clientToProxyRequest.url; // 获取请求路径
+    const host = ctx.clientToProxyRequest.headers.host; // 获取主机名
+
+    // 根据请求的协议构建完整的 URL
+    const protocol = ctx.isSSL ? 'https' : 'http';
+    const requestUrl = `${protocol}://${host}${requestPath}`;
+    console.log("服务器请求", ctx)
+    pluginManager.resolvePluginModule<Bridge>(PluginType.agent, (pluginsOfType => {
+      for (const plugin of pluginsOfType) {
+        const isMatch = isUrlMatched(requestUrl, plugin.match);
+        if (isMatch) {
+          return plugin;
+        }
+      }
+      return null;
+    }))
       .then(module => {
         module.onRequest(ctx);
         callback(); // 继续请求
@@ -27,7 +51,22 @@ export async function startProxyServer(upstreamProxy) {
 
   // 拦截 HTTP 响应
   proxy.onResponse((ctx, callback) => {
-    pluginManager.resolvePluginModule<Bridge>(PluginType.agent)
+    const requestPath = ctx.clientToProxyRequest.url; // 获取请求路径
+    const host = ctx.clientToProxyRequest.headers.host; // 获取主机名
+
+    // 根据请求的协议构建完整的 URL
+    const protocol = ctx.isSSL ? 'https' : 'http';
+    const requestUrl = `${protocol}://${host}${requestPath}`;
+    console.log("服务器响应", ctx.serverToProxyResponse.headers)
+    pluginManager.resolvePluginModule<Bridge>(PluginType.agent, (pluginsOfType => {
+      for (const plugin of pluginsOfType) {
+        const isMatch = isUrlMatched(requestUrl, plugin.match);
+        if (isMatch) {
+          return plugin;
+        }
+      }
+      return null;
+    }))
       .then(module => {
         module.onResponse(ctx).then((body: string) => {
           if (body) {
@@ -81,14 +120,14 @@ export async function startProxyServer(upstreamProxy) {
   //   options.httpAgent = new HttpProxyAgent(proxyUrl);
   //   options.httpsAgent = new HttpsProxyAgent(proxyUrl);
   // }
-  (proxy as any)._onError_bak_ = proxy._onError;
-  proxy._onError = (kind, ctx, err) => {
-    if ((err as any).code === 'ERR_SSL_SSLV3_ALERT_CERTIFICATE_UNKNOWN') {
-      // console.log(`忽略 SSL 错误: ${ctx.clientToProxyRequest.url}`);
-      return;
-    }
-    (proxy as any)._onError_bak_(kind, ctx, err)
-  }
+  // (proxy as any)._onError_bak_ = proxy._onError;
+  // proxy._onError = (kind, ctx, err) => {
+  //   if ((err as any).code === 'ERR_SSL_SSLV3_ALERT_CERTIFICATE_UNKNOWN') {
+  //     // console.log(`忽略 SSL 错误: ${ctx.clientToProxyRequest.url}`);
+  //     return;
+  //   }
+  //   (proxy as any)._onError_bak_(kind, ctx, err)
+  // }
   // 启动代理服务器
 
   return new Promise((resolve, reject) => {

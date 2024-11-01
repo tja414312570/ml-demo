@@ -34,7 +34,7 @@
 import { ref, onMounted } from 'vue';
 import { WebviewTag } from 'electron';
 
-const url = ref('https://chatgpt.com/');
+const url = ref('https://www.doubao.com/');
 const tempUrl = ref(url.value);
 const webviews = ref<WebviewTag | null>(null);
 const isFocused = ref(false);

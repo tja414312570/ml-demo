@@ -2,7 +2,7 @@ import { execFile, exec } from 'child_process';
 import { promisify } from 'util';
 import util from 'util';
 import { IncomingHttpHeaders } from 'http';
-import { SseHandler } from './share.github';
+import { SseHandler } from './doubao';
 import { pluginContext } from 'mylib/main';
 
 // import { createWindow ,requiredWindow} from './window_manager.js';
@@ -147,78 +147,16 @@ const processResponse = async (headers:IncomingHttpHeaders|undefined, body:strin
         //处理delta编码
         const start = performance.now();
    
-        if(body.startsWith('event: delta_encoding')){
-            new SseHandler().onMessage((data:any)=>{
 
-            }).onError(err=>{
-                reject(err)
-            }).onEnd((data:any)=>{
-                const end = performance.now();
-                console.log(`解析数据耗时： ${(end - start).toFixed(2)} ms`);
-                resolve(data.message.content.parts[0]);
-            }).handler(sseData)
-            return;
-        }
-        const events = sseData.split('\n\n');
-        let completedResponse:string
-        // 遍历每个事件并处理
-        events.forEach(event => {
-            if (event.startsWith('data:')) {
-                // 去除 'data:' 前缀并整理数据
-                const eventData = event.slice(5).trim();
-                // 打印 SSE 事件数据
-                // console.log(`SSE Event Data:\n${eventData}`);
-                if (eventData) {
-                    if (eventData === '[DONE]') {
-                        // console.log("EventStream 完成，等待处理...");
-                        // for (const [key, value] of Object.entries(headers)) {
-                        //     switch (key) {
-                        //         case "content-length":
-                        //             console.log(`内容长度: ${value}`);
-                        //             break;
-                        //         case "authorization":
-                        //             console.log(`授权: ${value.slice(0, 10)}...（部分隐藏）`);
-                        //             break;
-                        //         case "accept":
-                        //             console.log(`接受内容类型: ${value}`);
-                        //             break;
-                        //         case "referer":
-                        //             console.log(`来源页面: ${value}`);
-                        //             break;
-                        //         case "cookie":
-                        //             console.log(`Cookie 信息: ${value.slice(0, 30)}...（部分隐藏）`);
-                        //             break;
-                        //         default:
-                        //             console.log(`${key}: ${value}`);
-                        //     }
-                        // }
-                        resolve(completedResponse);
-                    } else {
-                        try{
-                            const bodyData = JSON.parse(eventData);
-                            const message = bodyData.message || {};
-                            const content = message.content?.parts?.[0] || '';
-                            if (content) {
-                                completedResponse = content;
-                            }
-                        }catch(err:any){
-                            console.error(`转化json出现错误:${eventData}`)
-                            reject(err)
-                        }
-                        
-                        // const metadata = message.metadata || {};
-                        // if (metadata.model_slug) {
-                        //     console.log(`模型类型: ${metadata.model_slug}`);
-                        // }
-                        // if (metadata.model_switcher_deny) {
-                        //     metadata.model_switcher_deny.forEach((deny: { description: any; }) => {
-                        //         console.log(`模型切换原因: ${deny.description || ''}`);
-                        //     });
-                        // }
-                    }
-                }
-            }
-        });
+        new SseHandler().onMessage((data:any)=>{
+
+        }).onError(err=>{
+            reject(err)
+        }).onEnd((data:any)=>{
+            const end = performance.now();
+            console.log(`dubo解析数据耗时： ${(end - start).toFixed(2)} ms\r\n${data}\r\n`);
+            resolve(data.message.content.parts[0]);
+        }).handler(sseData)
     })
 }
 
