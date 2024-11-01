@@ -118,6 +118,14 @@ class SshExecutor
       const context = this.cache.get(id);
       if (context) {
         context.abort("用户主动终止");
+      } else {
+        resolve({
+          id: instruct.id,
+          // ret: output,
+          std: "",
+          execId: uuidv4(),
+          type: InstructResultType.completed,
+        });
       }
       pluginContext.pty.write("\x03");
       resolve();
