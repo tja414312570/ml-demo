@@ -21,13 +21,14 @@ class MainInit {
   // 主窗口函数
   createMainWindow() {
     this.mainWindow = new BrowserWindow({
-      titleBarStyle: config.IsUseSysTitle ? "default" : "hidden",
+      title: '开放解释器',
+      titleBarStyle: "hidden",
       height: 800,
       useContentSize: true,
       width: 1700,
       minWidth: 1366,
       show: false,
-      frame: config.IsUseSysTitle,
+      frame: false,
       webPreferences: {
         // webSecurity: false,
         webviewTag: true,

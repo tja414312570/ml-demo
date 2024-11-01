@@ -20,7 +20,7 @@
                 </v-treeview>
             </pane>
             <pane>
-                <div style="display: flex;flex-direction: column;height: 100%;">
+                <div style="display: flex;flex-direction: column;height: 100%;background: rgba(var(--v-theme-surface))">
                     <v-breadcrumbs :items="activatedPath">
                         <template v-slot:divider>
                             <v-icon icon="mdi-chevron-right"></v-icon>
@@ -118,6 +118,8 @@ const close = () => {
         if (result) {
             coreApi.invoke('close');
         }
+    } else {
+        coreApi.invoke('close');
     }
 }
 const newSettingsValue = reactive(new Map<string, any>());
@@ -198,7 +200,6 @@ const filterFn = function (value: any, search, item) {
 :deep(.splitpanes__splitter) {
     width: 2px;
     background: #606060;
-    margin-top: 4px;
 }
 
 .v-breadcrumbs,

@@ -126,7 +126,7 @@ codeApi.on('insertLine', (event: any, lineDiff: { code: string, line: number, ty
     console.log("执行完毕", JSON.stringify(lineDiff), type, InstructResultType.completed, (type === InstructResultType.completed || type === InstructResultType.failed))
     try {
         result.push(code)
-        if (type === InstructResultType.completed || type === InstructResultType.failed) {
+        if (type !== InstructResultType.executing) {
             isExecuting.value = false;
             if (isAutoSend.value) {
                 codeApi.send('send_execute-result', result.join('\r\n'))

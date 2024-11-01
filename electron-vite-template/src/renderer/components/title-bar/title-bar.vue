@@ -4,7 +4,7 @@
 
     <div class="region-area window-title">
       <!-- 中间标题位置 -->
-      <div class="title region-area">设置</div>
+      <div class="title region-area">{{ title }}</div>
     </div>
     <div class="menu">
       <div class="logo">
@@ -22,7 +22,7 @@
     </div>
   </div>
   <div v-else-if="!isNotMac" class="window-title region-area">
-    <div style="-webkit-app-region: drag" class="title">设置</div>
+    <div style="-webkit-app-region: drag" class="title">{{ title }}</div>
   </div>
 </template>
 
@@ -52,7 +52,10 @@ console.log(coreApi.platform)
 const isNotMac = ref(coreApi.platform !== 'darwin');
 // const IsWeb = ref(Boolean(__ISWEB__));
 const IsWeb = ref(Boolean(false));
-
+const title = ref('')
+api.invoke('title').then((result: string) => {
+  title.value = result;
+})
 // isNotMac.value = systemInfo.platform !== "darwin";
 
 // ipcRendererChannel.IsUseSysTitle.invoke().then((res) => {

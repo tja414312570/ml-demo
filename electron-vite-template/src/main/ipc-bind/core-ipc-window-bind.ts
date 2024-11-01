@@ -52,3 +52,8 @@ ipcMain.handle('ipc-core.window.isFullScreen', (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     return window ? window.isFullScreen() : false;
 });
+
+ipcMain.handle('ipc-core.window.title', (event, id: string) => {
+    const currentWindow = BrowserWindow.fromWebContents(event.sender);
+    return currentWindow.title;
+});

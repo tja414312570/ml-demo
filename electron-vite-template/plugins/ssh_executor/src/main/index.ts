@@ -124,7 +124,7 @@ class SshExecutor
           // ret: output,
           std: "",
           execId: uuidv4(),
-          type: InstructResultType.completed,
+          type: InstructResultType.abort,
         });
       }
       pluginContext.pty.write("\x03");

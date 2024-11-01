@@ -1,6 +1,5 @@
 <template>
-    <div>
-        <!-- 插件列表 -->
+    <div style="overflow: scroll;"><!-- 插件列表 -->
         <v-progress-linear v-show="loading" color="teal" indeterminate stream></v-progress-linear>
         <v-list>
             <v-list-item v-for="plugin in plugins" :key="plugin.id" class="plugin-item">

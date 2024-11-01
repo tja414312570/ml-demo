@@ -239,63 +239,6 @@ onMounted(() => {
     loadLayout();
   });
 });
-const menuData: MenuOptions = {
-  x: 0,
-  y: 0,
-  items: [
-    {
-      label: "文件",
-      children: [
-        { label: "New" },
-        { label: "Open" },
-        {
-          label: "Open recent",
-          children: [
-            { label: "File 1...." },
-            { label: "File 2...." },
-            { label: "File 3...." },
-            { label: "File 4...." },
-            { label: "File 5...." },
-          ],
-        },
-        { label: "Save", divided: true },
-        { label: "Save as..." },
-        { label: "Close" },
-        { label: "Exit" },
-      ],
-    },
-    {
-      label: "编辑",
-      children: [
-        { label: "Undo" },
-        { label: "Redo" },
-        { label: "Cut", divided: true },
-        { label: "Copy" },
-        { label: "Find", divided: true },
-        { label: "Replace" },
-      ],
-    },
-    {
-      label: "窗口",
-      children: [
-        { label: "Zoom in" },
-        { label: "Zoom out" },
-        { label: "Reset zoom" },
-        { label: "Full screent", divided: true },
-        { label: "Find", divided: true },
-        { label: "Replace" },
-      ],
-    },
-    {
-      label: "帮助",
-      children: [
-        { label: "关于" },
-      ],
-    },
-  ],
-  zIndex: 3,
-  minWidth: 230,
-};
 </script>
 
 <style lang="css" scoped>

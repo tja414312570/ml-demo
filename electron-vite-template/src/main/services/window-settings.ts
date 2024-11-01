@@ -25,16 +25,18 @@ export const createWindow = () => {
         },
     });
     mainWindow.loadURL(settingURL);
-    mainWindow.webContents.openDevTools({
-        mode: "undocked",
-        activate: true,
-    });
+    // mainWindow.webContents.openDevTools({
+    //     mode: "undocked",
+    //     activate: true,
+    // });
     mainWindow.webContents.on('will-attach-webview', (e, webPreferences) => {
         webPreferences.webSecurity = false
         webPreferences.allowRunningInsecureContent = true
         // webPreferences.preload = getPreloadFile('webview')
     })
-    mainWindow.show()
+    mainWindow.once("ready-to-show", () => {
+        mainWindow.show();
+    })
 }
 
 registeMenu({
