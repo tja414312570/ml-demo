@@ -83,8 +83,12 @@ class ExecuteContext {
 
 class NodeExecutor
   extends AbstractPlugin
-  implements Pluginlifecycle, InstructExecutor {
+  implements Pluginlifecycle, InstructExecutor
+{
   private executeContext: null | ExecuteContext = null;
+  currentTask(): string[] {
+    return this.executeContext ? [""] : [];
+  }
   abort(instruct: InstructContent): Promise<InstructResult | void> {
     if (!this.executeContext) {
       return Promise.reject(new Error("没有找到正在执行的指令"));
@@ -125,7 +129,7 @@ class NodeExecutor
         const virtualWindow = new VirtualWindow();
         const line = code.split(/\r?\n/).length;
         const render = (data: string, type: InstructResultType) => {
-          console.log(data)
+          console.log(data);
           virtualWindow.write(data);
           const output = virtualWindow.render();
           pluginContext.sendIpcRender("code-view-api.insertLine", {
@@ -243,7 +247,7 @@ class NodeExecutor
 
   onMounted(ctx: PluginExtensionContext): void {
     // 插件挂载时的处理逻辑
-    console.log("插件工作目录:", pluginContext.workPath)
+    console.log("插件工作目录:", pluginContext.workPath);
   }
 
   onUnmounted(ctx: PluginExtensionContext): void {

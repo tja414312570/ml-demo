@@ -29,14 +29,14 @@ class PluginManager {
         delete this.idMapping[pluginInfo.id];
         this.typeMapping.remove(pluginInfo.type, pluginInfo)
     }
-    public getPluginsFromType(type: PluginType): Set<PluginInfo> | undefined | null {
-        return this.typeMapping.get(type);
+    public getPluginsFromType(type: PluginType): Array<PluginInfo> | undefined | null {
+        return Array.from(this.typeMapping.get(type));
     }
-    public getAllPlugins(): Set<PluginInfo> {
-        return this.pluginSet;
+    public getAllPlugins(): Array<PluginInfo> {
+        return Array.from(this.pluginSet);
     }
 
-    public filtePlugins(condition: PluginInfo): Set<PluginInfo> {
+    public filtePlugins(condition: PluginInfo): PluginInfo[] {
         let allPlugins = Array.from(this.getAllPlugins());
         if (condition) {
             for (let key in condition) {
@@ -54,12 +54,11 @@ class PluginManager {
                 }
             }
         }
-        return new Set(allPlugins);
+        return allPlugins;
     }
     public getPluginFromId(id: string): PluginInfo {
         return this.idMapping[id];
     }
-
 
     private wrapperModule(pluginInfo: PluginInfo) {
         const proxyHandler: ProxyHandler<any> | any = {
@@ -83,10 +82,10 @@ class PluginManager {
         }
         return new Proxy(pluginInfo.module, proxyHandler);
     }
-    resolvePluginModule<T>(type: PluginType, filter?: (pluginsOfType: Set<PluginInfo>) => PluginInfo | Set<PluginInfo> | undefined): Promise<T> {
+    resolvePluginModule<T>(type: PluginType, filter?: (pluginsOfType: Array<PluginInfo>) => PluginInfo | Array<PluginInfo> | undefined): Promise<T> {
         return new Promise<T>((resolve, rejects) => {
-            let pluginsOfType: Set<PluginInfo> | PluginInfo | undefined = this.getPluginsFromType(type);
-            if (!pluginsOfType || pluginsOfType.size === 0) {
+            let pluginsOfType: Array<PluginInfo> | PluginInfo | undefined = this.getPluginsFromType(type);
+            if (!pluginsOfType || pluginsOfType.length === 0) {
                 rejects(`类型${type}没有相关注册插件!`)
                 return;
             }

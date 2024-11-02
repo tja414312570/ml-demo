@@ -23,7 +23,7 @@ ipcMain.handle('code-view-api.execute.stop', (event, code: InstructContent) => {
 export const stopExecute = async (code_body: InstructContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language, executor } = code_body;
-    pluginManager.resolvePluginModule(PluginType.executor, (pluginInfoList: Set<PluginInfo>) => {
+    pluginManager.resolvePluginModule(PluginType.executor, (pluginInfoList: Array<PluginInfo>) => {
         if (executor) {
             return pluginManager.getPluginFromId(executor);
         }
@@ -58,7 +58,7 @@ export const executeCode = async (code_body: InstructContent) => {
     console.log(`执行代码:\n${JSON.stringify(code_body)}`);
     const { code, language, executor } = code_body;
 
-    pluginManager.resolvePluginModule(PluginType.executor, (pluginInfoList: Set<PluginInfo>) => {
+    pluginManager.resolvePluginModule(PluginType.executor, (pluginInfoList: Array<PluginInfo>) => {
         if (executor) {
             return pluginManager.getPluginFromId(executor);
         }

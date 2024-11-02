@@ -19,6 +19,7 @@ import CodeDiff from './CodeDiff.vue';
 import { getIpcApi } from '@lib/preload/ipc-api';
 import { IpcEventHandler } from '@renderer/ts/default-ipc';
 import context from '@renderer/context';
+import { InstructResultType } from '@lib/main';
 
 
 const code = ref<string>(`
@@ -104,10 +105,11 @@ function removeInlineDiff(editor) {
 }
 // let app; (async () => app = (await import('@renderer/main')).default)();
 // 插入 Vue 组件作为 ViewZone 的内容
-function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber: number, diffContent: string, execId: string) {
+function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNumber: number, diffContent: string, execId: string, type: InstructResultType) {
   const viewContext = viewZones.get(execId);
   if (viewContext) {
     viewContext.prop.content.value = diffContent;
+    viewContext.prop.isCompleted.value = (type !== InstructResultType.executing)
     const ovsolve = () => {
       requestAnimationFrame(() => {
         // 获取渲染后 DOM 的实际高度
@@ -145,6 +147,7 @@ function insertVueInlineDiff(editor: monaco.editor.IStandaloneCodeEditor, lineNu
     const viewZoneId = accessor.addZone(viewZone);
     const $ref = ref(null);
     const prop = {
+      isCompleted: ref(type !== InstructResultType.executing),
       content: ref(diffContent), del: () => {
         render(null, domNode);
         editor.changeViewZones((accessor) => { accessor.removeZone(viewZoneId) })
@@ -199,11 +202,11 @@ codeApi.on('code', (event: any, code_content: InstructContent) => {
   removeInlineDiff(editor.value)
 })
 
-codeApi.on('insertLine', (event: any, lineDiff: { code: string, line: number, execId: string }) => {
-  const { code, line, execId } = lineDiff;
+codeApi.on('insertLine', (event: any, lineDiff: { code: string, line: number, execId: string, type: InstructResultType }) => {
+  const { code, line, execId, type } = lineDiff;
   console.log("执行完毕", JSON.stringify(lineDiff))
   try {
-    insertVueInlineDiff(editor.value, line, code, execId);
+    insertVueInlineDiff(editor.value, line, code, execId, type);
   } catch (error) {
     console.error(`执行出错:`, error);
     // 你可以在这里添加自定义的错误处理，例如发送通知或日志记录

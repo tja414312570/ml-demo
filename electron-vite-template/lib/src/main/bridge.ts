@@ -19,6 +19,7 @@ export type InstructResult = {
     execId: string,
 }
 export interface InstructExecutor {
+    currentTask(): string[];
     execute(instruct: InstructContent): Promise<InstructResult | void>
     abort(instruct: InstructContent): Promise<InstructResult | void>
 }

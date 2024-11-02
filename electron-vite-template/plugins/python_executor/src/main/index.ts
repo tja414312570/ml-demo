@@ -82,6 +82,9 @@ class PythonExecutor
   extends AbstractPlugin
   implements InstructExecutor, Pluginlifecycle
 {
+  currentTask(): string[] {
+    return this.executeContext ? [""] : [];
+  }
   private executeContext: null | ExecuteContext = null;
 
   abort(instruct: InstructContent): Promise<InstructResult | void> {

@@ -112,7 +112,10 @@ class SshExecutor
   extends AbstractPlugin
   implements InstructExecutor, Pluginlifecycle
 {
-  private cache: Map<String, ExecuteContext> = new Map();
+  private cache: Map<string, ExecuteContext> = new Map();
+  currentTask(): string[] {
+    return [...this.cache.keys()];
+  }
   abort(instruct: InstructContent): Promise<InstructResult | void> {
     return new Promise((resolve) => {
       const { id } = instruct;

@@ -15,7 +15,7 @@
                 <v-icon small v-bind="props" @click="executeCode" color="blue">{{ isExecuting ? 'mdi-close' :
                     'mdi-play-outline' }}</v-icon>
             </template>
-            <span>执行代码</span>
+            <span>{{ isExecuting ? '停止执行' : '停止所有代码执行' }}</span>
         </v-tooltip>
         <v-progress-circular v-show='isExecuting' color="purple" :width="3" indeterminate
             size="16"></v-progress-circular>
@@ -38,6 +38,14 @@
             </template>
             <span>{{ isAutoSend ? '自动发送执行结果' : '手动发送执行结果' }}</span>
         </v-tooltip>
+        <v-tooltip location="bottom">
+            <template v-slot:activator="{ props }">
+                <v-icon small v-bind="props" @click="toggleAutoSend"
+                    :color="runing > 0 ? 'green' : 'grey'">mdi-close-circle-multiple-outline</v-icon>
+            </template>
+            <span>{{ isAutoSend ? '关闭所有任务' : '没有运行中的任务' }}</span>
+        </v-tooltip>
+
     </div>
 </template>
 
@@ -88,7 +96,17 @@ watch(
     },
     { deep: true } // 深度监听对象
 );
-
+const runing = ref(0);
+const refreshPluginStatus = (id: string) => {
+    pluginViewApi.invoke('get-plugin-tasks', { id }).then(tasks => {
+        runing.value = tasks.length
+    })
+}
+refreshPluginStatus(selected.value);
+watch(selected, (newValue) => {
+    console.log("获取插件的任务:", newValue)
+    refreshPluginStatus(newValue);
+})
 // 监听对象变化
 watch(
     () => props.code,
@@ -122,8 +140,8 @@ const toggleAutoSend = () => {
 };
 let result = [];
 codeApi.on('insertLine', (event: any, lineDiff: { code: string, line: number, type: InstructResultType }) => {
+    refreshPluginStatus(selected.value);
     const { code, line, type } = lineDiff;
-    console.log("执行完毕", JSON.stringify(lineDiff), type, InstructResultType.completed, (type === InstructResultType.completed || type === InstructResultType.failed))
     try {
         result.push(code)
         if (type !== InstructResultType.executing) {

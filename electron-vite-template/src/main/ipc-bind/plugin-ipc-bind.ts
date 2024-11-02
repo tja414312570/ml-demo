@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import _ from 'lodash';  // 使用 ES6 import 语法
-import { Bridge, PluginInfo, PluginType } from '@lib/main';
+import { Bridge, InstructExecutor, PluginInfo, PluginType } from '@lib/main';
 import pluginManager from "@main/plugin/plugin-manager";
 import { getAgentFromUrl } from "@main/services/proxy";
 
@@ -27,16 +27,16 @@ const arrayPool = {
 const _clone = (pluginInfo: PluginInfo) => {
     return _.omit(pluginInfo, ['getModule', 'proxy', 'module'])
 }
-const copy = (pluginList: undefined | null | PluginInfo | Set<PluginInfo>) => {
+const copy = (pluginList: undefined | null | PluginInfo | PluginInfo[]) => {
     if (!pluginList) {
         return null;
     }
-    if (typeof pluginList === 'object' && !(pluginList instanceof Set)) {
+    if (typeof pluginList === 'object' && !(pluginList instanceof Array)) {
         return _clone(pluginList);
     }
     const list = arrayPool.acquire();
     list.length = 0;  // 清空数组
-    if (pluginList instanceof Set) {
+    if (pluginList instanceof Array) {
         for (const plugin of pluginList) {
             list.push(_clone(plugin));
         }
@@ -48,6 +48,12 @@ const copy = (pluginList: undefined | null | PluginInfo | Set<PluginInfo>) => {
 ipcMain.handle('plugin-view-api.get-plugin-list', (event, args) => {
     const cloneObj = copy(pluginManager.filtePlugins(args));
     return cloneObj;
+})
+
+ipcMain.handle('plugin-view-api.get-plugin-tasks', (event, args) => {
+    const plugin = pluginManager.filtePlugins(args);
+    const instance = pluginManager.getModule(plugin[0] as any) as InstructExecutor;
+    return instance.currentTask();
 })
 
 ipcMain.handle('plugin-view-api.plugin-reload', (event, id: string) => {
@@ -65,6 +71,5 @@ ipcMain.handle('load-script', (event, url) => {
         } catch (err) {
             reject(err)
         }
-
     })
 });
