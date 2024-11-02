@@ -41,8 +41,15 @@ export interface PluginProxy {
     getModule(): any
 }
 
-
+export interface ResourceManager {
+    require: <T>(id: string) => Promise<T>;
+    put: (id: string, resource: any) => void;
+}
+export enum ResourceStatus {
+    RESOURCE_NOT_FOUND
+}
 export interface PluginExtensionContext {
+    resourceManager: ResourceManager;
     _pluginPath: string;
     workPath: string;
     /**
@@ -60,7 +67,6 @@ export interface PluginExtensionContext {
      */
     notifyManager: { notify: (message: string) => void, notifyError: (message: string) => void }
     ipcMain: IIpcMain;
-    pty: IPty
     appPath: string
 
     sendIpcRender: (event_: string, message: any) => void

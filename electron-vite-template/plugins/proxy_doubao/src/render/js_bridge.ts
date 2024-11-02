@@ -19,6 +19,24 @@ const _observer = new MutationObserver(function (mutationsList, observer) {
 _observer.observe(document.body, { childList: true, subtree: true });
 // 开始观察整个 body 元素，检测子节点变化
 
+const setNativeValue = (el: any, value: any) => {
+  const previousValue = el.value;
+
+  if (el.type === "checkbox" || el.type === "radio") {
+    if ((!!value && !el.checked) || (!!!value && el.checked)) {
+      el.click();
+    }
+  } else el.value = value;
+
+  const tracker = el._valueTracker;
+  if (tracker) {
+    tracker.setValue(previousValue);
+  }
+
+  // 'change' instead of 'input', see https://github.com/facebook/react/issues/11488#issuecomment-381590324
+  el.dispatchEvent(new Event("change", { bubbles: true }));
+};
+
 const js_bridge = () => {
   if (_doc.myApp) {
     console.log("桥接程序已初始化", _doc.myApp);
@@ -56,23 +74,26 @@ const js_bridge = () => {
         alert("界面异常，没有找到表单组件");
         return;
       }
-      if (textarea.tagName.toLowerCase() === "textarea") {
-        textarea.textContent = message; // 对 textarea 赋值
-      }
-      // 判断是否为 contenteditable 的 div
-      else if (textarea.getAttribute("contenteditable") === "true") {
-        textarea.textContent = message; // 对 contenteditable 的 div 赋值
-      } else {
-        console.error(
-          "元素既不是 textarea 也不是 contenteditable 的 div",
-          textarea
-        );
-        alert("输入框不支持");
-        return;
-      }
-      // 触发 input 事件，确保 React 或 Vue 等框架监听的事件能够捕捉到变化
-      let inputEvent = new Event("input", { bubbles: true });
-      textarea.dispatchEvent(inputEvent);
+      setNativeValue(textarea, message);
+      // textarea.focus();
+      // if (textarea.tagName.toLowerCase() === "textarea") {
+      //   textarea.textContent = message; // 对 textarea 赋值
+      //   // textarea.value = message;
+      // }
+      // // 判断是否为 contenteditable 的 div
+      // else if (textarea.getAttribute("contenteditable") === "true") {
+      //   textarea.textContent = message; // 对 contenteditable 的 div 赋值
+      // } else {
+      //   console.error(
+      //     "元素既不是 textarea 也不是 contenteditable 的 div",
+      //     textarea
+      //   );
+      //   alert("输入框不支持");
+      //   return;
+      // }
+      // // 触发 input 事件，确保 React 或 Vue 等框架监听的事件能够捕捉到变化
+      // let inputEvent = new Event("input", { bubbles: true });
+      // textarea.dispatchEvent(inputEvent);
       console.log("输入值完成", message);
       // 立即点击按钮
       let times = 0;

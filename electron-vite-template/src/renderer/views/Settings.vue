@@ -111,7 +111,7 @@ loading.value = true;
 const filterItems = (items: Setting[]): Setting[] => {
     return items
         .map(item => {
-            // 只保留匹配的节点
+            // 只保留匹配的节点0
             if (item.hide !== true) {
                 if (item.subs) {
                     item.subs = filterItems(item.subs);

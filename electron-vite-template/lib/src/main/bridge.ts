@@ -8,7 +8,8 @@ export interface Bridge {
 export const  enum InstructResultType {
     executing = "executing",
     completed = "completed",
-    failed = "failed"
+    failed = "failed",
+    abort = "abort"
 }
 export type InstructResult = {
     id: string,

@@ -1,8 +1,8 @@
 "use strict";
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Promise Rejection:', reason);
-  process.exit(1); // 以非零状态码退出程序
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//   console.error('Unhandled Promise Rejection:', reason);
+//   process.exit(1); // 以非零状态码退出程序
+// });
 import { useMainDefaultIpc } from "./services/ipc-main";
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, session } from "electron";
 import { MainInit } from "./services/window-manager";
@@ -12,7 +12,7 @@ import { useMenu } from "@main/hooks/menu-hook"
 import { startProxyServer } from "./services/proxy";
 
 import fs, { glob } from "fs"
-import { init as ptyInit } from './services/pty'
+import { init as ptyInit } from './services/service-inner-shell'
 import { notify } from "./ipc/notify-manager";
 import { listeners } from "process";
 import pluginContext from '../../lib/src/main/plugin-context'

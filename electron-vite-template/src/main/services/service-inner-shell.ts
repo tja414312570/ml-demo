@@ -1,9 +1,7 @@
 import { send_ipc_render } from "@main/ipc/send_ipc";
-import { wrapper } from "@main/plugin/Iproxy";
-import { pluginContext } from "@lib/main";
-import { IPty } from '@lib/main'
 import { ipcMain } from "electron";
 import * as pty from 'node-pty';
+import resourceManager from "@main/plugin/resource-manager";
 let isinit = false;
 function init() {
     console.log(new Error(isinit + ''))
@@ -15,7 +13,7 @@ function init() {
     try {
         // 创建 PTY 实例
         const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
-        console.log("启动PTY shell:", shell);
+        console.log("启动shell:", shell);
         const ptyProcess = pty.spawn(shell, [], {
             name: 'xterm-color',
             cols: 80,
@@ -23,8 +21,7 @@ function init() {
             cwd: process.env.HOME,
             env: process.env,
         });
-        pluginContext.pty = wrapper<IPty>(ptyProcess);
-        (pluginContext.pty as any).type = shell;
+        resourceManager.put('pty', ptyProcess)
         // 监听输入事件
         ipcMain.on('pty.terminal-input', (event, input) => {
             ptyProcess.write(input);

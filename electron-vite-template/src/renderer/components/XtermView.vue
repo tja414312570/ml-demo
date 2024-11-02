@@ -101,7 +101,6 @@ onMounted(async () => {
   terminal.writeln('Welcome to chat interpter');
   // ipcRenderer.send("terminal-into", "ls -ila\r");
 
-  terminal.prompt();
   terminal.focus();
   terminal.onResize((size) => {
     const { cols, rows } = size;

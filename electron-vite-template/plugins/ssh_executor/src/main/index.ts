@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import VirtualWindow from "./virtual-window";
 import fs from "fs";
 import path from "path";
+import { IDisposable, IPty } from "node-pty";
 
 const removeInvisibleChars = (str: string) => {
   // 移除 ANSI 转义序列 (\u001b 是转义字符, \[\d*(;\d*)*m 匹配 ANSI 的样式)
@@ -127,7 +128,6 @@ class SshExecutor
           type: InstructResultType.abort,
         });
       }
-      pluginContext.pty.write("\x03");
       resolve();
     });
   }
@@ -135,13 +135,13 @@ class SshExecutor
   execute(instruct: InstructContent): Promise<InstructResult> {
     const { id, code } = instruct;
     const execId = uuidv4();
-    return new Promise((resolve, reject) => {
+    const line = code.split(/\r?\n/).length;
+    return new Promise(async (resolve, reject) => {
       if (this.cache.has(id)) {
         throw new Error("代码正在执行中");
       }
       const executeContext = new ExecuteContext();
       const virtualWindow = new VirtualWindow();
-      const line = code.split(/\r?\n/).length;
       const render = (data: string, type: InstructResultType) => {
         virtualWindow.write(data);
         const output = virtualWindow.render();
@@ -153,37 +153,11 @@ class SshExecutor
           type,
         });
       };
-
-      this.cache.set(id, executeContext);
-      executeContext.onWrite((data) => pluginContext.pty.write(data));
-      // const path_ = path.join(__dirname, "frames.txt");
-
-      // let frame = 0;
-      const disable = pluginContext.pty.onData((data: string) => {
-        render(data, InstructResultType.executing);
-        const output = virtualWindow.render();
-        // fs.appendFileSync(path_,"\r\n=========================原始帧【"+(frame++)+'\r\n')
-        // fs.appendFileSync(path_,debug(data),'utf-8')
-        // fs.appendFileSync(path_,"\r\n-------------------------渲染帧【"+(frame++)+'\r\n')
-        // fs.appendFileSync(path_,debug(output).replace(/\x0a/g,'\r\n'),'utf-8')
-        executeContext.callData(output);
-      });
+      let dispose: IDisposable;
       const destory = () => {
-        disable.dispose();
+        dispose?.dispose();
         this.cache.delete(id);
       };
-      executeContext.onEnd((data?: string) => {
-        render(data ? data : "", InstructResultType.completed);
-        const output = virtualWindow.render();
-        resolve({
-          id: instruct.id,
-          // ret: output,
-          std: output,
-          execId,
-          type: InstructResultType.completed,
-        });
-        destory();
-      });
       executeContext.onError((err) => {
         render(`程序异常:${err}`, InstructResultType.completed), destory();
         const output = virtualWindow.render();
@@ -195,45 +169,80 @@ class SshExecutor
           type: InstructResultType.completed,
         });
       });
-      executeContext.onAbort((err) => {
-        render(`程序终止执行:${err}`, InstructResultType.completed), destory();
-        const output = virtualWindow.render();
-        resolve({
-          id: instruct.id,
-          // ret: output,
-          std: output,
-          execId,
-          type: InstructResultType.completed,
-        });
-      });
+      try {
+        const pty = await pluginContext.resourceManager.require<IPty>("pty");
+        this.cache.set(id, executeContext);
+        executeContext.onWrite((data) => pty.write(data));
+        // const path_ = path.join(__dirname, "frames.txt");
 
-      const code_splits = instruct.code
-        .split(/\r?\n/)
-        .filter((line) => line.trim() && !/^\s*(#|REM|::)/i.test(line));
-      (async () => {
-        for (const instruct of code_splits) {
-          try {
-            const exitCode = await this.executeLine(
-              id,
-              instruct,
-              line,
-              execId,
-              executeContext
-            );
-            if (!isCommandSuccessful(exitCode)) {
-              executeContext.abort(`程序异常退出，退出码${exitCode}`);
-              break;
+        // let frame = 0;
+        dispose = pty.onData((data: string) => {
+          render(data, InstructResultType.executing);
+          const output = virtualWindow.render();
+          // fs.appendFileSync(path_,"\r\n=========================原始帧【"+(frame++)+'\r\n')
+          // fs.appendFileSync(path_,debug(data),'utf-8')
+          // fs.appendFileSync(path_,"\r\n-------------------------渲染帧【"+(frame++)+'\r\n')
+          // fs.appendFileSync(path_,debug(output).replace(/\x0a/g,'\r\n'),'utf-8')
+          executeContext.callData(output);
+        });
+
+        executeContext.onEnd((data?: string) => {
+          render(data ? data : "", InstructResultType.completed);
+          const output = virtualWindow.render();
+          resolve({
+            id: instruct.id,
+            // ret: output,
+            std: output,
+            execId,
+            type: InstructResultType.completed,
+          });
+          destory();
+        });
+
+        executeContext.onAbort((err) => {
+          pty.write("\x03");
+          render(`程序终止执行:${err}`, InstructResultType.completed),
+            destory();
+          const output = virtualWindow.render();
+          resolve({
+            id: instruct.id,
+            // ret: output,
+            std: output,
+            execId,
+            type: InstructResultType.completed,
+          });
+        });
+
+        const code_splits = instruct.code
+          .split(/\r?\n/)
+          .filter((line) => line.trim() && !/^\s*(#|REM|::)/i.test(line));
+        (async () => {
+          for (const instruct of code_splits) {
+            try {
+              const exitCode = await this.executeLine(
+                id,
+                instruct,
+                line,
+                execId,
+                executeContext
+              );
+              if (!isCommandSuccessful(exitCode)) {
+                executeContext.abort(`程序异常退出，退出码${exitCode}`);
+                break;
+              }
+              // 如果需要在执行成功后处理 result，可以在这里添加逻辑
+            } catch (error: any) {
+              // 在此捕获执行过程中可能发生的错误
+              console.error(`Error executing line: ${instruct}`, error);
+              executeContext.error(error);
+              break; // 如果发生错误，可以选择中断循环
             }
-            // 如果需要在执行成功后处理 result，可以在这里添加逻辑
-          } catch (error: any) {
-            // 在此捕获执行过程中可能发生的错误
-            console.error(`Error executing line: ${instruct}`, error);
-            executeContext.error(error);
-            break; // 如果发生错误，可以选择中断循环
           }
-        }
-        executeContext.end();
-      })();
+          executeContext.end();
+        })();
+      } catch (error: any) {
+        executeContext.error(error);
+      }
     });
   }
 

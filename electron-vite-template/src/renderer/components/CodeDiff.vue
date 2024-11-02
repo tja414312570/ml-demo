@@ -57,7 +57,7 @@ defineExpose({
 const props = defineProps<Props>();
 
 const ansiUp = new AnsiUp();
-const view = ref('')
+const view = ref(props.content.value)
 watch(
     () => props.content,
     (newValue) => {
