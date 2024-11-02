@@ -56,12 +56,14 @@ class MainInit {
   public loadWindow: BrowserWindow = null;
   public mainWindow: BrowserWindow = null;
   private childProcessGone = null;
+  private proxy: string;
 
-  constructor() {
+  constructor(proxy: string) {
     const { childProcessGone } = useProcessException();
     this.winURL = winURL;
     this.shartURL = loadingURL;
     this.childProcessGone = childProcessGone;
+    this.proxy = proxy;
   }
   // 主窗口函数
   createMainWindow() {
@@ -119,7 +121,7 @@ class MainInit {
     })
 
     ses.setProxy({
-      proxyRules: 'http://127.0.0.1:3001',  // 代理地址
+      proxyRules: this.proxy,  // 代理地址
       proxyBypassRules: 'localhost'  // 忽略本地流量
     }).then(() => {
       console.log('Proxy set successfully');

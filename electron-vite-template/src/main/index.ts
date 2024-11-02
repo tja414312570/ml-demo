@@ -28,7 +28,7 @@ import './services/service-setting'
 import './services/service-menu'
 import "./services/window-settings";
 import { handleChannelEvent } from "./services/web-content-listener";
-function onAppReady() {
+function onAppReady(proxy: string) {
   // const { disableF12 } = useDisableButton();
   // const { renderProcessGone } = useProcessException();
   // const { defaultIpc } = useMainDefaultIpc()
@@ -38,7 +38,7 @@ function onAppReady() {
   // defaultIpc();
   // creactMenu()
 
-  new MainInit().initWindow();
+  new MainInit(proxy).initWindow();
   // createWindow();
   if (process.env.NODE_ENV === "development") {
     const { VUEJS_DEVTOOLS } = require("electron-devtools-vendor");
@@ -72,7 +72,7 @@ handleChannelEvent('ipc-notify.show-notification', {
 })
 app.whenReady().then(() => {
   startProxyServer().then(proxy => {
-    onAppReady();
+    onAppReady(`http://${proxy.httpHost}:${proxy.httpPort}`);
     pluginManager.loadPluginFromDir(innerPluginPath)
   })
 });

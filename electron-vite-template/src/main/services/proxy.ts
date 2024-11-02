@@ -4,8 +4,8 @@ import { info } from '../utils/logger'
 import pluginManager from '@main/plugin/plugin-manager';
 import { PluginType } from '@lib/main';
 import { Bridge } from '@lib/main';
-import { notifyError } from '@main/ipc/notify-manager';
 import { dispatch } from './dispatcher';
+import portscanner from 'portscanner';
 function isUrlMatched(url, patterns) {
   return patterns.some(pattern => {
     const regexPattern = pattern.replace(/\*/g, '.*').replace(/([.+?^${}()|[\]\\])/g, '\\$1');
@@ -123,16 +123,35 @@ export async function startProxyServer() {
     }
     (proxy as any)._onError_bak_(kind, ctx, err)
   }
-  // 启动代理服务器
 
-  return new Promise((resolve, reject) => {
-    proxy.listen(options, (err) => {
-      if (err) {
-        reject(err)
+  const getAvailableConfig = async (options: IProxyOptions): Promise<IProxyOptions> => {
+    try {
+      const status = await portscanner.checkPortStatus(options.port, options.host);
+      if (status === 'open') {
+        console.log(`端口 ${options.port} 已被使用.`);
+        options.port += 1; // 增加端口
+        return getAvailableConfig(options); // 递归调用
       } else {
-        console.log('http-mitm-proxy server started on port 3001');
-        resolve(proxy);
+        return options; // 端口可用，返回配置
       }
-    });
+    } catch (err) {
+      console.error(`检查端口时发生错误: ${err}`);
+      throw err; // 抛出错误
+    }
+  };
+
+  return new Promise<Proxy>(async (resolve, reject) => {
+    getAvailableConfig(options).then(option => {
+      proxy.listen(option, (err) => {
+        if (err) {
+          reject(err)
+        } else {
+          console.log(`http-mitm-proxy server started on port ${option.host}:${option.port}`);
+          resolve(proxy);
+        }
+      });
+    }).catch(err => {
+      reject(err)
+    })
   });
 }
