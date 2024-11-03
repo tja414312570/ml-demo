@@ -4,14 +4,14 @@ import { join } from "path";
 import { say } from "cfonts";
 import { deleteAsync } from "del";
 import chalk from "chalk";
-import { rollup, OutputOptions } from "rollup";
-import { Listr } from "listr2";
+import { rollup, OutputOptions, RollupOptions } from "rollup";
+import { DefaultRenderer, Listr } from "listr2";
 import rollupOptions from "./rollup.config";
 import { errorLog, doneLog } from "./log";
 
-const mainOpt = rollupOptions(process.env.NODE_ENV, "main");
-const preloadOpt = rollupOptions(process.env.NODE_ENV, "preload");
-const pluginsOpt = rollupOptions(process.env.NODE_ENV, "executor");
+const mainOpt = rollupOptions(process.env.NODE_ENV, "main") as RollupOptions;
+const preloadOpt = rollupOptions(process.env.NODE_ENV, "preload") as RollupOptions[];
+// const pluginsOpt = rollupOptions(process.env.NODE_ENV, "executor");
 const isCI = process.env.CI || false;
 
 if (process.env.BUILD_TARGET === "web") web();
@@ -29,6 +29,24 @@ async function clean() {
   ]);
   doneLog(`clear done`);
   if (process.env.BUILD_TARGET === "onlyClean") process.exit();
+}
+function buildPreload() {
+  const tasks: any[] = [];
+  for (const preload of preloadOpt) {
+    tasks.push({
+      title: "building preload process",
+      task: async () => {
+        try {
+          const build = await rollup(preload);
+          await build.write(preload.output as OutputOptions);
+        } catch (error) {
+          errorLog(`failed to build main process\n`);
+          return Promise.reject(error);
+        }
+      },
+    })
+  }
+  return tasks;
 }
 
 async function unionBuild() {
@@ -49,29 +67,19 @@ async function unionBuild() {
           }
         },
       },
-      {
-        title: "building preload process",
-        task: async () => {
-          try {
-            const build = await rollup(preloadOpt);
-            await build.write(preloadOpt.output as OutputOptions);
-          } catch (error) {
-            errorLog(`failed to build main process\n`);
-            return Promise.reject(error);
-          }
-        },
-      }, {
-        title: "building plugin process",
-        task: async () => {
-          try {
-            const build = await rollup(pluginsOpt);
-            await build.write(pluginsOpt.output as OutputOptions);
-          } catch (error) {
-            errorLog(`failed to build main process\n`);
-            return Promise.reject(error);
-          }
-        },
-      },
+      ...buildPreload(),
+      //  {
+      //   title: "building plugin process",
+      //   task: async () => {
+      //     try {
+      //       const build = await rollup(pluginsOpt);
+      //       await build.write(pluginsOpt.output as OutputOptions);
+      //     } catch (error) {
+      //       errorLog(`failed to build main process\n`);
+      //       return Promise.reject(error);
+      //     }
+      //   },
+      // },
       {
         title: "building renderer process",
         task: async (_, tasks) => {
@@ -122,3 +130,4 @@ function greeting() {
   } else console.log(chalk.yellow.bold(`\n  let's-build`));
   console.log();
 }
+
