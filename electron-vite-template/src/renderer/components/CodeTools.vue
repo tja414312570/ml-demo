@@ -40,10 +40,10 @@
         </v-tooltip>
         <v-tooltip location="bottom">
             <template v-slot:activator="{ props }">
-                <v-icon small v-bind="props" @click="toggleAutoSend"
+                <v-icon small v-bind="props" @click="closeAll"
                     :color="runing > 0 ? 'green' : 'grey'">mdi-close-circle-multiple-outline</v-icon>
             </template>
-            <span>{{ isAutoSend ? '关闭所有任务' : '没有运行中的任务' }}</span>
+            <span>{{ runing > 0 ? '关闭所有任务' : '没有运行中的任务' }}</span>
         </v-tooltip>
 
     </div>
@@ -134,6 +134,23 @@ const toggleAutoExecute = () => {
     if (isAutoRunEnabled.value) {
         executeCode(); // 自动执行
     }
+};
+const closeAll = () => {
+    pluginViewApi.invoke('get-plugin-tasks', { id: selected.value }).then(tasks => {
+        const promises = tasks.map(id =>
+            codeApi.invoke("execute.stop", { id, executor: selected.value } as InstructContent)
+        );
+
+        // 使用 Promise.all 等待所有 Promise 执行完成
+        Promise.all(promises)
+            .then(results => {
+                refreshPluginStatus(selected.value);
+                // 在此处执行下一步操作
+            })
+            .catch(error => {
+                alert("任务执行错误")
+            });
+    })
 };
 const toggleAutoSend = () => {
     isAutoSend.value = !isAutoSend.value;

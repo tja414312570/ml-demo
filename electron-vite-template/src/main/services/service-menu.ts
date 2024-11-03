@@ -158,7 +158,7 @@ const settins_menu: Array<MenuDesc> = [
                     dialog.showMessageBox({
                         title: "关于",
                         type: "info",
-                        message: "electron-Vue框架",
+                        message: "GPT解释器",
                         detail: `版本信息：${version}\n引擎版本：${process.versions.v8
                             }\n当前系统：${type()} ${arch()} ${release()}
                             \n应用路径：${pluginContext.appPath}`,

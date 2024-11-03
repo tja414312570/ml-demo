@@ -1,23 +1,24 @@
 <template>
     <div class="diff-content">
-        <div style="" v-html="view"></div>
-        <div>
+
+        <v-card-text>
+            <div style="" v-html="view"></div>
+        </v-card-text>
+        <v-card-actions>
             <v-progress-circular v-show='!props.isCompleted.value' color="purple" :width="3" indeterminate
                 size="16"></v-progress-circular>
-            <v-btn class="text-none" v-show="isCompleted.value" prepend-icon="mdi-send-outline" @click="send"
+            <v-btn class="text-none" :disabled="!isCompleted.value" prepend-icon="mdi-send-outline" @click="send"
                 size="small" variant="tonal">
                 发送结果
             </v-btn>
-            <v-btn class="text-none" v-show="isCompleted.value" prepend-icon="mdi-close-outline" @click="del"
+            <v-btn class="text-none" :disabled="!isCompleted.value" prepend-icon="mdi-close-outline" @click="del"
                 size="small" variant="tonal">
                 删除结果
             </v-btn>
-            <v-btn class="text-none" v-show="isCompleted.value" prepend-icon="mdi-content-copy" @click="del"
-                size="small" variant="tonal">
+            <v-btn class="text-none" prepend-icon="mdi-content-copy" @click="del" size="small" variant="tonal">
                 复制结果
             </v-btn>
-        </div>
-    </div>
+        </v-card-actions>
     </div>
 </template>
 
