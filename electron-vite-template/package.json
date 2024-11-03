@@ -26,6 +26,7 @@
     "@imengyu/vue3-context-menu": "^1.4.3",
     "@mdi/font": "^7.4.47",
     "@mdi/js": "^7.4.47",
+    "@nut-tree/nut-js": "^3.1.2",
     "ansi-up": "^1.0.0",
     "axios": "^1.7.7",
     "blessed": "^0.1.81",
