@@ -11,13 +11,16 @@ export const DefaultWindowId = {
   LOADING: 'DEFAULT_WINDOW',
   MAIN: 'DEFAULT_MAIN',
 }
+export type ExtBrowserWindowOptions = {
+  showMenu?: boolean
+}
 
 class WindowManager {
   private windowMap: Map<string, BrowserWindow>
   constructor() {
     this.windowMap = new Map();
   }
-  createWindow(windowId: string, options?: BrowserWindowConstructorOptions) {
+  createWindow(windowId: string, options?: BrowserWindowConstructorOptions & ExtBrowserWindowOptions) {
     let window = this.windowMap.get(windowId);
     if (!window) {
       const mergedOptions = _.merge({}, options, {
@@ -32,6 +35,7 @@ class WindowManager {
         }
       });
       window = new BrowserWindow(mergedOptions)
+      window['options'] = mergedOptions;
       this.windowMap.set(windowId, window)
       window.on('closed', () => {
         console.log('主窗口已被销毁');
@@ -76,6 +80,7 @@ class MainInit {
       minWidth: 1366,
       show: false,
       frame: false,
+      showMenu: true,
       webPreferences: {
         // webSecurity: false,
         webviewTag: true,

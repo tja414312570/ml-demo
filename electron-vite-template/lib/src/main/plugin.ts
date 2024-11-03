@@ -48,7 +48,25 @@ export interface ResourceManager {
 export enum ResourceStatus {
     RESOURCE_NOT_FOUND
 }
+export type ISetting = {
+    name: string,
+    key: string,
+    page?: string,
+    path?: string,
+    hide?: boolean,
+    subs?: Array<ISetting> | null;
+}
+export interface ISettingManager {
+    onSettingChange(path: string, callback: (value: any) => void): void;
+    registeSetting(menus: ISetting | ISetting[], path_?: string): void;
+    getSettingValue(key: string): Promise<any>;
+    saveSettingValue(key: string | Record<string, any>, value?: any): Promise<void>;
+    getSettingConfig(): Promise<Record<string, any>>;
+    getSettings(path?: string): ISetting[] | ISetting;
+}
 export interface PluginExtensionContext {
+    settingManager: ISettingManager;
+    envDir: string;
     resourceManager: ResourceManager;
     _pluginPath: string;
     workPath: string;

@@ -19,6 +19,7 @@ export const createWindow = () => {
         width: 960,
         minWidth: 720,
         show: false,
+        frame: false,
         webPreferences: {
             devTools: process.env.NODE_ENV === "development",
             // 在macos中启用橡皮动画

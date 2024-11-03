@@ -1,7 +1,10 @@
 import { send_ipc_render } from "@main/ipc/send_ipc";
-import { ipcMain } from "electron";
+import { app, ipcMain } from "electron";
 import * as pty from 'node-pty';
 import resourceManager from "@main/plugin/resource-manager";
+import settingManager from "./service-setting";
+import path from "path";
+import { pluginContext } from "@lib/main";
 let isinit = false;
 function init() {
     console.log(new Error(isinit + ''))
@@ -10,23 +13,24 @@ function init() {
         throw new Error("已经初始化")
     }
     isinit = true;
+
     try {
         // 创建 PTY 实例
         const shell = process.platform === 'win32' ? 'powershell.exe' : 'bash';
         console.log("启动shell:", shell);
+        const _user_data = app.getPath('userData')
         const ptyProcess = pty.spawn(shell, [], {
             name: 'xterm-color',
             cols: 80,
             rows: 30,
             cwd: process.env.HOME,
-            env: process.env,
+            env: { ...process.env, gpt_interopter: pluginContext.envDir },
         });
         resourceManager.put('pty', ptyProcess)
         // 监听输入事件
         ipcMain.on('pty.terminal-input', (event, input) => {
             ptyProcess.write(input);
         });
-
         // 监听终端数据输出
         ptyProcess.onData((data) => {
             send_ipc_render('pty.terminal-output', data);

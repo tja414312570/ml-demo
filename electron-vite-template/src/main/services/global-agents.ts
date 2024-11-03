@@ -1,9 +1,9 @@
 process.env.DEBUG = 'global-agent';
 import { createGlobalProxyAgent, bootstrap, ProxyAgentConfigurationType } from "global-agent";
-import { getSettingValue, onSettingChange, registeSetting, saveSettingValue } from "./service-setting";
+import settingManager from "./service-setting";
 import '../ipc-bind/proxy-ipc-bind'
 bootstrap();
-registeSetting({
+settingManager.registeSetting({
   name: "代理设置",
   key: "proxy",
 }, 'network')
@@ -70,11 +70,11 @@ export const setProxy = (proxy: Proxy) => {
 
 (async () => {
   // await saveSettingValue('net.proxy', { http: 'http://127.0.0.1:7890', https: 'https://127.0.0.1:7890' });
-  const proxySettings = await getSettingValue('network.proxy') as ProxySettings;
+  const proxySettings = await settingManager.getSettingValue('network.proxy') as ProxySettings;
   const proxy = buildProxy(proxySettings);
   setProxy(proxy)
   console.log("代理设置", proxySettings, proxy)
-  onSettingChange('network.proxy', (value: ProxySettings) => {
+  settingManager.onSettingChange('network.proxy', (value: ProxySettings) => {
     const proxy = buildProxy(value);
     setProxy(proxy)
     console.log("代理设置", value, proxy, getProxy())

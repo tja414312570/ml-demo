@@ -2,7 +2,7 @@ import { IProxyOptions, Proxy } from 'http-mitm-proxy'; // 导入 CommonJS 模�
 
 import { info } from '../utils/logger'
 import pluginManager from '@main/plugin/plugin-manager';
-import { PluginType } from '@lib/main';
+import { PluginStatus, PluginType } from '@lib/main';
 import { Bridge } from '@lib/main';
 import { dispatch } from './dispatcher';
 import portscanner from 'portscanner';
@@ -22,6 +22,14 @@ export const getAgent = (domain: string) => {
     for (const plugin of pluginsOfType) {
       const isMatch = isUrlMatched(domain, plugin.match);
       if (isMatch) {
+        for (const [key] of map) {
+          const value = map.get(key);
+          pluginManager.unload(value['_plugin'])
+          map.delete(key);
+        }
+        if (plugin.status !== PluginStatus.load) {
+          pluginManager.load(plugin as any);
+        }
         module = pluginManager.getModule(plugin as any);
         map.set(domain, module as any);
         break;

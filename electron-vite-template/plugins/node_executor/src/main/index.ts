@@ -247,7 +247,13 @@ class NodeExecutor
 
   onMounted(ctx: PluginExtensionContext): void {
     // 插件挂载时的处理逻辑
-    console.log("插件工作目录:", pluginContext.workPath);
+    pluginContext.notifyManager.notify("正在检查环境");
+    const plugHome = pluginContext.workPath;
+    if (fs.existsSync(plugHome)) {
+      fs.mkdirSync(plugHome, { recursive: true });
+    }
+    if (fs.existsSync(pluginContext.workPath)) {
+    }
   }
 
   onUnmounted(ctx: PluginExtensionContext): void {

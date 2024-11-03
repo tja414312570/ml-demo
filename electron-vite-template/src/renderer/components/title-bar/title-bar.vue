@@ -35,6 +35,7 @@ import { MenuItem } from "./menu/ContextMenuDefine";
 import { MenuBarOptions } from "./menu";
 const isMax = ref(false)
 
+
 const api = getIpcApi('ipc-core.window');
 const coreApi: any = getIpcApi('ipc-core');
 api.invoke('isMaximized').then(result => {
@@ -82,6 +83,7 @@ function wrapperMenu(menu: MenuItem | MenuItem[]): void {
     }
   }
 }
+
 coreApi.invoke('get-menus').then((result: Array<MenuDesc>) => {
   wrapperMenu(result)
   console.log("获取菜单:", result)

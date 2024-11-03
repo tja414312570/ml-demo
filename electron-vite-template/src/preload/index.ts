@@ -8,7 +8,6 @@ import './core-api-pre'
 
 exposeInMainWorld('pty');
 
-
 exposeInMainWorld('ipc-notify', ipcRenderer => ({
   onReady: () => ipcRenderer.send('ready'),
   sendNotification: (message, isError = false) => ipcRenderer.send('notify', { message, isError }),

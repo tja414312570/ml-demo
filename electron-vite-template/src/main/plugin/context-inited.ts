@@ -3,6 +3,7 @@ import { app, dialog, ipcMain } from "electron";
 import { notify } from '@main/ipc/notify-manager';
 import { notifyError } from '@main/ipc/notify-manager';
 import { send_ipc_render } from '@main/ipc/send_ipc';
+import settingManager from '@main/services/service-setting'
 import fs from 'fs';
 import path from 'path';
 
@@ -20,5 +21,10 @@ const init = () => {
     pluginContext.notifyManager = { notify, notifyError } as any
     pluginContext.showDialog = dialog.showMessageBox
     pluginContext.sendIpcRender = send_ipc_render;
+    pluginContext.envDir = path.join(_user_data, 'bin')
+    if (!fs.existsSync(pluginContext.envDir)) {
+        fs.mkdirSync(pluginContext.envDir, { recursive: true });
+    }
+    pluginContext.settingManager = settingManager
 }
 export default init;

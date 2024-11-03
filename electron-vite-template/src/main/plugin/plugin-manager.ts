@@ -64,6 +64,9 @@ class PluginManager {
         const proxyHandler: ProxyHandler<any> | any = {
             _plugin: pluginInfo,
             get(target: any, prop: string) {
+                if (prop === '_plugin') {
+                    return this._plugin;
+                }
                 // // 1. 直接处理特殊属性和 Symbol
                 if (special_key_props.has(prop) || typeof prop === "symbol") {
                     return target[prop];
@@ -115,7 +118,7 @@ class PluginManager {
         })
     }
     public load(pluginInfo: PluginInfo & PluginProxy) {
-        assert.ok(pluginInfo.status === PluginStatus.ready, `插件${pluginInfo.manifest.name}状态不正常：${pluginInfo.status}，不允许加载`)
+        assert.ok(pluginInfo.status === PluginStatus.ready || pluginInfo.status === PluginStatus.unload, `插件${pluginInfo.manifest.name}状态不正常：${pluginInfo.status}，不允许加载`)
         const orgin = require(pluginInfo.main) as any;
         assert.ok(orgin.default, `插件${pluginInfo.manifest.name}的入口文件没有提供默认导出,文件位置:${pluginInfo.manifest.main}`)
         assert.ok(typeof orgin.default === 'object' && orgin.default !== null, `插件${pluginInfo.manifest.name}的入口文件导出非对象,文件位置:${pluginInfo.manifest.main}`)
@@ -143,7 +146,7 @@ class PluginManager {
         pluginInfo.module.onUnmounted(pluginContext);
         pluginInfo.status = PluginStatus.unload;
         pluginContext.remove(pluginInfo);
-        this.remove(pluginInfo)
+        // this.remove(pluginInfo)
         // 清除 require.cache 中的模块缓存
         delete require.cache[require.resolve(pluginInfo.main)];
         delete pluginInfo.module;
