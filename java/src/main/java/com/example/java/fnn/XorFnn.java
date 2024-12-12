@@ -1,4 +1,4 @@
-package com.example.java;
+package com.example.java.fnn;
 
 import lombok.Data;
 import org.springframework.boot.CommandLineRunner;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Random;
 @Component
 @Data
-public class XorFnn implements CommandLineRunner {
+public class XorFnn{
     // 权重和偏置
     double[][] inputToHiddenWeights; // 输入层到隐藏层的权重
     double[] hiddenBiases;           // 隐藏层的偏置
@@ -135,11 +135,5 @@ public class XorFnn implements CommandLineRunner {
         }
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        System.err.println(this);
-        this.train(10000); // 训练10000次
-        System.err.println(this);
-        this.test();       // 测试
-    }
+
 }
