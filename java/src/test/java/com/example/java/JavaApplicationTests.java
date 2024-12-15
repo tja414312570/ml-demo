@@ -86,6 +86,7 @@ class JavaApplicationTests {
 		var mnistViewer = new Window();
 		Window.mnistData = mnistData;
 		System.err.println(mnistData);
+		SimpleCNN.trans(mnistData);
 		mnistViewer.start();
 
 	}
