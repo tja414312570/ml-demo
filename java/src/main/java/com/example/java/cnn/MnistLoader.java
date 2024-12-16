@@ -1,6 +1,7 @@
 package com.example.java.cnn;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.zip.ZipInputStream;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class MnistLoader {
     private final ResourceLoader resourceLoader;
     public record MnistData(double[][] pixels, int label) {}
