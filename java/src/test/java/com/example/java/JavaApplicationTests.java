@@ -103,10 +103,10 @@ class JavaApplicationTests {
 			}
 
 			@Override
-			public void onTestProgress(int currentTest, int totalTests) {
-				if (currentTest % 1000 == 0 || currentTest == totalTests) {
-					System.out.printf("测试进度: %d/%d%n", currentTest, totalTests);
-				}
+			public void onTestProgress(int currentTest, int totalTests, MnistLoader.MnistData sample, int targetLabel) {
+//				if (currentTest % 1000 == 0 || currentTest == totalTests) {
+					System.out.printf("测试进度: %d/%d%n,测试标签:%d，期待标签:%s", currentTest, totalTests,targetLabel,sample.label());
+//				}
 			}
 
 			@Override
@@ -115,7 +115,7 @@ class JavaApplicationTests {
 			}
 		});
 
-		int epochs = 10; // 设置训练轮数
+		int epochs = 1000; // 设置训练轮数
 		simpleCNN.train(trainingData, epochs);
 
 		// 保存模型

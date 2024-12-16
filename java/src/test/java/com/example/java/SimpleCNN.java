@@ -7,14 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
 public class SimpleCNN {
 
     // 全连接层权重
-    private double[] fcWeights;
-    private final double learningRate = 0.001; // 降低学习率
+    private double[][] fcWeights; // [numClasses][inputSize]
+    private static final int NUM_CLASSES = 10; // MNIST有10个类别
 
     // 模型文件路径
     private final String modelFilePath = "fcWeights.model";
@@ -35,17 +36,50 @@ public class SimpleCNN {
 
     // 初始化权重（使用 Xavier 初始化）
     public void initializeWeights(int inputSize) {
-        fcWeights = new double[inputSize];
-        double limit = Math.sqrt(6.0 / (inputSize + 1)); // 假设输出大小为1
-        for (int i = 0; i < fcWeights.length; i++) {
-            fcWeights[i] = (Math.random() * 2 * limit) - limit;
+        fcWeights = new double[NUM_CLASSES][inputSize];
+        double limit = Math.sqrt(6.0 / (inputSize + NUM_CLASSES)); // Xavier初始化
+        for (int c = 0; c < NUM_CLASSES; c++) {
+            for (int i = 0; i < inputSize; i++) {
+                fcWeights[c][i] = (Math.random() * 2 * limit) - limit;
+            }
         }
         log.info("Initialized fully connected layer weights with Xavier initialization.");
     }
 
-    // Sigmoid 激活函数
-    public static double sigmoid(double x) {
-        return 1.0 / (1.0 + Math.exp(-x));
+    // Softmax 激活函数
+    public static double[] softmax(double[] logits) {
+        double max = Double.NEGATIVE_INFINITY;
+        for (double logit : logits) {
+            if (logit > max) {
+                max = logit;
+            }
+        }
+
+        double sum = 0.0;
+        double[] exp = new double[logits.length];
+        for (int i = 0; i < logits.length; i++) {
+            exp[i] = Math.exp(logits[i] - max); // 防止溢出
+            sum += exp[i];
+        }
+
+        double[] probabilities = new double[logits.length];
+        for (int i = 0; i < logits.length; i++) {
+            probabilities[i] = exp[i] / sum;
+        }
+        return probabilities;
+    }
+
+    // 前向传播方法，返回每个类别的输出概率
+    public double[] forward(double[] input) {
+        double[] logits = new double[NUM_CLASSES];
+        for (int c = 0; c < NUM_CLASSES; c++) {
+            double sum = 0;
+            for (int i = 0; i < input.length; i++) {
+                sum += input[i] * fcWeights[c][i];
+            }
+            logits[c] = sum;
+        }
+        return softmax(logits);
     }
 
     // 训练方法
@@ -56,30 +90,35 @@ public class SimpleCNN {
             initializeWeights(pooledSize);
         }
 
+        // 验证并记录部分输入数据
+        if (!trainingData.isEmpty()) {
+            MnistLoader.MnistData sample = trainingData.get(0);
+            log.debug("Sample label: {}", sample.label());
+            log.debug("Sample pixels: {}", Arrays.deepToString(sample.pixels()));
+        }
+
         for (int epoch = 1; epoch <= epochs; epoch++) {
             // 回调：训练开始
             int finalEpoch = epoch;
             trainingCallbacks.forEach(callback -> callback.onEpochStart(finalEpoch, epochs));
 
             double totalLoss = 0;
+            int validSamples = 0; // 计算有效样本数量
+
             for (MnistLoader.MnistData sample : trainingData) {
-                double[][] input = sample.pixels();
+                double[][] inputMatrix = sample.pixels();
                 int label = sample.label();
 
                 // 前向传播
-                double[][] conv = convolve(input, getSobelKernel());
+                double[][] conv = convolve(inputMatrix, getSobelKernel());
                 double[][] activated = relu(conv);
                 double[][] pooled = maxPool(activated, 2);
                 double[] flat = flatten(pooled);
-                double fcOutputRaw = fullyConnected(flat, fcWeights);
-                log.debug("fcOutputRaw: {}", fcOutputRaw);
+                double[] probabilities = forward(flat);
+                log.debug("Probabilities: {}", Arrays.toString(probabilities));
 
-                double fcOutput = sigmoid(fcOutputRaw);
-                log.debug("fcOutput (after sigmoid): {}", fcOutput);
-
-                // 计算损失（平方损失）
-                double target = (label > 4) ? 1.0 : 0.0; // 简单二分类
-                double loss = Math.pow(fcOutput - target, 2);
+                // 计算交叉熵损失
+                double loss = -Math.log(probabilities[label] + 1e-15); // 添加小常数防止log(0)
                 log.debug("loss: {}", loss);
 
                 // 检查 loss 是否为 NaN 或 Infinity
@@ -89,24 +128,43 @@ public class SimpleCNN {
                 }
 
                 totalLoss += loss;
+                validSamples++;
 
-                // 反向传播（更新全连接层权重）
-                double dLoss_dOutput = 2 * (fcOutput - target);
-                log.debug("dLoss_dOutput: {}", dLoss_dOutput);
-
-                // 检查 dLoss_dOutput 是否为 NaN 或 Infinity
-                if (Double.isNaN(dLoss_dOutput) || Double.isInfinite(dLoss_dOutput)) {
-                    log.error("dLoss_dOutput is NaN or Infinite. Skipping weight update.");
-                    continue; // 跳过权重更新
+                // 反向传播（计算梯度并更新权重）
+                // Gradient of loss w.r.t logits
+                double[] dLoss_dLogits = new double[NUM_CLASSES];
+                for (int c = 0; c < NUM_CLASSES; c++) {
+                    dLoss_dLogits[c] = probabilities[c];
                 }
+                dLoss_dLogits[label] -= 1.0; // 对于正确类别
 
-                for (int i = 0; i < fcWeights.length; i++) {
-                    double dOutput_dWeight = flat[i];
-                    fcWeights[i] -= learningRate * dLoss_dOutput * dOutput_dWeight;
+                // 更新权重
+                double learningRate = 0.001;
+                for (int c = 0; c < NUM_CLASSES; c++) {
+                    for (int i = 0; i < flat.length; i++) {
+                        fcWeights[c][i] -= learningRate * dLoss_dLogits[c] * flat[i];
+                    }
                 }
             }
-            double averageLoss = totalLoss / trainingData.size();
-            log.info("Epoch {}/{} - Average Loss: {}", epoch, epochs, String.format("%.4f", averageLoss));
+
+            // 计算平均损失
+            double averageLoss = (validSamples > 0) ? (totalLoss / validSamples) : Double.NaN;
+            log.info("Epoch {}/{} - Average Loss: {}", epoch, epochs,
+                    (Double.isNaN(averageLoss) ? "NaN" : String.format("%.4f", averageLoss)));
+
+            // 训练结束后，记录权重的统计信息
+            double sumWeights = 0;
+            double sumSquares = 0;
+            for (int c = 0; c < NUM_CLASSES; c++) {
+                for (double weight : fcWeights[c]) {
+                    sumWeights += weight;
+                    sumSquares += weight * weight;
+                }
+            }
+            double mean = sumWeights / (fcWeights.length * fcWeights[0].length);
+            double variance = (sumSquares / (fcWeights.length * fcWeights[0].length)) - (mean * mean);
+            double stdDev = Math.sqrt(variance);
+            log.debug("Weights Mean: {}, StdDev: {}", mean, stdDev);
 
             // 回调：训练结束
             int finalEpoch1 = epoch;
@@ -125,34 +183,33 @@ public class SimpleCNN {
         int currentTest = 0;
         for (MnistLoader.MnistData sample : testData) {
             currentTest++;
-            double[][] input = sample.pixels();
+            double[][] inputMatrix = sample.pixels();
             int label = sample.label();
 
-            double[][] conv = convolve(input, getSobelKernel());
+            double[][] conv = convolve(inputMatrix, getSobelKernel());
             double[][] activated = relu(conv);
             double[][] pooled = maxPool(activated, 2);
             double[] flat = flatten(pooled);
-            double fcOutputRaw = fullyConnected(flat, fcWeights);
-            log.debug("fcOutputRaw (test): {}", fcOutputRaw);
+            double[] probabilities = forward(flat);
+            log.debug("Probabilities (test): {}", Arrays.toString(probabilities));
 
-            double fcOutput = sigmoid(fcOutputRaw);
-            log.debug("fcOutput (after sigmoid, test): {}", fcOutput);
-
-            // 检查 fcOutput 是否为 NaN 或 Infinity
-            if (Double.isNaN(fcOutput) || Double.isInfinite(fcOutput)) {
-                log.error("fcOutput is NaN or Infinite during testing. Skipping this sample.");
-                continue; // 跳过这个样本，防止污染准确率
+            // 预测标签为概率最高的类别
+            int predictedLabel = 0;
+            double maxProb = probabilities[0];
+            for (int c = 1; c < NUM_CLASSES; c++) {
+                if (probabilities[c] > maxProb) {
+                    maxProb = probabilities[c];
+                    predictedLabel = c;
+                }
             }
 
-            int predictedLabel = fcOutput > 0.5 ? 1 : 0;
-            int targetLabel = label > 4 ? 1 : 0;
-            if (predictedLabel == targetLabel) {
+            if (predictedLabel == label) {
                 correct++;
             }
-
             // 回调：测试进度
             int finalCurrentTest = currentTest;
-            testingCallbacks.forEach(callback -> callback.onTestProgress(finalCurrentTest, total));
+            int finalPredictedLabel = predictedLabel;
+            testingCallbacks.forEach(callback -> callback.onTestProgress(finalCurrentTest, total,sample, finalPredictedLabel));
         }
         double accuracy = (double) correct / testData.size();
         log.info("Test Accuracy: {}", String.format("%.2f%% (%d / %d)", accuracy * 100, correct, testData.size()));
@@ -174,7 +231,7 @@ public class SimpleCNN {
     // 从文件加载模型权重
     public void loadModel() throws IOException, ClassNotFoundException {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelFilePath))) {
-            fcWeights = (double[]) ois.readObject();
+            fcWeights = (double[][]) ois.readObject();
             log.info("模型已从 {} 加载", modelFilePath);
         }
     }
@@ -254,41 +311,12 @@ public class SimpleCNN {
         return flat;
     }
 
-    // 全连接层
-    public static double fullyConnected(double[] input, double[] weights) {
-        double sum = 0;
-        for (int i = 0; i < input.length; i++) {
-            sum += input[i] * weights[i];
-        }
-        // 假设没有偏置
-        return sum;
-    }
-
-    // 获取Sobel卷积核
+    // 获取Sobel卷积核（水平边缘检测）
     public static double[][] getSobelKernel() {
         return new double[][]{
                 {1, 0, -1},
                 {2, 0, -2},
                 {1, 0, -1}
         };
-    }
-
-    // 打印矩阵
-    public static void printMatrix(double[][] matrix) {
-        for (double[] row : matrix) {
-            for (double val : row) {
-                System.out.printf("%.2f\t", val);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    // 打印向量
-    public static void printVector(double[] vector) {
-        for (double val : vector) {
-            System.out.printf("%.2f\t", val);
-        }
-        System.out.println("\n");
     }
 }
