@@ -21,18 +21,8 @@ public class SimpleCNN {
     private final String modelFilePath = "fcWeights.model";
 
     // 回调列表
-    private final List<TrainingCallback> trainingCallbacks = new ArrayList<>();
-    private final List<TestingCallback> testingCallbacks = new ArrayList<>();
-
-    // 方法用于注册训练回调
-    public void addTrainingCallback(TrainingCallback callback) {
-        trainingCallbacks.add(callback);
-    }
-
-    // 方法用于注册测试回调
-    public void addTestingCallback(TestingCallback callback) {
-        testingCallbacks.add(callback);
-    }
+    private TrainingCallback trainingCallbacks ;
+    private TestingCallback testingCallbacks;
 
     // 初始化权重（使用 Xavier 初始化）
     public void initializeWeights(int inputSize) {
@@ -100,7 +90,7 @@ public class SimpleCNN {
         for (int epoch = 1; epoch <= epochs; epoch++) {
             // 回调：训练开始
             int finalEpoch = epoch;
-            trainingCallbacks.forEach(callback -> callback.onEpochStart(finalEpoch, epochs));
+            trainingCallbacks.onEpochStart(finalEpoch, epochs);
 
             double totalLoss = 0;
             int validSamples = 0; // 计算有效样本数量
@@ -168,7 +158,7 @@ public class SimpleCNN {
 
             // 回调：训练结束
             int finalEpoch1 = epoch;
-            trainingCallbacks.forEach(callback -> callback.onEpochEnd(finalEpoch1, averageLoss));
+            trainingCallbacks.onEpochEnd(finalEpoch1, averageLoss);
         }
     }
 
@@ -178,7 +168,7 @@ public class SimpleCNN {
         int total = testData.size();
 
         // 回调：测试开始
-        testingCallbacks.forEach(callback -> callback.onTestStart(total));
+        testingCallbacks.onTestStart(total);
 
         int currentTest = 0;
         for (MnistLoader.MnistData sample : testData) {
@@ -209,13 +199,13 @@ public class SimpleCNN {
             // 回调：测试进度
             int finalCurrentTest = currentTest;
             int finalPredictedLabel = predictedLabel;
-            testingCallbacks.forEach(callback -> callback.onTestProgress(finalCurrentTest, total,sample, finalPredictedLabel));
+            testingCallbacks.onTestProgress(finalCurrentTest, total,sample, finalPredictedLabel);
         }
         double accuracy = (double) correct / testData.size();
         log.info("Test Accuracy: {}", String.format("%.2f%% (%d / %d)", accuracy * 100, correct, testData.size()));
 
         // 回调：测试结束
-        testingCallbacks.forEach(callback -> callback.onTestEnd(accuracy));
+        testingCallbacks.onTestEnd(accuracy);
 
         return accuracy;
     }
