@@ -50,6 +50,9 @@ repositories {
 }
 
 dependencies {
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-aop
+	implementation 'org.springframework.boot:spring-boot-starter-aop:3.4.0'
+
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation "org.openjfx:javafx-controls:${javafxVersion}"
@@ -70,6 +73,9 @@ dependencies {
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// https://mvnrepository.com/artifact/org.knowm.xchart/xchart
+	implementation 'org.knowm.xchart:xchart:3.8.8'
+
 
 	// https://mvnrepository.com/artifact/ai.djl/api
 	implementation 'ai.djl:api:0.31.0'
