@@ -1,4 +1,4 @@
-package com.example.java.callbacks;
+package com.example.java.cnn.callbacks;
 
 import com.example.java.cnn.MnistLoader;
 

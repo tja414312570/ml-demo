@@ -1,8 +1,8 @@
 // 文件: SimpleCNN.java
-package com.example.java;
+package com.example.java.cnn;
 
-import com.example.java.callbacks.TestingCallback;
-import com.example.java.callbacks.TrainingCallback;
+import com.example.java.cnn.callbacks.TestingCallback;
+import com.example.java.cnn.callbacks.TrainingCallback;
 import com.example.java.cnn.MnistLoader.MnistData;
 // 文件: SimpleCNN.java
 

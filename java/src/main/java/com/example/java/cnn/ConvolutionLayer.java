@@ -1,9 +1,9 @@
 // 文件: ConvolutionLayer.java
-package com.example.java;
+package com.example.java.cnn;
 
 import java.util.Arrays;
 
-import static com.example.java.SimpleCNNs.L2_REGULARIZATION;
+import static com.example.java.cnn.SimpleCNNs.L2_REGULARIZATION;
 
 /**
  * 卷积层实现，支持多输入通道和多输出通道。

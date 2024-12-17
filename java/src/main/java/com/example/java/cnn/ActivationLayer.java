@@ -1,5 +1,5 @@
 // 文件: ActivationLayer.java
-package com.example.java;
+package com.example.java.cnn;
 
 /**
  * ReLU激活层实现。

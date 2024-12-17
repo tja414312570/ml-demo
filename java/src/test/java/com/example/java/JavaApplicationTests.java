@@ -1,7 +1,8 @@
 package com.example.java;
 
-import com.example.java.callbacks.TestingCallback;
-import com.example.java.callbacks.TrainingCallback;
+import com.example.java.cnn.SimpleCNNs;
+import com.example.java.cnn.callbacks.TestingCallback;
+import com.example.java.cnn.callbacks.TrainingCallback;
 import com.example.java.cnn.MnistLoader;
 import com.example.java.fnn.XorFnn;
 import org.apache.commons.codec.digest.DigestUtils;

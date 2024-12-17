@@ -1,5 +1,5 @@
 // 文件: Layer.java
-package com.example.java;
+package com.example.java.cnn;
 
 /**
  * 网络层接口，所有网络层都需要实现该接口。

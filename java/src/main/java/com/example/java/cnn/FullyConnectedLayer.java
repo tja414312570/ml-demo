@@ -1,9 +1,9 @@
 // 文件: FullyConnectedLayer.java
-package com.example.java;
+package com.example.java.cnn;
 
 import java.util.Arrays;
 
-import static com.example.java.SimpleCNNs.L2_REGULARIZATION;
+import static com.example.java.cnn.SimpleCNNs.L2_REGULARIZATION;
 
 /**
  * 全连接层实现，包含权重和偏置，使用Adam优化器。

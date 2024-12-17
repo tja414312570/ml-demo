@@ -1,5 +1,5 @@
 // 文件: DropoutLayer.java
-package com.example.java;
+package com.example.java.cnn;
 
 import java.util.Random;
 

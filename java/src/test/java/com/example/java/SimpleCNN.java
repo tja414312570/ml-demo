@@ -1,12 +1,11 @@
 package com.example.java;
 
 import com.example.java.cnn.MnistLoader;
-import com.example.java.callbacks.TestingCallback;
-import com.example.java.callbacks.TrainingCallback;
+import com.example.java.cnn.callbacks.TestingCallback;
+import com.example.java.cnn.callbacks.TrainingCallback;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 

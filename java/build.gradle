@@ -71,6 +71,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// https://mvnrepository.com/artifact/ai.djl/api
+	implementation 'ai.djl:api:0.31.0'
+// https://mvnrepository.com/artifact/ai.djl.mxnet/mxnet-engine
+	runtimeOnly 'ai.djl.mxnet:mxnet-engine:0.31.0'
+// https://mvnrepository.com/artifact/ai.djl.mxnet/mxnet-native-auto
+	runtimeOnly 'ai.djl.mxnet:mxnet-native-auto:1.8.0'
+// https://mvnrepository.com/artifact/tech.tablesaw/tablesaw-jsplot
+	implementation 'tech.tablesaw:tablesaw-jsplot:0.43.1'
+
 }
 
 tasks.named('test') {

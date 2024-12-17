@@ -1,4 +1,4 @@
-package com.example.java;
+package com.example.java.cnn;
 
 // 文件: SoftmaxLayer.java
 
