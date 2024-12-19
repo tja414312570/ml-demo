@@ -3,12 +3,14 @@ package com.example.java;
 import com.example.java.cnn.MnistLoader;
 import com.example.java.cnn.callbacks.TestingCallback;
 import com.example.java.cnn.callbacks.TrainingCallback;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 
+@Data
 @Slf4j
 public class SimpleCNN {
 

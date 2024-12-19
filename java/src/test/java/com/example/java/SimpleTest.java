@@ -2,7 +2,10 @@ package com.example.java;
 
 import ai.djl.ndarray.NDArray;
 import ai.djl.ndarray.NDManager;
+import ai.djl.ndarray.index.NDIndex;
 import ai.djl.ndarray.types.DataType;
+import ai.djl.ndarray.types.Shape;
+import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,5 +98,26 @@ public class SimpleTest {
                 .build();
 
         return new Figure(layout, trace, trace2);
+    }
+
+    @Test
+    void testAdd(){
+        int n = 10000;
+        NDManager manager = NDManager.newBaseManager();
+        NDArray a = manager.ones(new Shape(n));
+        NDArray b = manager.ones(new Shape(n));
+        NDArray c = manager.zeros(new Shape(n));
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        for (int i = 0; i < n; i++) {
+            c.set(new NDIndex(i), a.getFloat(i) + b.getFloat(i));
+        }
+        stopWatch.stop();
+        System.out.printf("1: %d sec\n",stopWatch.getNanoTime() );
+        stopWatch.reset();
+        stopWatch.start();
+        NDArray d = a.add(b);
+        stopWatch.stop();
+        System.out.printf("2: %d sec\n",stopWatch.getNanoTime());
     }
 }
