@@ -10,6 +10,7 @@ import com.example.java.cnn.layers.ConvLayer;
 import com.example.java.cnn.layers.FCLayer;
 import com.example.java.cnn.layers.PoolLayer;
 import com.example.java.fnn.XorFnn;
+import lombok.Setter;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @SpringBootTest
+@Setter
 class JavaApplicationTests {
 	@Autowired
 	private XorFnn xorFnn;
@@ -113,10 +115,13 @@ class JavaApplicationTests {
 		mnistViewer.start();
 
 	}
+
 	@Test
 	void mnist2() throws IOException {
-		List<MnistLoader.MnistData> trainingData = mnistLoader.loadMnistData("classpath:/dataset/mnist/t10k-images-idx3-ubyte.zip",
-				"classpath:/dataset/mnist/t10k-labels-idx1-ubyte.zip");
+		List<MnistLoader.MnistData> trainingData = mnistLoader.loadMnistData(
+				"classpath:/dataset/mnist/t10k-images-idx3-ubyte.zip",
+				"classpath:/dataset/mnist/t10k-labels-idx1-ubyte.zip"
+		);
 //		var mnistViewer = new Window();
 		// 初始化神经网络
 		NeuralNetwork network = new NeuralNetwork();

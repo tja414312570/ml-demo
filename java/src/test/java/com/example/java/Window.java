@@ -48,7 +48,7 @@ public class Window extends Application {
         listView.getItems().addAll(groupedData);
 
         // 设置自定义 ListCell
-        listView.setCellFactory(_ -> new MnistListCell());
+        listView.setCellFactory(item -> new MnistListCell());
 
         // 使用 BorderPane 作为根布局
         BorderPane root = new BorderPane();

@@ -20,7 +20,7 @@ javafx {
 }
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(23)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 
@@ -91,7 +91,6 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-tasks.withType(JavaExec) {
-	// 设置模块路径，确保 JavaFX 库可以被找到
+tasks.named('run', JavaExec) {
 	jvmArgs = ['--module-path', classpath.asPath, '--add-modules', 'javafx.controls,javafx.fxml']
 }
