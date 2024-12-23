@@ -92,5 +92,9 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 tasks.named('run', JavaExec) {
-	jvmArgs = ['--module-path', classpath.asPath, '--add-modules', 'javafx.controls,javafx.fxml']
+	jvmArgs = [
+			'--module-path', classpath.asPath,
+			   '--add-modules', 'javafx.controls,javafx.fxml',
+			   '-Xshare:off'
+	]
 }
